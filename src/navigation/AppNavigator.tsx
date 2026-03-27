@@ -8,6 +8,7 @@ import type {
   DashboardStackParamList, 
   InventoryStackParamList, 
   TimeStackParamList,
+  LeaveStackParamList,
   SettingsStackParamList,
 } from '../types/navigation-params';
 
@@ -22,12 +23,18 @@ import SettingsScreen from '../screens/SettingsScreen';
 import POSCheckoutScreen from '../screens/POSCheckoutScreen';
 import POSReceiptScreen from '../screens/POSReceiptScreen';
 
+// Leave sub-screens
+import LeaveRequestsScreen from '../screens/LeaveRequestsScreen';
+import LeaveApprovalsScreen from '../screens/LeaveApprovalsScreen';
+import LeaveBalanceScreen from '../screens/LeaveBalanceScreen';
+
 // Navigation instances
 const Tab = createBottomTabNavigator<BottomTabsParamList>();
 const POSStack = createNativeStackNavigator<POSStackParamList>();
 const DashboardStack = createNativeStackNavigator<DashboardStackParamList>();
 const InventoryStack = createNativeStackNavigator<InventoryStackParamList>();
 const TimeStack = createNativeStackNavigator<TimeStackParamList>();
+const LeaveStack = createNativeStackNavigator<LeaveStackParamList>();
 const SettingsStack = createNativeStackNavigator<SettingsStackParamList>();
 
 /**
@@ -124,6 +131,36 @@ function TimeStackNavigator() {
 }
 
 /**
+ * Leave Stack Navigator
+ * Handles navigation: LeaveRequests (tab) → LeaveApprovals, LeaveBalance
+ */
+function LeaveStackNavigator() {
+  return (
+    <LeaveStack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <LeaveStack.Screen
+        name="LeaveRequests"
+        component={LeaveRequestsScreen}
+        options={{ title: 'Leave Requests' }}
+      />
+      <LeaveStack.Screen
+        name="LeaveApprovals"
+        component={LeaveApprovalsScreen}
+        options={{ title: 'Leave Approvals' }}
+      />
+      <LeaveStack.Screen
+        name="LeaveBalance"
+        component={LeaveBalanceScreen}
+        options={{ title: 'Leave Balance' }}
+      />
+    </LeaveStack.Navigator>
+  );
+}
+
+/**
  * Settings Stack Navigator
  */
 function SettingsStackNavigator() {
@@ -164,6 +201,8 @@ export default function AppNavigator() {
             iconName = 'package-variant';
           } else if (route.name === 'TimeTab') {
             iconName = 'clock-outline';
+          } else if (route.name === 'LeaveTab') {
+            iconName = 'calendar-heart';
           } else if (route.name === 'SettingsTab') {
             iconName = 'cog-outline';
           }
@@ -213,6 +252,13 @@ export default function AppNavigator() {
         component={TimeStackNavigator}
         options={{
           tabBarLabel: 'Time',
+        }}
+      />
+      <Tab.Screen
+        name="LeaveTab"
+        component={LeaveStackNavigator}
+        options={{
+          tabBarLabel: 'Leave',
         }}
       />
       <Tab.Screen

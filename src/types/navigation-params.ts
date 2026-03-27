@@ -12,6 +12,7 @@ export type BottomTabsParamList = {
   DashboardTab: undefined;
   InventoryTab: undefined;
   TimeTab: undefined;
+  LeaveTab: undefined;
   SettingsTab: undefined;
 };
 
@@ -73,6 +74,13 @@ export type TimeStackParamList = {
     startDate?: string;
     endDate?: string;
   };
+};
+
+// Leave Stack (Nested within LeaveTab)
+export type LeaveStackParamList = {
+  LeaveRequests: undefined;
+  LeaveApprovals: undefined;
+  LeaveBalance: undefined;
 };
 
 // Settings Stack (Nested within SettingsTab)

@@ -78,12 +78,14 @@ const time = {
 const leaveAll = ['leave'] as const;
 const leave = {
   all: leaveAll,
+  types: () => [...leaveAll, 'types'] as const,
+  balance: () => [...leaveAll, 'balance'] as const,
+  myRequests: (limit?: number, offset?: number) =>
+    [...leaveAll, 'requests', 'my', { limit, offset }] as const,
+  pendingApprovals: (limit?: number, offset?: number) =>
+    [...leaveAll, 'requests', 'approvals', { limit, offset }] as const,
+  detail: (id: string) => [...leaveAll, 'requests', id] as const,
   balances: () => [...leaveAll, 'balances'] as const,
-  requests: {
-    all: [...leaveAll, 'requests'] as const,
-    list: () => [...leaveAll, 'requests', 'list'] as const,
-    detail: (id: string) => [...leaveAll, 'requests', id] as const,
-  },
   policies: () => [...leaveAll, 'policies'] as const,
 } as const;
 
