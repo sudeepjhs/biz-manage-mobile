@@ -1,3 +1,19 @@
 module.exports = {
-  presets: ['module:@react-native/babel-preset'],
+  presets: ['@react-native/babel-preset'],
+  plugins: [
+    [
+      'module-resolver',
+      {
+        alias: {
+          '@lib': './src/lib',
+          '@store': './src/store',
+          '@hooks': './src/hooks',
+          '@screens': './src/screens',
+          '@navigation': './src/navigation',
+          '@components': './src/components',
+          '@types': './src/types',
+        },
+      },
+    ],
+  ],
 };

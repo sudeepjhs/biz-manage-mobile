@@ -1,97 +1,292 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Mobile App
 
-# Getting Started
+React Native mobile application for BizManage, providing iOS and Android versions of the web app.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## Prerequisites
 
-## Step 1: Start Metro
+- Node.js >= 18
+- pnpm >= 9
+- Xcode 15+ (for iOS development)
+- Android Studio & Android SDK (for Android development)
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+## Quick Start
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+### 1. Install Dependencies
 
-```sh
-# Using npm
-npm start
-
-# OR using Yarn
-yarn start
+```bash
+pnpm install
 ```
 
-## Step 2: Build and run your app
+### 2. Environment Setup
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+Copy `.env.example` to `.env.local` and update values:
 
-### Android
-
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
+```bash
+cp .env.example .env.local
 ```
+
+### 3. Development
+
+#### iOS
+
+```bash
+# Install pods (first time only)
+cd ios && pod install && cd ..
+
+# Start dev server
+pnpm start
+
+# In another terminal, run on simulator
+pnpm ios
+```
+
+#### Android
+
+```bash
+# Start dev server (if not already running)
+pnpm start
+
+# In another terminal, run on emulator/device
+pnpm android
+```
+
+## Project Structure
+
+```
+src/
+├── App.tsx              # Root component with providers
+├── index.tsx            # App entry point
+├── components/          # Reusable UI components (Phase 2)
+├── screens/             # Feature screens
+│   ├── LoginScreen.tsx
+│   ├── DashboardScreen.tsx
+│   ├── POSScreen.tsx
+│   ├── InventoryScreen.tsx
+│   ├── TimeClockScreen.tsx
+│   └── SettingsScreen.tsx
+├── navigation/          # React Navigation setup
+│   └── AppNavigator.tsx
+├── hooks/               # Custom React hooks
+│   ├── useApi.ts
+│   ├── useAuth.ts
+│   └── usePOSCart.ts
+├── lib/                 # Utility & helper functions
+│   ├── api-client.ts    # Axios with JWT interceptor
+│   ├── theme.ts         # Paper theme configuration
+│   ├── query-keys.ts    # React Query key factory
+│   └── ...
+├── store/               # Zustand state stores
+│   ├── authStore.ts     # Authentication state
+│   └── posStore.ts      # POS cart state
+├── config/              # Configuration & constants
+│   ├── index.ts
+│   └── API.ts
+└── types/               # TypeScript type definitions
+    ├── navigation.ts
+    └── api.ts
+```
+
+## Tech Stack
+
+- **React Native** 0.74.5 - Cross-platform native development
+- **React Native Paper** 5.14.0 - Material Design 3 UI components
+- **React Navigation** 7.2.0 - Native navigation library
+- **Zustand** 5.1.7 - Lightweight state management
+- **TanStack React Query** 5.64.0 - Server state management & caching
+- **Axios** 1.7.0 - HTTP client with JWT interceptor
+- **AsyncStorage** 1.24.1 - Persistent local storage
+- **Zod** 3.24.8 - TypeScript-first schema validation
+- **date-fns** 4.1.0 - Date manipulation utilities
+
+## API Integration
+
+The mobile app connects to the same REST API as the web app. Authentication uses JWT tokens:
+
+1. User logs in with email/password
+2. Server returns JWT token and user info
+3. Token is stored in AsyncStorage (persisted across sessions)
+4. All API requests include `Authorization: Bearer <token>` header
+5. On 401 response, token is cleared and user is redirected to login
+
+## State Management
+
+### Authentication (Zustand)
+
+- Persisted auth state (token, user info)
+- Automatic restoration on app launch
+- 401 interceptor triggers logout
+
+### POS Cart (Zustand)
+
+- Shopping cart state
+- Persisted to AsyncStorage
+- Cleared on successful checkout
+
+### Server State (React Query)
+
+- API data caching with 5-min stale time
+- Automatic refetching when stale
+- Mutation support for create/update/delete operations
+
+## Code Generation
+
+Type-safe API response schemas via Zod:
+
+```typescript
+import { z } from 'zod';
+
+const ProductSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  price: z.number(),
+});
+
+type Product = z.infer<typeof ProductSchema>;
+```
+
+## Testing
+
+```bash
+# Run unit tests
+pnpm test
+
+# Run with coverage
+pnpm test --coverage
+
+# Watch mode
+pnpm test --watch
+```
+
+## Linting & Type Checking
+
+```bash
+# Lint code
+pnpm lint
+
+# Type check TypeScript
+pnpm type-check
+
+# Format code
+pnpm prettier --write .
+```
+
+## Build for Production
 
 ### iOS
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
+```bash
+cd ios
+xcodebuild -workspace BizManageMobile.xcworkspace \
+  -scheme BizManageMobile \
+  -configuration Release \
+  -derivedDataPath build
 ```
 
-Then, and every time you update your native dependencies, run:
+### Android
 
-```sh
-bundle exec pod install
+```bash
+cd android
+./gradlew assembleRelease
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+## Environment Variables
 
-```sh
-# Using npm
-npm run ios
+### Available Variables
 
-# OR using Yarn
-yarn ios
+- `EXPO_PUBLIC_API_URL` - Backend API base URL (required)
+- `DEBUG` - Enable debug logging
+- `ENABLE_BIOMETRIC` - Enable biometric auth (Phase 2)
+- `ENABLE_OFFLINE_MODE` - Enable offline support
+- `ENABLE_ANALYTICS` - Enable analytics tracking
+
+## Troubleshooting
+
+### Metro Bundler Issues
+
+```bash
+# Clear cache
+pnpm start -- --reset-cache
+
+# or manually
+rm -rf $TMPDIR/metro-bundler-cache-* || rm -rf /tmp/metro-bundler-cache-*
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+### Pod Dependencies (iOS)
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+```bash
+cd ios
+rm -rf Pods
+pod install
+cd ..
+```
 
-## Step 3: Modify your app
+### Android Build Issues
 
-Now that you have successfully run the app, let's make changes!
+```bash
+cd android
+./gradlew clean
+cd ..
+pnpm android
+```
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+## Features
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+### Phase 1 (Current - MVP Core)
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+- ✅ Authentication (JWT login)
+- ✅ Root navigation setup
+- ✅ Theme system (Material Design 3)
+- ✅ API client integration
+- ⏳ Dashboard (pending Phase 2)
+- ⏳ POS (pending Phase 2)
+- ⏳ Inventory (pending Phase 2)
+- ⏳ Time Clock (pending Phase 2)
 
-## Congratulations! :tada:
+### Phase 2 (Full Feature Implementation)
 
-You've successfully run and modified your React Native App. :partying_face:
+- [ ] Dashboard with real data
+- [ ] POS with product search & checkout
+- [ ] Inventory management & stock movements
+- [ ] Time clock & timesheet entry
+- [ ] Biometric authentication
 
-### Now what?
+### Phase 3 (Optimization & Polish)
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+- [ ] Offline mode with sync queue
+- [ ] Push notifications
+- [ ] Analytics tracking
+- [ ] Performance optimization
 
-# Troubleshooting
+## Development Guide
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+### Adding a Screen
 
-# Learn More
+1. Create file in `src/screens/MyScreen.tsx`
+2. Add to navigation in `src/navigation/AppNavigator.tsx`
+3. Create associated navigation type in `src/types/navigation.ts`
+4. Add route in stack navigator
 
-To learn more about React Native, take a look at the following resources:
+### Adding a Store
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+1. Create file in `src/store/myStore.ts`
+2. Use Zustand with AsyncStorage middleware for persistence
+3. Export custom hook for component access
+
+### Adding an API Endpoint
+
+1. Add endpoint to `src/config/API.ts`
+2. Add query key to `src/lib/query-keys.ts`
+3. Create custom hook in `src/hooks/` if needed
+4. Use `useApi()` or `useQuery()` in components
+
+## Support & Documentation
+
+- [React Native Documentation](https://reactnative.dev)
+- [React Native Paper](https://reactnativepaper.com)
+- [React Navigation](https://reactnavigation.org)
+- [Zustand](https://github.com/pmndrs/zustand)
+- [React Query](https://tanstack.com/query/latest)
+
+## License
+
+Same as main BizManage project.

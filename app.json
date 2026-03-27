@@ -1,4 +1,30 @@
 {
-  "name": "mobile",
-  "displayName": "mobile"
+  "name": "BizManageMobile",
+  "displayName": "Biz Manage",
+  "version": "0.1.0",
+  "expo": {
+    "name": "Biz Manage",
+    "slug": "biz-manage-mobile",
+    "version": "0.1.0",
+    "scheme": "bizmanage",
+    "platforms": ["ios", "android"],
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0f172a"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "plugins": [
+      [
+        "react-native-vector-icons",
+        {
+          "fonts": [
+            "MaterialCommunityIcons.ttf",
+            "MaterialIcons.ttf"
+          ]
+        }
+      ]
+    ]
+  }
 }
