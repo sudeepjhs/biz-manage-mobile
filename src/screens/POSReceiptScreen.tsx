@@ -1,23 +1,23 @@
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useCallback } from 'react';
 import {
-  View,
-  StyleSheet,
   ScrollView,
   Share,
+  StyleSheet,
+  View,
 } from 'react-native';
 import {
-  useTheme,
-  Card,
-  Text,
   Button,
+  Card,
   Divider,
+  Text,
+  useTheme,
 } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { SafeHeader, LoadingOverlay } from '../components';
-import type { POSStackParamList } from '../types/navigation-params';
-import { SPACING, LAYOUT } from '../lib/ui-utils';
+import { SafeHeader } from '@components/ui';
+import { LAYOUT, SPACING } from '@lib/ui-utils';
+import type { POSStackParamList } from "../types/navigation-params";
 
 type Props = NativeStackScreenProps<POSStackParamList, 'POSReceipt'>;
 
@@ -38,8 +38,8 @@ export default function POSReceiptScreen({ route, navigation }: Props) {
   // Format date safely
   const formattedDate = React.useMemo(() => {
     try {
-      const date = receipt.timestamp instanceof Date 
-        ? receipt.timestamp 
+      const date = receipt.timestamp instanceof Date
+        ? receipt.timestamp
         : new Date(receipt.timestamp);
       return date.toLocaleString();
     } catch {

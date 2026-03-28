@@ -1,22 +1,20 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
-  View,
-  StyleSheet,
   FlatList,
   RefreshControl,
+  StyleSheet,
+  View,
 } from 'react-native';
-import { useTheme, Card, Text, IconButton, Badge } from 'react-native-paper';
+import { Badge, Card, IconButton, Text, useTheme } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
-  SearchBar,
-  ListItem,
-  LoadingOverlay,
-  ErrorAlert,
   EmptyState,
-} from '../components';
-import { useInventoryProducts, useLowStockAlerts } from '../hooks/useInventory';
-import { SPACING, LAYOUT, SHADOWS } from '../lib/ui-utils';
+  ErrorAlert,
+  LoadingOverlay,
+  SearchBar
+} from '@components/index';
+import { useInventoryProducts, useLowStockAlerts } from '@hooks/useInventory';
+import { LAYOUT, SHADOWS, SPACING } from '@lib/ui-utils';
 
 export default function InventoryScreen() {
   const theme = useTheme();

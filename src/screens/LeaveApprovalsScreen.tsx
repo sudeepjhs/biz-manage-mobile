@@ -23,14 +23,14 @@ import {
   LoadingOverlay,
   ErrorAlert,
   EmptyState,
-} from '../components';
+} from '@components/index';
 import {
   usePendingLeaveApprovals,
   useApproveLeaveRequest,
   LeaveRequest,
-} from '../hooks/useLeave';
-import { useApiError } from '../hooks/useApiError';
-import { SPACING, LAYOUT } from '../lib/ui-utils';
+} from '@hooks/useLeave';
+import { useApiError } from '@hooks/useApiError';
+import { SPACING, LAYOUT } from '@lib/ui-utils';
 
 /**
  * Leave Approvals Screen (Manager View)

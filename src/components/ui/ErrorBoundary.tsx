@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { SPACING, LAYOUT } from '../../lib/ui-utils';
+import { SPACING, LAYOUT } from '@lib/ui-utils';
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;

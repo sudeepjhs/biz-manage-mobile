@@ -1,26 +1,25 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
-  View,
-  StyleSheet,
   FlatList,
   RefreshControl,
-  Dimensions,
+  StyleSheet,
+  View
 } from 'react-native';
-import { useTheme, Card, Text, Button, ActivityIndicator } from 'react-native-paper';
+import { Button, Card, Text, useTheme } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
-  LoadingOverlay,
-  ErrorAlert,
   EmptyState,
-} from '../components';
+  ErrorAlert,
+  LoadingOverlay,
+} from '@components/index';
 import {
   useClockIn,
   useClockOut,
   useClockStatus,
   useTodayTimeEntries,
-} from '../hooks/useTime';
-import { SPACING, LAYOUT, SHADOWS } from '../lib/ui-utils';
+} from '@hooks/useTime';
+import { LAYOUT, SHADOWS, SPACING } from '@lib/ui-utils';
 
 export default function TimeClockScreen() {
   const theme = useTheme();

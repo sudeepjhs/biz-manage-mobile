@@ -1,27 +1,27 @@
-import React, { useState, useCallback, useMemo } from 'react';
 import {
-  View,
-  StyleSheet,
-  FlatList,
-  RefreshControl,
-  Dimensions,
-} from 'react-native';
-import { useTheme, FAB, Text } from 'react-native-paper';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import {
-  ProductCard,
-  CategoryTabs,
-  SearchBar,
   BottomSheet,
   CartItem,
   CartSummary,
-  LoadingOverlay,
-  ErrorAlert,
+  CategoryTabs,
   EmptyState,
-} from '../components';
-import { useProducts, useCategories, POSProduct, POSCategory } from '../hooks/usePOS';
-import { usePOSCart } from '../hooks/usePOSCart';
-import { SPACING, LAYOUT } from '../lib/ui-utils';
+  ErrorAlert,
+  LoadingOverlay,
+  ProductCard,
+  SearchBar,
+} from '@components/index';
+import { POSCategory, POSProduct, useCategories, useProducts } from '@hooks/usePOS';
+import { usePOSCart } from '@hooks/usePOSCart';
+import { LAYOUT, SPACING } from '@lib/ui-utils';
+import React, { useCallback, useMemo, useState } from 'react';
+import {
+  Dimensions,
+  FlatList,
+  RefreshControl,
+  StyleSheet,
+  View,
+} from 'react-native';
+import { FAB, useTheme } from 'react-native-paper';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const PRODUCT_COLUMNS = 2;

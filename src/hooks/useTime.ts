@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import apiClient from '../lib/api-client';
-import { API_ENDPOINTS } from '../config/API';
-import { queryKeys } from '../lib/query-keys';
+import apiClient from '@lib/api-client';
+import { API_ENDPOINTS } from '@config/API';
+import { queryKeys } from '@lib/query-keys';
 
 /**
  * Time Clock Types

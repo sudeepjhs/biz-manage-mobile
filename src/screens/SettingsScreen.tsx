@@ -1,28 +1,27 @@
-import React, { useState, useCallback } from 'react';
 import {
-  View,
-  StyleSheet,
-  ScrollView,
+  ConfirmDialog,
+  ErrorAlert,
+  LoadingOverlay
+} from '@components/index';
+import { useAuth, useNotificationSettings, useUserProfile } from "@hooks/index";
+import { LAYOUT, SHADOWS, SPACING } from '@lib/ui-utils';
+import React, { useCallback, useState } from 'react';
+import {
   RefreshControl,
+  ScrollView,
+  StyleSheet,
+  View,
 } from 'react-native';
 import {
-  useTheme,
-  Card,
-  Text,
-  Switch,
   Button,
+  Card,
   Divider,
+  Switch,
+  Text,
+  useTheme,
 } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {
-  LoadingOverlay,
-  ErrorAlert,
-  ConfirmDialog,
-  ListItem,
-} from '../components';
-import { useUserProfile, useNotificationSettings, useAuth } from "../hooks";
-import { SPACING, LAYOUT, SHADOWS } from '../lib/ui-utils';
 
 export default function SettingsScreen() {
   const theme = useTheme();
@@ -247,7 +246,7 @@ export default function SettingsScreen() {
                       {setting.description}
                     </Text>
                   </View>
-                  <Switch value={setting.value} onValueChange={() => {}} />
+                  <Switch value={setting.value} onValueChange={() => { }} />
                 </View>
                 {index < 4 && <Divider />}
               </View>
@@ -285,7 +284,7 @@ export default function SettingsScreen() {
                   Use dark theme
                 </Text>
               </View>
-              <Switch value={false} onValueChange={() => {}} />
+              <Switch value={false} onValueChange={() => { }} />
             </View>
             <Divider />
             <View
@@ -304,7 +303,7 @@ export default function SettingsScreen() {
                   Use fingerprint/face ID
                 </Text>
               </View>
-              <Switch value={false} onValueChange={() => {}} />
+              <Switch value={false} onValueChange={() => { }} />
             </View>
           </Card.Content>
         </Card>

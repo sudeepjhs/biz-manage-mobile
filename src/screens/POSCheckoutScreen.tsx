@@ -23,11 +23,11 @@ import {
   ErrorAlert,
   CartSummary,
   ConfirmDialog,
-} from '../components';
-import { usePOSCart } from '../hooks/usePOSCart';
-import { useCheckout, POSProduct } from '../hooks/usePOS';
-import { useApiError } from '../hooks/useApiError';
-import { SPACING, LAYOUT } from '../lib/ui-utils';
+} from '@components/index';
+import { usePOSCart } from '@hooks/usePOSCart';
+import { useCheckout, POSProduct } from '@hooks/usePOS';
+import { useApiError } from '@hooks/useApiError';
+import { SPACING, LAYOUT } from '@lib/ui-utils';
 
 interface CheckoutParams {
   onSuccess?: () => void;
@@ -94,7 +94,7 @@ export default function POSCheckoutScreen(params?: CheckoutParams) {
       };
 
       await checkoutMutation.mutateAsync(checkoutData as never);
-      
+
       // Success: complete checkout and notify
       completeCheckout();
       params?.onSuccess?.();

@@ -1,18 +1,18 @@
+import { ErrorAlert, LoadingOverlay } from '@components/index';
+import { useAuth } from '@hooks/useAuth';
+import { useDashboardActivity, useDashboardStats } from '@hooks/useDashboard';
+import { LAYOUT, SHADOWS, SPACING } from '@lib/ui-utils';
 import React, { useCallback } from 'react';
 import {
-  View,
-  StyleSheet,
-  ScrollView,
-  RefreshControl,
   Dimensions,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  View,
 } from 'react-native';
-import { useTheme, Card, Text, Button, ActivityIndicator } from 'react-native-paper';
+import { Button, Card, Text, useTheme } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useAuth } from '../hooks/useAuth';
-import { useDashboardStats, useDashboardActivity } from '../hooks/useDashboard';
-import { ErrorAlert, LoadingOverlay, EmptyState } from '../components';
-import { SPACING, LAYOUT, SHADOWS } from '../lib/ui-utils';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 

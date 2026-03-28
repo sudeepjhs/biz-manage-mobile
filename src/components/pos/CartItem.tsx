@@ -1,7 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Text, IconButton, useTheme } from 'react-native-paper';
-import { ListItem } from '../common/ListItem';
+import { IconButton, Text, useTheme } from 'react-native-paper';
 
 export interface CartItemProps {
   id: string;

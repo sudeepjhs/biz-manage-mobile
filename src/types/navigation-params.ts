@@ -1,4 +1,3 @@
-import type { CartItem } from '../store/posStore';
 
 /**
  * Navigation Parameters for all screens
@@ -99,7 +98,7 @@ export type RootStackParamList = {
 };
 
 // Combined Navigation Type for useNavigation hook
-export type AllNavigation = 
+export type AllNavigation =
   | BottomTabsParamList
   | POSStackParamList
   | DashboardStackParamList
