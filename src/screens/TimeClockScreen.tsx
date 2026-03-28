@@ -6,8 +6,9 @@ import {
   RefreshControl,
   StyleSheet,
   View,
+  Pressable,
 } from 'react-native';
-import { Button, Card, Text, useTheme } from 'react-native-paper';
+import { Button, Card, Text, useTheme, IconButton } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
@@ -97,86 +98,212 @@ export default function TimeClockScreen() {
     return () => { if (anim) anim.stop(); };
   }, [isClocked, pulse]);
 
-  const renderTimeEntry = ({ item }: { item: any }) => (
-    <Card
+  const renderTimeEntry = ({ item, index }: { item: any; index: number }) => (
+    <View
       style={{
-        marginHorizontal: SPACING.lg,
+        marginHorizontal: SPACING.md,
         marginBottom: SPACING.md,
-        ...SHADOWS.sm,
+        flexDirection: 'row',
+        gap: SPACING.md,
       }}
     >
-      <Card.Content style={{ paddingVertical: SPACING.md }}>
+      {/* Timeline Indicator */}
+      <View
+        style={{
+          alignItems: 'center',
+          width: 40,
+        }}
+      >
         <View
           style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
+            width: 32,
+            height: 32,
+            borderRadius: 16,
+            backgroundColor: item.status === 'COMPLETED' ? (theme.colors as any).success || '#16a34a' : theme.colors.secondary,
             alignItems: 'center',
-            marginBottom: SPACING.sm,
+            justifyContent: 'center',
           }}
         >
-          <Text variant="titleMedium" style={{ fontWeight: '600' }}>
-            {item.date}
-          </Text>
-          <MaterialCommunityIcon 
-            name={item.status === 'COMPLETED' ? 'check-decagram' : 'clock-outline'} 
-            size={20} 
-            color={item.status === 'COMPLETED' ? theme.colors.primary : theme.colors.secondary} 
+          <MaterialCommunityIcon
+            name={item.status === 'COMPLETED' ? 'check' : 'clock-outline'}
+            size={18}
+            color={theme.colors.onSurface}
           />
         </View>
+        {index < (timeEntriesQuery.data?.length || 0) - 1 && (
+          <View
+            style={{
+              width: 2,
+              height: 40,
+              backgroundColor: theme.colors.outlineVariant,
+              marginTop: 4,
+            }}
+          />
+        )}
+      </View>
 
-        <View
+      {/* Entry Details */}
+      <View style={{ flex: 1, paddingVertical: SPACING.sm }}>
+        <Card
           style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            marginBottom: SPACING.md,
+            borderRadius: 12,
+            overflow: 'hidden',
+            backgroundColor: theme.colors.surface,
+            ...SHADOWS.sm,
           }}
         >
-          <View>
-            <Text variant="labelSmall" style={{ color: theme.colors.outline }}>
-              First Punch
-            </Text>
-            <Text variant="bodyMedium" style={{ fontWeight: '600' }}>
-              {item.firstPunch ? new Date(item.firstPunch).toLocaleTimeString() : '—'}
-            </Text>
-          </View>
-          <View>
-            <Text variant="labelSmall" style={{ color: theme.colors.outline }}>
-              Last Punch
-            </Text>
-            <Text variant="bodyMedium" style={{ fontWeight: '600' }}>
-              {item.lastPunch ? new Date(item.lastPunch).toLocaleTimeString() : '—'}
-            </Text>
-          </View>
-          <View>
-            <Text variant="labelSmall" style={{ color: theme.colors.outline }}>
-              Total Hours
-            </Text>
-            <Text variant="bodyMedium" style={{ fontWeight: '600', color: theme.colors.primary }}>
-              {item.totalHours?.toFixed(2)}h
-            </Text>
-          </View>
-        </View>
+          <Card.Content style={{ paddingVertical: SPACING.md }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: SPACING.sm,
+              }}
+            >
+              <Text
+                variant="titleSmall"
+                style={{
+                  fontWeight: '700',
+                  color: theme.colors.onSurface,
+                }}
+              >
+                {item.date}
+              </Text>
+              <View
+                style={{
+                  backgroundColor: item.status === 'COMPLETED' 
+                    ? (theme.colors as any).successContainer || '#dcfce7'
+                    : theme.colors.secondaryContainer,
+                  paddingHorizontal: SPACING.sm,
+                  paddingVertical: 2,
+                  borderRadius: 6,
+                }}
+              >
+                <Text
+                  variant="labelSmall"
+                  style={{
+                    fontWeight: '600',
+                    color: item.status === 'COMPLETED' 
+                      ? (theme.colors as any).onSuccessContainer || '#051005'
+                      : theme.colors.onSecondaryContainer,
+                  }}
+                >
+                  {item.status}
+                </Text>
+              </View>
+            </View>
 
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text variant="bodySmall" style={{ color: theme.colors.outline }}>
-            Punches: {item.punchCount}
-          </Text>
-          <View style={{ 
-            backgroundColor: theme.colors.surfaceVariant, 
-            paddingHorizontal: SPACING.sm, 
-            paddingVertical: 2, 
-            borderRadius: 4 
-          }}>
-            <Text variant="labelSmall">{item.status}</Text>
-          </View>
-        </View>
-      </Card.Content>
-    </Card>
+            {/* Time Grid */}
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                backgroundColor: theme.colors.surfaceVariant,
+                borderRadius: 8,
+                padding: SPACING.md,
+                marginBottom: SPACING.sm,
+              }}
+            >
+              <View style={{ alignItems: 'center', flex: 1 }}>
+                <Text
+                  variant="labelSmall"
+                  style={{
+                    color: theme.colors.onSurfaceVariant,
+                    marginBottom: SPACING.xs,
+                  }}
+                >
+                  In
+                </Text>
+                <Text
+                  variant="titleSmall"
+                  style={{
+                    fontWeight: '700',
+                    color: theme.colors.primary,
+                  }}
+                >
+                  {item.firstPunch ? new Date(item.firstPunch).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—'}
+                </Text>
+              </View>
+
+              <View
+                style={{
+                  width: 1,
+                  backgroundColor: theme.colors.outlineVariant,
+                  marginHorizontal: SPACING.sm,
+                }}
+              />
+
+              <View style={{ alignItems: 'center', flex: 1 }}>
+                <Text
+                  variant="labelSmall"
+                  style={{
+                    color: theme.colors.onSurfaceVariant,
+                    marginBottom: SPACING.xs,
+                  }}
+                >
+                  Out
+                </Text>
+                <Text
+                  variant="titleSmall"
+                  style={{
+                    fontWeight: '700',
+                    color: theme.colors.error,
+                  }}
+                >
+                  {item.lastPunch ? new Date(item.lastPunch).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—'}
+                </Text>
+              </View>
+
+              <View
+                style={{
+                  width: 1,
+                  backgroundColor: theme.colors.outlineVariant,
+                  marginHorizontal: SPACING.sm,
+                }}
+              />
+
+              <View style={{ alignItems: 'center', flex: 1 }}>
+                <Text
+                  variant="labelSmall"
+                  style={{
+                    color: theme.colors.onSurfaceVariant,
+                    marginBottom: SPACING.xs,
+                  }}
+                >
+                  Hours
+                </Text>
+                <Text
+                  variant="titleSmall"
+                  style={{
+                    fontWeight: '700',
+                    color: (theme.colors as any).success || '#16a34a',
+                  }}
+                >
+                  {item.totalHours?.toFixed(1)}h
+                </Text>
+              </View>
+            </View>
+
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text
+                variant="labelSmall"
+                style={{
+                  color: theme.colors.onSurfaceVariant,
+                }}
+              >
+                {item.punchCount} punch{item.punchCount !== 1 ? 'es' : ''}
+              </Text>
+            </View>
+          </Card.Content>
+        </Card>
+      </View>
+    </View>
   );
 
   return (
     <View style={[LAYOUT.fill, { backgroundColor: theme.colors.background }]}>
-      {/* Header */}
+      {/* Enhanced Header */}
       <View
         style={{
           backgroundColor: theme.colors.primary,
@@ -185,29 +312,131 @@ export default function TimeClockScreen() {
           paddingHorizontal: SPACING.lg,
         }}
       >
-        <Text
-          variant="headlineSmall"
-          style={{
-            color: theme.colors.onPrimary,
-            fontWeight: '700',
-            marginBottom: SPACING.md,
-          }}
-        >
-          Time Clock
-        </Text>
-        <Text
-          variant="bodyMedium"
-          style={{
-            color: theme.colors.onPrimary,
-            opacity: 0.8,
-          }}
-        >
-          {new Date().toLocaleDateString('en-US', {
-            weekday: 'long',
-            month: 'short',
-            day: 'numeric',
-          })}
-        </Text>
+        <View style={{ marginBottom: SPACING.md }}>
+          <Text
+            variant="headlineSmall"
+            style={{
+              color: theme.colors.onPrimary,
+              fontWeight: '800',
+              marginBottom: SPACING.xs,
+            }}
+          >
+            Time Clock
+          </Text>
+          <Text
+            variant="bodySmall"
+            style={{
+              color: theme.colors.onPrimaryContainer,
+            }}
+          >
+            {new Date().toLocaleDateString('en-US', {
+              weekday: 'long',
+              month: 'short',
+              day: 'numeric',
+            })}
+          </Text>
+        </View>
+
+        {/* Quick Stats */}
+        {todayEntry && (
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              gap: SPACING.sm,
+            }}
+          >
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: 'rgba(255,255,255,0.15)',
+                borderRadius: 8,
+                padding: SPACING.sm,
+                alignItems: 'center',
+              }}
+            >
+              <Text
+                variant="labelSmall"
+                style={{
+                  color: theme.colors.onPrimaryContainer,
+                  marginBottom: SPACING.xs,
+                }}
+              >
+                Total Hours
+              </Text>
+              <Text
+                variant="titleSmall"
+                style={{
+                  color: theme.colors.onPrimary,
+                  fontWeight: '700',
+                }}
+              >
+                {todayEntry.totalHours?.toFixed(1)}h
+              </Text>
+            </View>
+
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: 'rgba(255,255,255,0.15)',
+                borderRadius: 8,
+                padding: SPACING.sm,
+                alignItems: 'center',
+              }}
+            >
+              <Text
+                variant="labelSmall"
+                style={{
+                  color: theme.colors.onPrimaryContainer,
+                  marginBottom: SPACING.xs,
+                }}
+              >
+                Punches
+              </Text>
+              <Text
+                variant="titleSmall"
+                style={{
+                  color: theme.colors.onPrimary,
+                  fontWeight: '700',
+                }}
+              >
+                {todayEntry.punchCount || 0}
+              </Text>
+            </View>
+
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: 'rgba(255,255,255,0.15)',
+                borderRadius: 8,
+                padding: SPACING.sm,
+                alignItems: 'center',
+              }}
+            >
+              <Text
+                variant="labelSmall"
+                style={{
+                  color: theme.colors.onPrimaryContainer,
+                  marginBottom: SPACING.xs,
+                }}
+              >
+                Status
+              </Text>
+              <Text
+                variant="titleSmall"
+                style={{
+                  color: todayEntry.status === 'COMPLETED' 
+                    ? (theme.colors as any).successContainer || '#dcfce7'
+                    : theme.colors.onPrimary,
+                  fontWeight: '700',
+                  fontSize: 10,
+                }}
+              >
+                {todayEntry.status}
+              </Text>
+            </View>
+          </View>
+        )}
       </View>
 
       {/* Error Alert */}
@@ -223,11 +452,16 @@ export default function TimeClockScreen() {
         />
       )}
 
-      {/* Clock Status Card */}
+      {/* Enhanced Clock Status Card */}
       <Card
         style={{
-          marginHorizontal: SPACING.lg,
+          marginHorizontal: SPACING.md,
           marginVertical: SPACING.lg,
+          borderRadius: 16,
+          overflow: 'hidden',
+          backgroundColor: isClocked 
+            ? theme.colors.primaryContainer 
+            : theme.colors.surface,
           ...SHADOWS.lg,
         }}
       >
@@ -237,19 +471,47 @@ export default function TimeClockScreen() {
             alignItems: 'center',
           }}
         >
-          <MaterialCommunityIcon
-            name={isClocked ? 'clock-check' : 'clock'}
-            size={64}
-            color={isClocked ? theme.colors.primary : theme.colors.outline}
-            style={{ marginBottom: SPACING.lg }}
-          />
+          {isClocked && (
+            <View
+              style={{
+                width: 80,
+                height: 80,
+                borderRadius: 40,
+                backgroundColor: theme.colors.primary,
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: SPACING.lg,
+              }}
+            >
+              <Animated.View
+                style={{
+                  transform: [{ scale: pulse }],
+                }}
+              >
+                <MaterialCommunityIcon
+                  name="check-circle"
+                  size={60}
+                  color={theme.colors.onPrimary}
+                />
+              </Animated.View>
+            </View>
+          )}
+
+          {!isClocked && (
+            <MaterialCommunityIcon
+              name="clock-outline"
+              size={64}
+              color={theme.colors.outline}
+              style={{ marginBottom: SPACING.lg }}
+            />
+          )}
 
           <Text
-            variant="headlineSmall"
+            variant="displaySmall"
             style={{
-              fontWeight: '700',
-              marginBottom: SPACING.lg,
-              color: isClocked ? theme.colors.primary : theme.colors.onSurface,
+              fontWeight: '800',
+              marginBottom: SPACING.md,
+              color: isClocked ? theme.colors.onPrimaryContainer : theme.colors.onSurface,
             }}
           >
             {isClocked ? 'Clocked In' : 'Clocked Out'}
@@ -257,44 +519,49 @@ export default function TimeClockScreen() {
 
           {isClocked && (
             <>
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: SPACING.lg }}>
+              <View
+                style={{
+                  backgroundColor: theme.colors.primary,
+                  paddingHorizontal: SPACING.lg,
+                  paddingVertical: SPACING.md,
+                  borderRadius: 12,
+                  marginBottom: SPACING.md,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: SPACING.md,
+                }}
+              >
                 <Animated.View
                   style={{
-                    width: 12,
-                    height: 12,
-                    borderRadius: 6,
-                    marginRight: SPACING.sm,
-                    backgroundColor: theme.colors.primary,
+                    width: 10,
+                    height: 10,
+                    borderRadius: 5,
+                    backgroundColor: theme.colors.onPrimary,
                     transform: [{ scale: pulse }],
                   }}
                 />
-                <View style={{
-                  backgroundColor: theme.colors.primaryContainer,
-                  paddingHorizontal: SPACING.md,
-                  paddingVertical: 6,
-                  borderRadius: 20,
-                }}>
-                  <Text
-                    variant="titleLarge"
-                    style={{
-                      fontWeight: '700',
-                      color: theme.colors.onPrimaryContainer,
-                      fontFamily: 'monospace',
-                    }}
-                  >
-                    {formatElapsedTime(elapsedSeconds)}
-                  </Text>
-                </View>
+                <Text
+                  variant="displaySmall"
+                  style={{
+                    fontWeight: '800',
+                    color: theme.colors.onPrimary,
+                    fontFamily: 'monospace',
+                    fontSize: 32,
+                  }}
+                >
+                  {formatElapsedTime(elapsedSeconds)}
+                </Text>
               </View>
 
               <Text
-                variant="bodyMedium"
+                variant="bodyLarge"
                 style={{
-                  color: theme.colors.outline,
+                  color: theme.colors.onPrimaryContainer,
                   marginBottom: SPACING.xl,
+                  fontWeight: '500',
                 }}
               >
-                Since {new Date(clockInTime || '').toLocaleTimeString()}
+                Since {new Date(clockInTime || '').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </Text>
             </>
           )}
@@ -302,66 +569,108 @@ export default function TimeClockScreen() {
           {/* Clock Buttons */}
           <View
             style={{
-              flexDirection: 'row',
-              gap: SPACING.md,
               width: '100%',
+              gap: SPACING.md,
             }}
           >
             {isClocked ? (
-              <Button
-                mode="contained"
+              <Pressable
                 onPress={() => clockOutMutation.mutate({ 
                   type: 'PUNCH_OUT', 
                   latitude: 0, 
                   longitude: 0 
                 })}
-                loading={clockOutMutation.isPending}
                 disabled={clockOutMutation.isPending || isDayCompleted}
-                icon="logout"
-                style={{ flex: 1, height: 48, justifyContent: 'center' }}
-                accessibilityLabel={isDayCompleted ? 'Day completed' : 'Clock out'}
+                style={{
+                  backgroundColor: isDayCompleted 
+                    ? theme.colors.outlineVariant 
+                    : theme.colors.error,
+                  paddingVertical: SPACING.lg,
+                  borderRadius: 12,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  opacity: clockOutMutation.isPending ? 0.7 : 1,
+                }}
               >
-                {isDayCompleted ? 'Completed' : 'Clock Out'}
-              </Button>
+                <Text
+                  variant="labelLarge"
+                  style={{
+                    color: isDayCompleted 
+                      ? theme.colors.onSurfaceVariant 
+                      : theme.colors.onError,
+                    fontWeight: '700',
+                  }}
+                >
+                  {isDayCompleted ? '✓ Day Completed' : '🔴 Clock Out'}
+                </Text>
+              </Pressable>
             ) : (
-              <Button
-                mode="contained"
+              <Pressable
                 onPress={() => clockInMutation.mutate({ 
                   type: 'PUNCH_IN', 
                   latitude: 0, 
                   longitude: 0 
                 })}
-                loading={clockInMutation.isPending}
                 disabled={clockInMutation.isPending || isDayCompleted}
-                icon="login"
-                style={{ flex: 1, height: 48, justifyContent: 'center' }}
-                accessibilityLabel={isDayCompleted ? 'Day completed' : 'Clock in'}
+                style={{
+                  backgroundColor: isDayCompleted 
+                    ? theme.colors.outlineVariant 
+                    : (theme.colors as any).success || '#16a34a',
+                  paddingVertical: SPACING.lg,
+                  borderRadius: 12,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  opacity: clockInMutation.isPending ? 0.7 : 1,
+                }}
               >
-                {isDayCompleted ? 'Day Completed' : 'Clock In'}
-              </Button>
+                <Text
+                  variant="labelLarge"
+                  style={{
+                    color: isDayCompleted 
+                      ? theme.colors.onSurfaceVariant 
+                      : '#ffffff',
+                    fontWeight: '700',
+                  }}
+                >
+                  {isDayCompleted ? '✓ Day Completed' : '🟢 Clock In'}
+                </Text>
+              </Pressable>
             )}
           </View>
+
           {/* Explain disabled state when applicable */}
           {isDayCompleted && (
-            <Text variant="bodySmall" style={{ color: theme.colors.outline, marginTop: SPACING.md, textAlign: 'center' }}>
+            <Text
+              variant="bodySmall"
+              style={{
+                color: theme.colors.outline,
+                marginTop: SPACING.md,
+                textAlign: 'center',
+                fontStyle: 'italic',
+              }}
+            >
               Today's timesheet is completed. Contact admin to reopen or make edits.
             </Text>
           )}
         </Card.Content>
       </Card>
 
-      {/* Today's Entries */}
-      <Text
-        variant="titleMedium"
-        style={{
-          fontWeight: '600',
-          marginHorizontal: SPACING.lg,
-          marginTop: SPACING.lg,
-          marginBottom: SPACING.md,
-        }}
-      >
-        Today's Entries
-      </Text>
+      {/* Today's Entries Section */}
+      {timeEntriesQuery.data && timeEntriesQuery.data.length > 0 && (
+        <View style={{ paddingHorizontal: SPACING.md, marginTop: SPACING.lg }}>
+          <Text
+            variant="titleMedium"
+            style={{
+              fontWeight: '700',
+              marginBottom: SPACING.md,
+              color: theme.colors.onSurface,
+            }}
+          >
+            📋 Today's Entries
+          </Text>
+        </View>
+      )}
+
 
       {timeEntriesQuery.data && timeEntriesQuery.data.length > 0 ? (
         <FlatList
@@ -376,17 +685,19 @@ export default function TimeClockScreen() {
             <RefreshControl
               refreshing={clockStatusQuery.isRefetching || timeEntriesQuery.isRefetching}
               onRefresh={onRefresh}
-              colors={[theme.colors.primary]}
+              tintColor={theme.colors.primary}
             />
           }
           scrollEnabled={true}
         />
       ) : (
-        <EmptyState
-          icon="clock-off"
-          title="No entries today"
-          description="Your time entries will appear here"
-        />
+        <View style={{ flex: 1, justifyContent: 'center' }}>
+          <EmptyState
+            icon="clock-off"
+            title="No entries yet"
+            description="Clock in to start your workday"
+          />
+        </View>
       )}
 
       {/* Loading Overlay */}
@@ -399,4 +710,30 @@ export default function TimeClockScreen() {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  timelineContainer: {
+    flexDirection: 'row',
+    gap: SPACING.md,
+    marginHorizontal: SPACING.md,
+    marginBottom: SPACING.md,
+  },
+  timelineIndicator: {
+    alignItems: 'center',
+    width: 40,
+  },
+  timelineConnector: {
+    width: 2,
+    height: 40,
+    marginTop: 4,
+  },
+  timeGridRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  divider: {
+    width: 1,
+    marginHorizontal: SPACING.sm,
+  },
 });

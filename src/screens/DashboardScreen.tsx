@@ -1,25 +1,27 @@
 import { ErrorAlert, LoadingOverlay } from '@components/index';
 import { useAuth } from '@hooks/useAuth';
 import { useDashboardActivity, useDashboardStats } from '@hooks/useDashboard';
-import { LAYOUT, SPACING, BORDER_RADIUS } from '@lib/ui-utils';
+import { LAYOUT, SPACING, BORDER_RADIUS, SHADOWS } from '@lib/ui-utils';
 import { ModernCard } from '@components/modern';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import {
   Dimensions,
   RefreshControl,
   ScrollView,
   View,
+  Animated,
+  Pressable,
 } from 'react-native';
-import { Button, Text, useTheme } from 'react-native-paper';
+import { Button, Text, useTheme, Card } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
 /**
- * Modern Stat Card Component
- * Theme-centric design with interactive feedback and semantic colors
+ * Enhanced Interactive Stat Card Component
+ * Theme-centric design with animations and better visual feedback
  */
 const StatCard: React.FC<{
   icon: string;
@@ -27,8 +29,26 @@ const StatCard: React.FC<{
   value: string | number;
   variant?: 'primary' | 'secondary' | 'success' | 'warning' | 'critical';
   onPress?: () => void;
-}> = ({ icon, title, value, variant = 'primary', onPress }) => {
+  animated?: boolean;
+}> = ({ icon, title, value, variant = 'primary', onPress, animated = true }) => {
   const theme = useTheme();
+  const [scaleAnim] = useState(new Animated.Value(1));
+
+  const handlePressIn = () => {
+    if (!onPress) return;
+    Animated.spring(scaleAnim, {
+      toValue: 0.95,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    if (!onPress) return;
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+    }).start();
+  };
 
   const variantColors = {
     primary: {
@@ -61,59 +81,85 @@ const StatCard: React.FC<{
   const colors = variantColors[variant];
 
   return (
-    <ModernCard
-      variant="filled"
-      interactive={!!onPress}
-      onPress={onPress}
-      style={{
-        flex: 1,
-        marginHorizontal: SPACING.sm,
-        marginVertical: SPACING.md,
-        backgroundColor: colors.bg,
-      }}
+    <Animated.View
+      style={
+        onPress
+          ? {
+              flex: 1,
+              marginHorizontal: SPACING.sm,
+              marginVertical: SPACING.md,
+              transform: [{ scale: scaleAnim }],
+            }
+          : {
+              flex: 1,
+              marginHorizontal: SPACING.sm,
+              marginVertical: SPACING.md,
+            }
+      }
     >
-      <View
-        style={{
-          padding: SPACING.lg,
-          alignItems: 'center',
-        }}
+      <Pressable
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        onPress={onPress}
       >
-        <View
+        <Card
           style={{
-            width: 50,
-            height: 50,
-            borderRadius: 25,
-            backgroundColor: `${colors.icon}20`,
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginBottom: SPACING.md,
+            borderRadius: 12,
+            overflow: 'hidden',
+            backgroundColor: colors.bg,
+            ...SHADOWS.md,
           }}
         >
-          <MaterialCommunityIcon name={icon} size={28} color={colors.icon} />
-        </View>
-        <Text
-          variant="bodySmall"
-          style={{
-            marginTop: SPACING.sm,
-            color: theme.colors.onSurfaceVariant,
-            fontSize: 12,
-            textAlign: 'center',
-          }}
-        >
-          {title}
-        </Text>
-        <Text
-          variant="headlineSmall"
-          style={{
-            marginTop: SPACING.sm,
-            fontWeight: '700',
-            color: colors.text,
-          }}
-        >
-          {value}
-        </Text>
-      </View>
-    </ModernCard>
+          <View
+            style={{
+              padding: SPACING.lg,
+              alignItems: 'center',
+            }}
+          >
+            {/* Icon Container */}
+            <View
+              style={{
+                width: 56,
+                height: 56,
+                borderRadius: 28,
+                backgroundColor: `${colors.icon}20`,
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginBottom: SPACING.md,
+              }}
+            >
+              <MaterialCommunityIcon name={icon} size={32} color={colors.icon} />
+            </View>
+
+            {/* Title */}
+            <Text
+              variant="labelSmall"
+              style={{
+                marginTop: SPACING.sm,
+                color: theme.colors.onSurfaceVariant,
+                fontSize: 11,
+                textAlign: 'center',
+                fontWeight: '500',
+              }}
+            >
+              {title}
+            </Text>
+
+            {/* Value */}
+            <Text
+              variant="headlineSmall"
+              style={{
+                marginTop: SPACING.sm,
+                fontWeight: '800',
+                color: colors.text,
+              }}
+            >
+              {value}
+            </Text>
+          </View>
+        </Card>
+      </Pressable>
+    </Animated.View>
   );
 };
 
@@ -342,8 +388,8 @@ export default function DashboardScreen() {
           </View>
         )}
 
-        {/* Quick Actions */}
-        <View style={{ paddingHorizontal: SPACING.lg, marginTop: SPACING.xl, marginBottom: SPACING.lg }}>
+        {/* Quick Actions - Enhanced */}
+        <View style={{ paddingHorizontal: SPACING.md, marginTop: SPACING.xl, marginBottom: SPACING.lg }}>
           <Text
             variant="titleMedium"
             style={{
@@ -352,46 +398,145 @@ export default function DashboardScreen() {
               color: theme.colors.onSurface,
             }}
           >
-            Quick Actions
+            🚀 Quick Actions
           </Text>
-          <View style={{ flexDirection: 'row', gap: SPACING.md }}>
+          <View style={{ gap: SPACING.md }}>
             {hasPermission('POS', 'CREATE') && (
-              <Button
-                mode="contained"
-                icon="cash-register"
+              <Pressable
                 onPress={() => {
                   (navigation as any).navigate('POSTab');
                 }}
-                style={{ flex: 1 }}
-                buttonColor={theme.colors.primary}
               >
-                POS
-              </Button>
+                <Card
+                  style={{
+                    borderRadius: 12,
+                    overflow: 'hidden',
+                    backgroundColor: theme.colors.primary,
+                    ...SHADOWS.md,
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      paddingVertical: SPACING.md,
+                      paddingHorizontal: SPACING.lg,
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACING.md }}>
+                      <MaterialCommunityIcon
+                        name="cash-register"
+                        size={28}
+                        color={theme.colors.onPrimary}
+                      />
+                      <Text
+                        variant="labelLarge"
+                        style={{
+                          color: theme.colors.onPrimary,
+                          fontWeight: '700',
+                        }}
+                      >
+                        Start POS
+                      </Text>
+                    </View>
+                    <MaterialCommunityIcon
+                      name="chevron-right"
+                      size={24}
+                      color={`${theme.colors.onPrimary}80`}
+                    />
+                  </View>
+                </Card>
+              </Pressable>
             )}
-            {hasPermission('INVENTORY', 'VIEW') && (
-              <Button
-                mode="contained-tonal"
-                icon="package-variant"
-                onPress={() => {
-                  (navigation as any).navigate('InventoryTab');
-                }}
-                style={{ flex: 1 }}
-              >
-                Inventory
-              </Button>
-            )}
-            {hasPermission('TIME', 'CLOCK') && (
-              <Button
-                mode="contained-tonal"
-                icon="clock"
-                onPress={() => {
-                  (navigation as any).navigate('TimeTab');
-                }}
-                style={{ flex: 1 }}
-              >
-                Clock
-              </Button>
-            )}
+
+            <View style={{ flexDirection: 'row', gap: SPACING.md }}>
+              {hasPermission('INVENTORY', 'VIEW') && (
+                <Pressable
+                  onPress={() => {
+                    (navigation as any).navigate('InventoryTab');
+                  }}
+                  style={{ flex: 1 }}
+                >
+                  <Card
+                    style={{
+                      borderRadius: 12,
+                      overflow: 'hidden',
+                      backgroundColor: theme.colors.secondaryContainer,
+                      ...SHADOWS.md,
+                    }}
+                  >
+                    <View
+                      style={{
+                        alignItems: 'center',
+                        paddingVertical: SPACING.lg,
+                        paddingHorizontal: SPACING.md,
+                      }}
+                    >
+                      <MaterialCommunityIcon
+                        name="package-variant"
+                        size={32}
+                        color={theme.colors.secondary}
+                      />
+                      <Text
+                        variant="labelSmall"
+                        style={{
+                          color: theme.colors.onSecondaryContainer,
+                          fontWeight: '700',
+                          marginTop: SPACING.sm,
+                          textAlign: 'center',
+                        }}
+                      >
+                        Inventory
+                      </Text>
+                    </View>
+                  </Card>
+                </Pressable>
+              )}
+
+              {hasPermission('TIME', 'CLOCK') && (
+                <Pressable
+                  onPress={() => {
+                    (navigation as any).navigate('TimeTab');
+                  }}
+                  style={{ flex: 1 }}
+                >
+                  <Card
+                    style={{
+                      borderRadius: 12,
+                      overflow: 'hidden',
+                      backgroundColor: (theme.colors as any).tertiaryContainer || theme.colors.tertiaryContainer,
+                      ...SHADOWS.md,
+                    }}
+                  >
+                    <View
+                      style={{
+                        alignItems: 'center',
+                        paddingVertical: SPACING.lg,
+                        paddingHorizontal: SPACING.md,
+                      }}
+                    >
+                      <MaterialCommunityIcon
+                        name="clock"
+                        size={32}
+                        color={theme.colors.tertiary}
+                      />
+                      <Text
+                        variant="labelSmall"
+                        style={{
+                          color: theme.colors.onTertiaryContainer,
+                          fontWeight: '700',
+                          marginTop: SPACING.sm,
+                          textAlign: 'center',
+                        }}
+                      >
+                        Clock In
+                      </Text>
+                    </View>
+                  </Card>
+                </Pressable>
+              )}
+            </View>
           </View>
         </View>
 
@@ -446,19 +591,47 @@ export default function DashboardScreen() {
           </View>
         )}
 
-        {/* Logout Button */}
-        <View style={{ paddingHorizontal: SPACING.lg, marginTop: SPACING.md, marginBottom: SPACING.lg }}>
-          <Button
-            mode="outlined"
+        {/* Logout Button - Enhanced */}
+        <View style={{ paddingHorizontal: SPACING.lg, marginTop: SPACING.lg, marginBottom: SPACING.xl }}>
+          <Pressable
             onPress={logout}
-            icon="logout"
-            style={{
-              borderColor: theme.colors.error,
-            }}
-            textColor={theme.colors.error}
           >
-            Logout
-          </Button>
+            <Card
+              style={{
+                borderRadius: 12,
+                overflow: 'hidden',
+                backgroundColor: theme.colors.errorContainer,
+                borderColor: theme.colors.error,
+                borderWidth: 1,
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  paddingVertical: SPACING.md,
+                  paddingHorizontal: SPACING.lg,
+                  justifyContent: 'center',
+                  gap: SPACING.md,
+                }}
+              >
+                <MaterialCommunityIcon
+                  name="logout"
+                  size={20}
+                  color={theme.colors.error}
+                />
+                <Text
+                  variant="labelLarge"
+                  style={{
+                    color: theme.colors.error,
+                    fontWeight: '700',
+                  }}
+                >
+                  Logout
+                </Text>
+              </View>
+            </Card>
+          </Pressable>
         </View>
       </ScrollView>
     </View>

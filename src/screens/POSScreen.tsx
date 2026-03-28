@@ -11,7 +11,7 @@ import {
 } from '@components/index';
 import { POSCategory, POSProduct, useCategories, useProducts } from '@hooks/usePOS';
 import { usePOSCart } from '@hooks/usePOSCart';
-import { LAYOUT, SPACING } from '@lib/ui-utils';
+import { LAYOUT, SPACING, SHADOWS } from '@lib/ui-utils';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
   Animated,
@@ -22,7 +22,7 @@ import {
   View,
   Pressable,
 } from 'react-native';
-import { FAB, useTheme, Chip, Text } from 'react-native-paper';
+import { FAB, useTheme, Chip, Text, Card, IconButton } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -44,6 +44,7 @@ export default function POSScreen() {
   const [cartVisible, setCartVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [cartBadgeScale] = useState(new Animated.Value(1));
+  const [isGridView, setIsGridView] = useState(true);
 
   // Fetch data
   const productsQuery = useProducts();
@@ -101,6 +102,10 @@ export default function POSScreen() {
     return filtered.map((p) => ({ ...p, key: p.id }));
   }, [productsQuery.data, selectedCategory, searchQuery]);
 
+  // Calculate cart stats
+  const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+  const cartTotalValue = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
   // Render product card with proper spacing
   // Touch target size: 44×48dp minimum (Apple HIG, Material Design)
   const renderProduct = ({ item }: { item: DisplayProduct }) => (
@@ -127,9 +132,6 @@ export default function POSScreen() {
     </View>
   );
 
-  // Calculate cart stats
-  const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0);
-
   // Loading state
   if (productsQuery.isLoading || categoriesQuery.isLoading) {
     return <LoadingOverlay visible={true} message="Loading products..." />;
@@ -141,7 +143,7 @@ export default function POSScreen() {
     <View 
       style={[LAYOUT.fill, { backgroundColor: theme.colors.background }]}
     >
-      {/* Header - Matching Dashboard Style */}
+      {/* Enhanced Header with Stats */}
       <View
         style={{
           backgroundColor: theme.colors.primary,
@@ -150,26 +152,132 @@ export default function POSScreen() {
           paddingHorizontal: SPACING.lg,
         }}
       >
-        <Text
-          variant="headlineSmall"
+        <View style={{ marginBottom: SPACING.md }}>
+          <Text
+            variant="headlineSmall"
+            style={{
+              color: theme.colors.onPrimary,
+              fontWeight: '800',
+              marginBottom: SPACING.xs,
+            }}
+          >
+            Point of Sale
+          </Text>
+          <Text
+            variant="bodySmall"
+            style={{
+              color: theme.colors.onPrimaryContainer,
+            }}
+          >
+            Browse and add products to cart
+          </Text>
+        </View>
+
+        {/* Quick Stats */}
+        <View
           style={{
-            color: theme.colors.onPrimary,
-            fontWeight: '700',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginBottom: SPACING.md,
+            gap: SPACING.sm,
           }}
         >
-          Point of Sale
-        </Text>
-        <Text
-          variant="bodyMedium"
-          style={{
-            color: theme.colors.onPrimary,
-            opacity: 0.8,
-            marginTop: SPACING.sm,
-          }}
-        >
-          Browse and add products to cart
-        </Text>
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: 'rgba(255,255,255,0.15)',
+              borderRadius: 8,
+              padding: SPACING.sm,
+              alignItems: 'center',
+            }}
+          >
+            <Text
+              variant="labelSmall"
+              style={{
+                color: theme.colors.onPrimaryContainer,
+                marginBottom: SPACING.xs,
+              }}
+            >
+              Products
+            </Text>
+            <Text
+              variant="titleSmall"
+              style={{
+                color: theme.colors.onPrimary,
+                fontWeight: '700',
+              }}
+            >
+              {displayProducts.length}
+            </Text>
+          </View>
+
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: 'rgba(255,255,255,0.15)',
+              borderRadius: 8,
+              padding: SPACING.sm,
+              alignItems: 'center',
+            }}
+          >
+            <Text
+              variant="labelSmall"
+              style={{
+                color: theme.colors.onPrimaryContainer,
+                marginBottom: SPACING.xs,
+              }}
+            >
+              Categories
+            </Text>
+            <Text
+              variant="titleSmall"
+              style={{
+                color: theme.colors.onPrimary,
+                fontWeight: '700',
+              }}
+            >
+              {categories.length + 1}
+            </Text>
+          </View>
+
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: 'rgba(255,255,255,0.15)',
+              borderRadius: 8,
+              padding: SPACING.sm,
+              alignItems: 'center',
+            }}
+          >
+            <Text
+              variant="labelSmall"
+              style={{
+                color: theme.colors.onPrimaryContainer,
+                marginBottom: SPACING.xs,
+              }}
+            >
+              Cart Items
+            </Text>
+            <Text
+              variant="titleSmall"
+              style={{
+                color: theme.colors.onPrimary,
+                fontWeight: '700',
+              }}
+            >
+              {cartItemCount}
+            </Text>
+          </View>
+        </View>
+
+        {/* Search Bar */}
+        <SearchBar
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          placeholder="Search products by name or SKU..."
+        />
       </View>
+
 
       {/* Error Alert */}
       {!!errorMessage && (
@@ -188,43 +296,41 @@ export default function POSScreen() {
         </View>
       )}
 
-      {/* Search Bar - Prominent placement for discoverability */}
-      <View
-        style={{
-          paddingHorizontal: SPACING.lg,
-          paddingVertical: SPACING.md,
-          backgroundColor: theme.colors.background,
-          borderBottomWidth: 1,
-          borderBottomColor: theme.colors.outlineVariant,
-        }}
-        accessible={true}
-        accessibilityRole="search"
-      >
-        <SearchBar
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          placeholder="Search products by name or SKU..."
-        />
-      </View>
-
-      {/* Category Tabs with visual state indicator */}
+      {/* Enhanced Category Tabs with View Toggle */}
       <View
         style={{
           backgroundColor: theme.colors.surface,
           borderBottomWidth: 1,
           borderBottomColor: theme.colors.outlineVariant,
+          paddingHorizontal: SPACING.md,
+          paddingVertical: SPACING.sm,
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
         }}
         accessible={true}
         accessibilityRole="tablist"
       >
-        <CategoryTabs
-          categories={[
-            { id: 'all', name: 'All Products' },
-            ...categories,
-          ]}
-          selected={selectedCategory || 'all'}
-          onSelect={(id) => setSelectedCategory(id === 'all' ? null : id)}
-        />
+        <View style={{ flex: 1 }}>
+          <CategoryTabs
+            categories={[
+              { id: 'all', name: 'All' },
+              ...categories,
+            ]}
+            selected={selectedCategory || 'all'}
+            onSelect={(id) => setSelectedCategory(id === 'all' ? null : id)}
+          />
+        </View>
+
+        {/* View Toggle */}
+        <View style={{ flexDirection: 'row', gap: SPACING.sm }}>
+          <IconButton
+            icon={isGridView ? 'view-grid' : 'view-list'}
+            size={20}
+            iconColor={isGridView ? theme.colors.primary : theme.colors.onSurfaceVariant}
+            onPress={() => setIsGridView(!isGridView)}
+          />
+        </View>
       </View>
 
       {/* Products Grid with proper spacing and loading state */}
@@ -311,7 +417,7 @@ export default function POSScreen() {
         </View>
       )}
 
-      {/* Cart FAB with animated badge and better affordance */}
+      {/* Enhanced Cart FAB with animated badge and better affordance */}
       {cartItemCount > 0 && (
         <Animated.View
           style={{
@@ -323,30 +429,90 @@ export default function POSScreen() {
           }}
           accessible={true}
           accessibilityRole="button"
-          accessibilityLabel={`${cartItemCount} items in cart, ₹${subtotal.toFixed(2)}`}
+          accessibilityLabel={`${cartItemCount} items in cart, ₹${cartTotalValue.toFixed(2)}`}
           accessibilityHint="Double tap to open shopping cart"
         >
-          <FAB
-            icon="cart"
-            label={`${cartItemCount} items`}
-            onPress={() => setCartVisible(true)}
-            color={theme.colors.onPrimary}
+          <Card
             style={{
+              borderRadius: 12,
+              overflow: 'hidden',
               backgroundColor: theme.colors.primary,
+              ...SHADOWS.lg,
             }}
-          />
+          >
+            <Pressable
+              onPress={() => setCartVisible(true)}
+              style={{
+                paddingHorizontal: SPACING.lg,
+                paddingVertical: SPACING.md,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: SPACING.md,
+              }}
+            >
+              <Text
+                variant="labelLarge"
+                style={{
+                  color: theme.colors.onPrimary,
+                  fontWeight: '700',
+                }}
+              >
+                🛒 {cartItemCount} items
+              </Text>
+              <View
+                style={{
+                  backgroundColor: 'rgba(255,255,255,0.3)',
+                  paddingHorizontal: SPACING.sm,
+                  paddingVertical: SPACING.xs,
+                  borderRadius: 6,
+                }}
+              >
+                <Text
+                  variant="labelSmall"
+                  style={{
+                    color: theme.colors.onPrimary,
+                    fontWeight: '700',
+                  }}
+                >
+                  ₹{cartTotalValue.toFixed(2)}
+                </Text>
+              </View>
+            </Pressable>
+          </Card>
         </Animated.View>
       )}
 
-      {/* Cart Bottom Sheet with improved layout */}
+      {/* Enhanced Cart Bottom Sheet */}
       <BottomSheet
         visible={cartVisible}
         onClose={() => setCartVisible(false)}
-        height="80%"
+        height="85%"
         title="Shopping Cart"
       >
         {items.length > 0 ? (
-          <View style={LAYOUT.fill}>
+          <View style={[LAYOUT.fill, { backgroundColor: theme.colors.background }]}>
+            {/* Cart Items Header */}
+            <View
+              style={{
+                paddingHorizontal: SPACING.lg,
+                paddingVertical: SPACING.md,
+                backgroundColor: theme.colors.surfaceVariant,
+                borderBottomWidth: 1,
+                borderBottomColor: theme.colors.outlineVariant,
+              }}
+            >
+              <Text
+                variant="labelMedium"
+                style={{
+                  color: theme.colors.onSurfaceVariant,
+                  fontWeight: '600',
+                }}
+              >
+                {items.length} item{items.length !== 1 ? 's' : ''} in cart
+              </Text>
+            </View>
+
             {/* Cart Items with proper spacing */}
             <FlatList
               data={items}
@@ -369,59 +535,126 @@ export default function POSScreen() {
               )}
               keyExtractor={(item) => item.productId}
               scrollEnabled={true}
+              contentContainerStyle={{ paddingVertical: SPACING.md }}
               accessible={true}
               accessibilityRole="list"
             />
 
-            {/* Summary with visual separation */}
+            {/* Summary Section with Enhanced Design */}
             <View
               style={{
                 borderTopWidth: 1,
                 borderTopColor: theme.colors.outlineVariant,
+                backgroundColor: theme.colors.surfaceVariant,
               }}
             >
-              <CartSummary subtotal={subtotal} />
+              <View
+                style={{
+                  padding: SPACING.lg,
+                }}
+              >
+                <CartSummary subtotal={subtotal} />
+              </View>
+
+              {/* Tax & Total Info */}
+              <View
+                style={{
+                  paddingHorizontal: SPACING.lg,
+                  paddingBottom: SPACING.md,
+                  borderTopWidth: 1,
+                  borderTopColor: theme.colors.outlineVariant,
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: SPACING.sm,
+                    paddingTop: SPACING.md,
+                  }}
+                >
+                  <Text
+                    variant="labelMedium"
+                    style={{
+                      color: theme.colors.onSurfaceVariant,
+                    }}
+                  >
+                    Total
+                  </Text>
+                  <Text
+                    variant="headlineSmall"
+                    style={{
+                      color: theme.colors.primary,
+                      fontWeight: '800',
+                    }}
+                  >
+                    ₹{total.toFixed(2)}
+                  </Text>
+                </View>
+              </View>
             </View>
 
             {/* Action Buttons with proper spacing and semantic roles */}
             <View 
               style={{ 
-                padding: SPACING.lg, 
+                padding: SPACING.lg,
                 gap: SPACING.md,
-                borderTopWidth: 1,
-                borderTopColor: theme.colors.outlineVariant,
+                backgroundColor: theme.colors.background,
               }}
-
             >
-              <FAB
-                icon="check"
-                label="Proceed to Checkout"
+              <Pressable
+                style={{
+                  backgroundColor: theme.colors.primary,
+                  paddingVertical: SPACING.md,
+                  borderRadius: 8,
+                  alignItems: 'center',
+                }}
                 onPress={() => {
                   setCartVisible(false);
                   // Navigation to checkout would go here
                   // Would be: navigation.navigate('POSCheckout')
                 }}
-                mode="elevated"
-                style={{ width: '100%' }}
-                accessibilityRole="button"
-                accessibilityLabel="Proceed to checkout"
-              />
-              <FAB
-                icon="trash-can"
-                label="Clear Cart"
-                onPress={clearCart}
-                style={{ 
-                  width: '100%',
+              >
+                <Text
+                  variant="labelLarge"
+                  style={{
+                    color: theme.colors.onPrimary,
+                    fontWeight: '700',
+                  }}
+                >
+                  ✓ Proceed to Checkout
+                </Text>
+              </Pressable>
+
+              <Pressable
+                style={{
                   backgroundColor: theme.colors.errorContainer,
+                  paddingVertical: SPACING.md,
+                  borderRadius: 8,
+                  alignItems: 'center',
                 }}
-                accessibilityRole="button"
-                accessibilityLabel="Clear cart"
-                accessibilityHint="Remove all items from cart"
-              />
+                onPress={clearCart}
+              >
+                <Text
+                  variant="labelLarge"
+                  style={{
+                    color: theme.colors.onErrorContainer,
+                    fontWeight: '700',
+                  }}
+                >
+                  🗑️ Clear Cart
+                </Text>
+              </Pressable>
             </View>
           </View>
         ) : (
           <View
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
             accessible={true}
           >
             <EmptyState 

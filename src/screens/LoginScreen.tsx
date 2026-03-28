@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import { TextInput, Button, Text, HelperText } from 'react-native-paper';
+import { View, StyleSheet, ScrollView, Pressable, Dimensions, Animated } from 'react-native';
+import { TextInput, Button, Text, HelperText, Card, useTheme, IconButton } from 'react-native-paper';
 import { z } from 'zod';
 import { useAuth } from '@hooks/useAuth';
+import { SPACING, SHADOWS } from '@lib/ui-utils';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+
+const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 const LoginSchema = z.object({
   email: z.string().email('Invalid email'),
@@ -10,54 +15,42 @@ const LoginSchema = z.object({
 });
 
 type LoginFormData = z.infer<typeof LoginSchema>;
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 16,
-  },
-  content: {
-    gap: 16,
-  },
-  title: {
-    textAlign: 'center',
-    marginBottom: 8,
-    fontWeight: 'bold',
-  },
-  subtitle: {
-    textAlign: 'center',
-    marginBottom: 24,
-    color: '#666',
-  },
-  input: {
-    marginBottom: 8,
-  },
-  button: {
-    marginTop: 16,
-    paddingVertical: 8,
-  },
-  errorMessage: {
-    marginBottom: 8,
-  },
-  info: {
-    textAlign: 'center',
-    marginTop: 16,
-    color: '#0066cc',
-  },
-  footer: {
-    textAlign: 'center',
-    marginTop: 24,
-    color: '#999',
-    lineHeight: 20,
-  },
-});
 
 export default function LoginScreen() {
+  const theme = useTheme();
+  const insets = useSafeAreaInsets();
   const { login, loginMutation } = useAuth();
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<Partial<LoginFormData>>({});
   const [showPassword, setShowPassword] = useState(false);
+  const [pulseAnim] = useState(new Animated.Value(0));
+
+  // Continuous pulse animation
+  React.useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 2000,
+          useNativeDriver: false,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 0,
+          duration: 2000,
+          useNativeDriver: false,
+        }),
+      ])
+    ).start();
+  }, [pulseAnim]);
+
+  const pulseStyle = {
+    opacity: pulseAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0.3, 0.8],
+    }),
+  };
 
   const handleLogin = async () => {
     try {
@@ -104,71 +97,329 @@ export default function LoginScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.content}>
-        <Text variant="headlineMedium" style={styles.title}>
+    <ScrollView
+      contentContainerStyle={{
+        flexGrow: 1,
+        backgroundColor: theme.colors.background,
+      }}
+      showsVerticalScrollIndicator={false}
+    >
+      {/* Header with brand gradient background */}
+      <View
+        style={{
+          backgroundColor: theme.colors.primary,
+          paddingTop: insets.top + SPACING.xl,
+          paddingBottom: SPACING.xxl,
+          paddingHorizontal: SPACING.lg,
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: SCREEN_HEIGHT * 0.25,
+        }}
+      >
+        {/* Logo/Icon */}
+        <View
+          style={{
+            width: 80,
+            height: 80,
+            borderRadius: 40,
+            backgroundColor: 'rgba(255,255,255,0.2)',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: SPACING.lg,
+          }}
+        >
+          <MaterialCommunityIcon
+            name="briefcase"
+            size={48}
+            color={theme.colors.onPrimary}
+          />
+        </View>
+
+        {/* Title */}
+        <Text
+          variant="displaySmall"
+          style={{
+            color: theme.colors.onPrimary,
+            fontWeight: '800',
+            marginBottom: SPACING.xs,
+            textAlign: 'center',
+          }}
+        >
           BizManage
         </Text>
-        <Text variant="bodyMedium" style={styles.subtitle}>
-          Sign in to your account
-        </Text>
 
-        <TextInput
-          label="Email"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          disabled={isLoading}
-          mode="outlined"
-          style={styles.input}
-          error={!!errors.email}
-        />
-        {errors.email && <HelperText type="error">{errors.email}</HelperText>}
-
-        <TextInput
-          label="Password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry={!showPassword}
-          disabled={isLoading}
-          mode="outlined"
-          style={styles.input}
-          error={!!errors.password}
-          right={
-            <TextInput.Icon
-              icon={showPassword ? 'eye-off' : 'eye'}
-              onPress={() => setShowPassword(!showPassword)}
-            />
-          }
-        />
-        {errors.password && <HelperText type="error">{errors.password}</HelperText>}
-
-        {getErrorMessage() && (
-          <HelperText type="error" style={styles.errorMessage}>
-            {getErrorMessage()}
-          </HelperText>
-        )}
-
-        <Button
-          mode="contained"
-          onPress={handleLogin}
-          loading={isLoading}
-          disabled={isLoading || !email || !password}
-          style={styles.button}
+        {/* Subtitle */}
+        <Text
+          variant="bodyLarge"
+          style={{
+            color: theme.colors.onPrimaryContainer,
+            textAlign: 'center',
+            fontWeight: '500',
+          }}
         >
-          Sign In
-        </Button>
-
-        <Text variant="bodySmall" style={styles.info}>
-          Next-Auth: Secure credential-based authentication
+          Business Management Suite
         </Text>
+      </View>
 
-        <Text variant="bodySmall" style={styles.footer}>
-          Demo credentials:{'\n'}
-          Email: admin@bizmanage.com{'\n'}
-          Password: password123
-        </Text>
+      {/* Login Form */}
+      <View
+        style={{
+          flex: 1,
+          paddingHorizontal: SPACING.lg,
+          paddingTop: SPACING.lg,
+          paddingBottom: SPACING.xl,
+          justifyContent: 'center',
+        }}
+      >
+        {/* Sign In Card */}
+        <Card
+          style={{
+            borderRadius: 16,
+            overflow: 'hidden',
+            backgroundColor: theme.colors.surface,
+            ...SHADOWS.lg,
+            marginBottom: SPACING.lg,
+          }}
+        >
+          <Card.Content style={{ paddingVertical: SPACING.xl }}>
+            {/* Card Header */}
+            <View style={{ marginBottom: SPACING.xl }}>
+              <Text
+                variant="headlineSmall"
+                style={{
+                  color: theme.colors.onSurface,
+                  fontWeight: '700',
+                  marginBottom: SPACING.xs,
+                }}
+              >
+                Welcome Back
+              </Text>
+              <Text
+                variant="bodyMedium"
+                style={{
+                  color: theme.colors.onSurfaceVariant,
+                }}
+              >
+                Sign in to your account to continue
+              </Text>
+            </View>
+
+            {/* Email Input */}
+            <View style={{ marginBottom: SPACING.md }}>
+              <TextInput
+                label="Email Address"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                disabled={isLoading}
+                mode="outlined"
+                placeholder="admin@bizmanage.com"
+                error={!!errors.email}
+                left={<TextInput.Icon icon="email-outline" />}
+                style={{
+                  backgroundColor: theme.colors.surfaceVariant,
+                }}
+              />
+              {errors.email && (
+                <HelperText type="error" visible={!!errors.email}>
+                  📧 {errors.email}
+                </HelperText>
+              )}
+            </View>
+
+            {/* Password Input */}
+            <View style={{ marginBottom: SPACING.md }}>
+              <TextInput
+                label="Password"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+                disabled={isLoading}
+                mode="outlined"
+                placeholder="••••••••"
+                error={!!errors.password}
+                left={<TextInput.Icon icon="lock-outline" />}
+                right={
+                  <Pressable
+                    onPress={() => setShowPassword(!showPassword)}
+                    style={{ paddingRight: SPACING.md }}
+                  >
+                    <Text style={{ color: theme.colors.primary, fontWeight: '700' }}>
+                      {showPassword ? '👁️' : '👁️‍🗨️'}
+                    </Text>
+                  </Pressable>
+                }
+                style={{
+                  backgroundColor: theme.colors.surfaceVariant,
+                }}
+              />
+              {errors.password && (
+                <HelperText type="error" visible={!!errors.password}>
+                  🔒 {errors.password}
+                </HelperText>
+              )}
+            </View>
+
+            {/* Server Error Message */}
+            {getErrorMessage() && (
+              <View
+                style={{
+                  backgroundColor: theme.colors.errorContainer,
+                  borderRadius: 8,
+                  padding: SPACING.md,
+                  marginBottom: SPACING.lg,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: SPACING.md,
+                }}
+              >
+                <MaterialCommunityIcon
+                  name="alert-circle"
+                  size={20}
+                  color={theme.colors.error}
+                />
+                <Text
+                  variant="bodySmall"
+                  style={{
+                    color: theme.colors.onErrorContainer,
+                    flex: 1,
+                    fontWeight: '500',
+                  }}
+                >
+                  {getErrorMessage()}
+                </Text>
+              </View>
+            )}
+
+            {/* Sign In Button */}
+            <Pressable
+              onPress={handleLogin}
+              disabled={isLoading || !email || !password}
+              style={{
+                backgroundColor: isLoading || !email || !password 
+                  ? theme.colors.outlineVariant 
+                  : theme.colors.primary,
+                paddingVertical: SPACING.lg,
+                borderRadius: 12,
+                alignItems: 'center',
+                justifyContent: 'center',
+                opacity: isLoading ? 0.7 : 1,
+                marginBottom: SPACING.md,
+              }}
+            >
+              <Text
+                variant="labelLarge"
+                style={{
+                  color: isLoading || !email || !password 
+                    ? theme.colors.onSurfaceVariant 
+                    : theme.colors.onPrimary,
+                  fontWeight: '700',
+                }}
+              >
+                {isLoading ? '🔄 Signing in...' : '✓ Sign In'}
+              </Text>
+            </Pressable>
+
+            {/* Divider or additional options */}
+            <View style={{ marginTop: SPACING.lg }}>
+              <Text
+                variant="bodySmall"
+                style={{
+                  color: theme.colors.onSurfaceVariant,
+                  textAlign: 'center',
+                  fontWeight: '500',
+                  marginBottom: SPACING.sm,
+                }}
+              >
+                Demo Credentials
+              </Text>
+              <View
+                style={{
+                  backgroundColor: theme.colors.surfaceVariant,
+                  borderRadius: 8,
+                  padding: SPACING.md,
+                  gap: SPACING.sm,
+                }}
+              >
+                <View style={{ flexDirection: 'row', gap: SPACING.sm }}>
+                  <MaterialCommunityIcon
+                    name="email"
+                    size={14}
+                    color={theme.colors.onSurfaceVariant}
+                  />
+                  <Text
+                    variant="labelSmall"
+                    style={{
+                      color: theme.colors.onSurfaceVariant,
+                      fontFamily: 'monospace',
+                    }}
+                  >
+                    admin@bizmanage.com
+                  </Text>
+                </View>
+                <View style={{ flexDirection: 'row', gap: SPACING.sm }}>
+                  <MaterialCommunityIcon
+                    name="lock"
+                    size={14}
+                    color={theme.colors.onSurfaceVariant}
+                  />
+                  <Text
+                    variant="labelSmall"
+                    style={{
+                      color: theme.colors.onSurfaceVariant,
+                      fontFamily: 'monospace',
+                    }}
+                  >
+                    password123
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </Card.Content>
+        </Card>
+
+        {/* Footer Information */}
+        <View
+          style={{
+            alignItems: 'center',
+            gap: SPACING.sm,
+          }}
+        >
+          <Text
+            variant="bodySmall"
+            style={{
+              color: theme.colors.onSurfaceVariant,
+              textAlign: 'center',
+            }}
+          >
+            Secure Authentication with Next-Auth
+          </Text>
+          <Text
+            variant="labelSmall"
+            style={{
+              color: theme.colors.outlineVariant,
+              textAlign: 'center',
+            }}
+          >
+            Your data is encrypted and secure
+          </Text>
+        </View>
+
+        {/* Animated Decorative Element */}
+        <Animated.View
+          style={[
+            {
+              height: 4,
+              backgroundColor: theme.colors.primary,
+              borderRadius: 2,
+              marginTop: SPACING.lg,
+              alignSelf: 'center',
+              width: 40,
+            },
+            pulseStyle,
+          ]}
+        />
       </View>
     </ScrollView>
   );
