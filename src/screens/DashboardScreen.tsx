@@ -221,7 +221,7 @@ export default function DashboardScreen() {
               <StatCard
                 icon="cash-multiple"
                 title="Total Revenue"
-                value={`$${(stats.totalSales || 0).toFixed(0)}`}
+                value={`₹${(stats.totalSales || 0).toFixed(0)}`}
                 color={theme.colors.primary}
               />
               <StatCard

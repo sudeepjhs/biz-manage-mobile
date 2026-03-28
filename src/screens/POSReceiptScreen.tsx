@@ -57,17 +57,17 @@ export default function POSReceiptScreen({ route, navigation }: Props) {
       '--- ITEMS ---',
       ...receipt.items.map(
         (item) =>
-          `${item.name.padEnd(30)} x${item.quantity} $${item.subtotal.toFixed(2)}`
+          `${item.name.padEnd(30)} x${item.quantity} ₹${item.subtotal.toFixed(2)}`
       ),
       '',
       '--- TOTALS ---',
-      `Subtotal: $${receipt.subtotal.toFixed(2)}`,
-      receipt.discount > 0 ? `Discount: -$${receipt.discount.toFixed(2)}` : '',
-      `Total: $${receipt.total.toFixed(2)}`,
+      `Subtotal: ₹${receipt.subtotal.toFixed(2)}`,
+      receipt.discount > 0 ? `Discount: -₹${receipt.discount.toFixed(2)}` : '',
+      `Total: ₹${receipt.total.toFixed(2)}`,
       '',
       `Payment: ${receipt.paymentMethod}`,
-      `Amount Paid: $${receipt.amountPaid.toFixed(2)}`,
-      receipt.change > 0 ? `Change: $${receipt.change.toFixed(2)}` : '',
+      `Amount Paid: ₹${receipt.amountPaid.toFixed(2)}`,
+      receipt.change > 0 ? `Change: ₹${receipt.change.toFixed(2)}` : '',
       receipt.customerEmail ? `Customer Email: ${receipt.customerEmail}` : '',
       receipt.notes ? `Notes: ${receipt.notes}` : '',
       '',

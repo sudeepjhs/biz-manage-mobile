@@ -165,7 +165,7 @@ export default function POSScreen() {
       {cartItemCount > 0 && (
         <FAB
           icon="shopping-cart"
-          label={`${cartItemCount} items - $${subtotal.toFixed(2)}`}
+          label={`${cartItemCount} items - ₹${subtotal.toFixed(2)}`}
           onPress={() => setCartVisible(true)}
           style={{
             position: 'absolute',

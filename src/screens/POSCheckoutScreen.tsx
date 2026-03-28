@@ -291,7 +291,7 @@ export default function POSCheckoutScreen(params?: CheckoutParams) {
       <ConfirmDialog
         visible={confirmVisible}
         title="Confirm Order"
-        description={`Complete order for $${total.toFixed(2)}?`}
+        description={`Complete order for ₹${total.toFixed(2)}?`}
         confirmLabel="Yes, Complete"
         cancelLabel="No, Cancel"
         isDangerous={false}
