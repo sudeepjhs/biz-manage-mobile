@@ -1,9 +1,11 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  Animated,
+  Easing,
   FlatList,
   RefreshControl,
   StyleSheet,
-  View
+  View,
 } from 'react-native';
 import { Button, Card, Text, useTheme } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -59,6 +61,22 @@ export default function TimeClockScreen() {
     return () => interval && clearInterval(interval);
   }, [clockStatusQuery.data]);
 
+  // Animated pulse for clocked-in status
+  const pulse = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    let anim: Animated.CompositeAnimation | null = null;
+    if (isClocked) {
+      anim = Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulse, { toValue: 1.15, duration: 700, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+          Animated.timing(pulse, { toValue: 1, duration: 700, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+        ])
+      );
+      anim.start();
+    }
+    return () => anim && anim.stop();
+  }, [isClocked, pulse]);
+
   // Format elapsed time
   const formatElapsedTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
@@ -75,6 +93,7 @@ export default function TimeClockScreen() {
   const clockState = clockStatusQuery.data?.currentState || 'OUT';
   const isClocked = clockState === 'IN' || clockState === 'MEAL' || clockState === 'BREAK';
   const todayEntry = timeEntriesQuery.data?.[0]; // Assuming only one entry for current user/day
+  const isDayCompleted = todayEntry?.status === 'COMPLETED';
 
   const renderTimeEntry = ({ item }: { item: any }) => (
     <Card
@@ -276,11 +295,11 @@ export default function TimeClockScreen() {
                   longitude: 0 
                 })}
                 loading={clockOutMutation.isPending}
-                disabled={clockOutMutation.isPending}
+                disabled={clockOutMutation.isPending || isDayCompleted}
                 icon="logout"
                 style={{ flex: 1 }}
               >
-                Clock Out
+                {isDayCompleted ? 'Completed' : 'Clock Out'}
               </Button>
             ) : (
               <Button
@@ -291,11 +310,11 @@ export default function TimeClockScreen() {
                   longitude: 0 
                 })}
                 loading={clockInMutation.isPending}
-                disabled={clockInMutation.isPending}
+                disabled={clockInMutation.isPending || isDayCompleted}
                 icon="login"
                 style={{ flex: 1 }}
               >
-                Clock In
+                {isDayCompleted ? 'Day Completed' : 'Clock In'}
               </Button>
             )}
           </View>

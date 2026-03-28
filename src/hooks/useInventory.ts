@@ -129,3 +129,22 @@ export const useInventoryCategories = () => {
     staleTime: 30 * 60 * 1000, // 30 minutes
   });
 };
+/**
+ * Propose a stock movement (for workers/managers)
+ */
+export const useProposeMovement = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (payload: StockMovement & { isProposal?: boolean }) => {
+      const response = await apiClient.post(
+        `${API_ENDPOINTS.INVENTORY.MOVEMENTS}/propose`,
+        { ...payload, isProposal: true }
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.inventory.products.all });
+    },
+  });
+};

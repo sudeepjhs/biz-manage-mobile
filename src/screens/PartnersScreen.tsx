@@ -31,10 +31,17 @@ import { useAuth } from '@hooks/useAuth';
 export default function PartnersScreen() {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
-  const { hasRole } = useAuth();
+  const { hasPermission } = useAuth();
+
+  const canViewSuppliers = hasPermission('SUPPLIERS', 'VIEW');
+  const canViewCustomers = hasPermission('CUSTOMERS', 'VIEW');
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [partnerType, setPartnerType] = useState<'SUPPLIER' | 'CUSTOMER'>('SUPPLIER');
+  const [partnerType, setPartnerType] = useState<'SUPPLIER' | 'CUSTOMER'>(
+    canViewSuppliers ? 'SUPPLIER' : 'CUSTOMER'
+  );
+
+  const showTabs = canViewSuppliers && canViewCustomers;
 
   // Fetch data
   const suppliersQuery = useSuppliers({ search: searchQuery });
@@ -50,9 +57,9 @@ export default function PartnersScreen() {
     }
   }, [partnerType, suppliersQuery, customersQuery]);
 
-  const displayData = partnerType === 'SUPPLIER' 
-    ? suppliersQuery.data || [] 
-    : customersQuery.data || [];
+  const displayData = partnerType === 'SUPPLIER'
+    ? suppliersQuery.data?.data || []
+    : customersQuery.data?.data || [];
 
   const isLoading = partnerType === 'SUPPLIER' ? suppliersQuery.isLoading : customersQuery.isLoading;
   const isError = partnerType === 'SUPPLIER' ? suppliersQuery.isError : customersQuery.isError;
@@ -105,14 +112,16 @@ export default function PartnersScreen() {
             )}
           </View>
           <View style={{ flexDirection: 'row' }}>
-            <IconButton
-              icon="pencil"
-              size={20}
-              onPress={() => {
-                // Navigate to edit
-              }}
-            />
-            {hasRole('ADMIN') && (
+            {hasPermission(partnerType === 'SUPPLIER' ? 'SUPPLIERS' : 'CUSTOMERS', 'EDIT') && (
+              <IconButton
+                icon="pencil"
+                size={20}
+                onPress={() => {
+                  // Navigate to edit
+                }}
+              />
+            )}
+            {hasPermission(partnerType === 'SUPPLIER' ? 'SUPPLIERS' : 'CUSTOMERS', 'DELETE') && (
               <IconButton
                 icon="delete"
                 size={20}
@@ -164,16 +173,18 @@ export default function PartnersScreen() {
         />
       </View>
 
-      <View style={{ padding: SPACING.lg }}>
-        <SegmentedButtons
-          value={partnerType}
-          onValueChange={value => setPartnerType(value as any)}
-          buttons={[
-            { value: 'SUPPLIER', label: 'Suppliers', icon: 'truck-delivery-outline' },
-            { value: 'CUSTOMER', label: 'Customers', icon: 'account-star-outline' },
-          ]}
-        />
-      </View>
+      {showTabs && (
+        <View style={{ padding: SPACING.lg }}>
+          <SegmentedButtons
+            value={partnerType}
+            onValueChange={value => setPartnerType(value as any)}
+            buttons={[
+              { value: 'SUPPLIER', label: 'Suppliers', icon: 'truck-delivery-outline' },
+              { value: 'CUSTOMER', label: 'Customers', icon: 'account-star-outline' },
+            ]}
+          />
+        </View>
+      )}
 
       {isError && (
         <ErrorAlert
@@ -210,7 +221,7 @@ export default function PartnersScreen() {
         />
       )}
 
-      {hasRole('ADMIN') && (
+      {hasPermission(partnerType === 'SUPPLIER' ? 'SUPPLIERS' : 'CUSTOMERS', 'CREATE') && (
         <FAB
           icon="plus"
           style={{

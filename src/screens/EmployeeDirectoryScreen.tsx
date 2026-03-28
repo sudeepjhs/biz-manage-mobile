@@ -44,11 +44,13 @@ const useEmployees = (search?: string) => {
   });
 };
 
+import { useAuth } from '@hooks/useAuth';
 import { LAYOUT, SHADOWS, SPACING } from '@lib/ui-utils';
 
 export default function EmployeeDirectoryScreen() {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
+  const { user, hasPermission } = useAuth();
 
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -59,6 +61,11 @@ export default function EmployeeDirectoryScreen() {
   const onRefresh = useCallback(() => {
     employeesQuery.refetch();
   }, [employeesQuery]);
+
+  // Filter based on permissions
+  const displayEmployees = hasPermission('EMPLOYEES', 'VIEW')
+    ? employeesQuery.data || []
+    : (employeesQuery.data || []).filter((emp: any) => emp.user?.email === user?.email);
 
   const renderEmployee = ({ item }: any) => (
     <Card
@@ -153,9 +160,9 @@ export default function EmployeeDirectoryScreen() {
         />
       )}
 
-      {employeesQuery.data && employeesQuery.data.length > 0 ? (
+      {displayEmployees && displayEmployees.length > 0 ? (
         <FlatList
-          data={employeesQuery.data}
+          data={displayEmployees}
           renderItem={renderEmployee}
           keyExtractor={(item) => item.id}
           contentContainerStyle={{

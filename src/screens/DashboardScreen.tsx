@@ -5,6 +5,7 @@ import { useDashboardActivity, useDashboardStats } from '@hooks/useDashboard';
 import API_CLIENT from '@lib/api-client';
 import { LAYOUT, SHADOWS, SPACING } from '@lib/ui-utils';
 import React, { useCallback } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import {
   Dimensions,
   RefreshControl,
@@ -133,7 +134,8 @@ const ActivityItemComponent: React.FC<{
 export default function DashboardScreen() {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
-  const { user, logout } = useAuth();
+  const { user, logout, hasPermission } = useAuth();
+  const navigation = useNavigation();
 
   // Fetch data
   const statsQuery = useDashboardStats();
@@ -216,37 +218,49 @@ export default function DashboardScreen() {
         {/* Stats Grid */}
         {stats && (
           <View>
-            {/* Row 1 */}
-            <View style={{ flexDirection: 'row', paddingHorizontal: SPACING.md }}>
-              <StatCard
-                icon="cash-multiple"
-                title="Total Revenue"
-                value={`₹${(stats.totalSales || 0).toFixed(0)}`}
-                color={theme.colors.primary}
-              />
-              <StatCard
-                icon="cart"
-                title="Total Orders"
-                value={stats.totalOrders || 0}
-                color={theme.colors.secondary}
-              />
-            </View>
+            {/* Row 1: Revenue & Orders (Admin/Manager only) */}
+            {(hasPermission('DASHBOARD', 'ALL_DATA') || hasPermission('DASHBOARD', 'DEPARTMENT_DATA')) && (
+              <View style={{ flexDirection: 'row', paddingHorizontal: SPACING.md }}>
+                <StatCard
+                  icon="cash-multiple"
+                  title="Total Revenue"
+                  value={`₹${(stats.totalSales || 0).toFixed(0)}`}
+                  color={theme.colors.primary}
+                />
+                <StatCard
+                  icon="cart"
+                  title="Total Orders"
+                  value={stats.totalOrders || 0}
+                  color={theme.colors.secondary}
+                />
+              </View>
+            )}
 
-            {/* Row 2 */}
-            <View style={{ flexDirection: 'row', paddingHorizontal: SPACING.md }}>
-              <StatCard
-                icon="briefcase"
-                title="Active Staff"
-                value={stats.activeEmployees}
-                color="#4CAF50"
-              />
-              <StatCard
-                icon="alert-circle"
-                title="Low Stock"
-                value={stats.lowStock}
-                color="#FF9800"
-              />
-            </View>
+            {/* Row 2: Staff & Stock (Admin/Manager only) */}
+            {(hasPermission('DASHBOARD', 'ALL_DATA') || hasPermission('DASHBOARD', 'DEPARTMENT_DATA')) && (
+              <View style={{ flexDirection: 'row', paddingHorizontal: SPACING.md }}>
+                <StatCard
+                  icon="briefcase"
+                  title="Active Staff"
+                  value={stats.activeEmployees}
+                  color="#4CAF50"
+                />
+                <StatCard
+                  icon="alert-circle"
+                  title="Low Stock"
+                  value={stats.lowStock}
+                  color="#FF9800"
+                />
+              </View>
+            )}
+
+            {/* Worker specific stats if needed - for now just welcome them */}
+            {!(hasPermission('DASHBOARD', 'ALL_DATA') || hasPermission('DASHBOARD', 'DEPARTMENT_DATA')) && (
+               <View style={{ padding: SPACING.xl, alignItems: 'center' }}>
+                 <MaterialCommunityIcon name="star-outline" size={48} color={theme.colors.primary} />
+                 <Text variant="titleMedium" style={{ marginTop: SPACING.md }}>Have a productive day!</Text>
+               </View>
+            )}
           </View>
         )}
 
@@ -262,86 +276,103 @@ export default function DashboardScreen() {
             Quick Actions
           </Text>
           <View style={{ flexDirection: 'row', gap: SPACING.md }}>
-            <Button
-              mode="contained-tonal"
-              icon="cash-register"
-              onPress={() => {
-                // Navigate to POS
-              }}
-              style={{ flex: 1 }}
-            >
-              POS
-            </Button>
-            <Button
-              mode="contained-tonal"
-              icon="package-variant"
-              onPress={() => {
-                // Navigate to Inventory
-              }}
-              style={{ flex: 1 }}
-            >
-              Inventory
-            </Button>
-            <Button
-              mode="contained-tonal"
-              icon="clock"
-              onPress={() => {
-                // Navigate to Time Clock
-              }}
-              style={{ flex: 1 }}
-            >
-              Clock
-            </Button>
-          </View>
-        </View>
-
-        {/* Activity Feed */}
-        <View style={{ marginTop: SPACING.xl }}>
-          <View style={{ paddingHorizontal: SPACING.lg, marginBottom: SPACING.md }}>
-            <Text
-              variant="titleMedium"
-              style={{
-                fontWeight: '600',
-              }}
-            >
-              Recent Activity
-            </Text>
-          </View>
-
-          <Card
-            style={{
-              marginHorizontal: SPACING.lg,
-              ...SHADOWS.md,
-            }}
-          >
-            {activities.length > 0 ? (
-              activities.slice(0, 5).map((activity, index) => (
-                <ActivityItemComponent
-                  key={index}
-                  type={activity.entityType.toLowerCase()}
-                  title={`${activity.actor.name} ${activity.action}`}
-                  description={`${activity.entityType} #${activity.entityId.slice(-5)}`}
-                  timestamp={activity.timestamp}
-                />
-              ))
-            ) : (
-              <View style={{ padding: SPACING.lg, alignItems: 'center' }}>
-                <MaterialCommunityIcon
-                  name="history"
-                  size={40}
-                  color={theme.colors.outline}
-                  style={{ marginBottom: SPACING.md }}
-                />
-                <Text
-                  variant="bodyMedium"
-                  style={{ color: theme.colors.outline }}
-                >
-                  No recent activity
-                </Text>
-              </View>
+            {hasPermission('POS', 'CREATE') && (
+              <Button
+                mode="contained-tonal"
+                icon="cash-register"
+                onPress={() => {
+                  // Navigate to POS tab
+                  // If the POS tab exists, this will activate it
+                  // and show the POSScreen
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-ignore
+                  navigation.navigate('POSTab');
+                }}
+                style={{ flex: 1 }}
+              >
+                POS
+              </Button>
             )}
-          </Card>
+            {hasPermission('INVENTORY', 'VIEW') && (
+              <Button
+                mode="contained-tonal"
+                icon="package-variant"
+                onPress={() => {
+                  // Navigate to Inventory tab
+                  // @ts-ignore
+                  navigation.navigate('InventoryTab');
+                }}
+                style={{ flex: 1 }}
+              >
+                Inventory
+              </Button>
+            )}
+            {hasPermission('TIME', 'CLOCK') && (
+              <Button
+                mode="contained-tonal"
+                icon="clock"
+                onPress={() => {
+                  // Navigate to Time tab
+                  // @ts-ignore
+                  navigation.navigate('TimeTab');
+                }}
+                style={{ flex: 1 }}
+              >
+                Clock
+              </Button>
+            )}
+          </View>
         </View>
+
+        {/* Activity Feed (Admin/Manager only) */}
+        {(hasPermission('DASHBOARD', 'ALL_DATA') || hasPermission('DASHBOARD', 'DEPARTMENT_DATA')) && (
+          <View style={{ marginTop: SPACING.xl }}>
+            <View style={{ paddingHorizontal: SPACING.lg, marginBottom: SPACING.md }}>
+              <Text
+                variant="titleMedium"
+                style={{
+                  fontWeight: '600',
+                }}
+              >
+                Recent Activity
+              </Text>
+            </View>
+
+            <Card
+              style={{
+                marginHorizontal: SPACING.lg,
+                ...SHADOWS.md,
+              }}
+            >
+              {activities.length > 0 ? (
+                activities.slice(0, 5).map((activity, index) => (
+                  <ActivityItemComponent
+                    key={index}
+                    type={activity.entityType.toLowerCase()}
+                    title={`${activity.actor.name} ${activity.action}`}
+                    description={`${activity.entityType} #${activity.entityId.slice(-5)}`}
+                    timestamp={activity.timestamp}
+                  />
+                ))
+              ) : (
+                <View style={{ padding: SPACING.lg, alignItems: 'center' }}>
+                  <MaterialCommunityIcon
+                    name="history"
+                    size={40}
+                    color={theme.colors.outline}
+                    style={{ marginBottom: SPACING.md }}
+                  />
+                  <Text
+                    variant="bodyMedium"
+                    style={{ color: theme.colors.outline }}
+                  >
+                    No recent activity
+                  </Text>
+                </View>
+              )}
+            </Card>
+          </View>
+        )}
 
         {/* Logout Button */}
         <View style={{ paddingHorizontal: SPACING.lg, marginTop: SPACING.xl }}>

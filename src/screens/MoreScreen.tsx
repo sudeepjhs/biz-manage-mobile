@@ -26,7 +26,7 @@ export default function MoreScreen() {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<MoreScreenNavigationProp>();
-  const { hasRole } = useAuth();
+  const { hasPermission } = useAuth();
 
   const menuItems = [
     {
@@ -36,16 +36,23 @@ export default function MoreScreen() {
       icon: 'account-group-outline',
       color: '#3b82f6',
       onPress: () => navigation.navigate('Partners'),
-      visible: hasRole('ADMIN') || hasRole('MANAGER') || hasRole('WORKER'),
+      visible: hasPermission('CUSTOMERS', 'VIEW') || hasPermission('SUPPLIERS', 'VIEW'),
     },
     {
       id: 'employees',
-      title: 'Employee Directory',
-      subtitle: 'View staff information',
-      icon: 'badge-account-horizontal-outline',
+      title: hasPermission('EMPLOYEES', 'VIEW') ? 'Employee Directory' : 'My Profile',
+      subtitle: hasPermission('EMPLOYEES', 'VIEW') ? 'View staff information' : 'View your profile & settings',
+      icon: hasPermission('EMPLOYEES', 'VIEW') ? 'badge-account-horizontal-outline' : 'account-cog-outline',
       color: '#10b981',
-      onPress: () => navigation.navigate('EmployeeDirectory'),
-      visible: hasRole('ADMIN') || hasRole('MANAGER') || hasRole('WORKER'),
+      onPress: () => {
+        if (hasPermission('EMPLOYEES', 'VIEW')) {
+          navigation.navigate('EmployeeDirectory');
+        } else {
+          // @ts-ignore - Navigating to a different tab
+          navigation.navigate('SettingsTab');
+        }
+      },
+      visible: hasPermission('EMPLOYEES', 'VIEW') || hasPermission('EMPLOYEES', 'VIEW_OWN'),
     },
     {
       id: 'audit',
@@ -54,7 +61,7 @@ export default function MoreScreen() {
       icon: 'shield-check-outline',
       color: '#f59e0b',
       onPress: () => navigation.navigate('AuditLogs'),
-      visible: hasRole('ADMIN') || hasRole('MANAGER'),
+      visible: hasPermission('AUDIT', 'VIEW'),
     },
     {
       id: 'ai-assistant',
@@ -63,7 +70,7 @@ export default function MoreScreen() {
       icon: 'robot-outline',
       color: '#8b5cf6',
       onPress: () => navigation.navigate('AIChat'),
-      visible: hasRole('ADMIN') || hasRole('MANAGER'),
+      visible: hasPermission('AI_ASSISTANT', 'CHAT'),
     },
   ];
 

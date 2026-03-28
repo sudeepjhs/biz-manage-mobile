@@ -21,3 +21,4 @@ export { default as PartnersScreen } from '@screens/PartnersScreen';
 export { default as EmployeeDirectoryScreen } from '@screens/EmployeeDirectoryScreen';
 export { default as AuditLogScreen } from '@screens/AuditLogScreen';
 export { default as AIChatScreen } from '@screens/AIChatScreen';
+export { default as ProposeMovementScreen } from '@screens/ProposeMovementScreen';

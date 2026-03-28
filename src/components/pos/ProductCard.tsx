@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { TouchableOpacity, View, Pressable } from 'react-native';
 import { Card, Text, useTheme, Button } from 'react-native-paper';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -28,17 +28,24 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const isOutOfStock = stock === 0;
 
   return (
-    <TouchableOpacity activeOpacity={0.7} onPress={onPress} disabled={isOutOfStock}>
+    <Pressable 
+      onPress={onPress} 
+      disabled={isOutOfStock}
+      style={({ pressed }) => ({
+        opacity: pressed ? 0.8 : 1,
+      })}
+    >
       <Card
         style={{
-          marginBottom: 12,
+          marginBottom: 0,
           opacity: isOutOfStock ? 0.6 : 1,
+          flex: 1,
         }}
       >
-        {/* Image placeholder or actual image */}
+        {/* Image placeholder - optimized height */}
         <View
           style={{
-            height: 120,
+            height: 100,
             backgroundColor: theme.colors.surfaceVariant,
             justifyContent: 'center',
             alignItems: 'center',
@@ -55,60 +62,73 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           )}
         </View>
 
-        {/* Content */}
-        <Card.Content style={{ paddingVertical: 12 }}>
+        {/* Content - Optimized spacing (8dp Material Design scale) */}
+        <Card.Content style={{ paddingHorizontal: 8, paddingVertical: 8 }}>
           <Text
-            variant="titleMedium"
+            variant="titleSmall"
             numberOfLines={2}
             style={{
               marginBottom: 4,
               fontWeight: '600',
+              color: theme.colors.onSurface,
             }}
           >
             {name}
           </Text>
 
           {category && (
-            <Text variant="bodySmall" style={{ color: theme.colors.outline, marginBottom: 8 }}>
+            <Text 
+              variant="labelSmall" 
+              style={{ 
+                color: theme.colors.outline, 
+                marginBottom: 6 
+              }}
+              numberOfLines={1}
+            >
               {category}
             </Text>
           )}
 
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+          {/* Price and Stock Row - Compact layout */}
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
             <Text
-              variant="headlineSmall"
+              variant="titleMedium"
               style={{
                 color: theme.colors.primary,
                 fontWeight: '700',
               }}
             >
-              ${unitPrice.toFixed(2)}
+              ₹{unitPrice.toFixed(0)}
             </Text>
             {stock !== undefined && (
               <Text
-                variant="bodySmall"
+                variant="labelSmall"
                 style={{
                   color: isOutOfStock ? theme.colors.error : theme.colors.outline,
+                  fontWeight: isOutOfStock ? '600' : '400',
                 }}
               >
-                Stock: {stock}
+                {isOutOfStock ? 'Out' : `${stock}`}
               </Text>
             )}
           </View>
         </Card.Content>
 
-        {/* Action */}
-        <Card.Actions>
+        {/* Action Button - Proper touch target (44dp minimum) */}
+        <View style={{ paddingHorizontal: 8, paddingBottom: 8 }}>
           <Button
             mode="contained"
             onPress={() => onAddToCart(id)}
             disabled={isOutOfStock}
-            style={{ flex: 1 }}
+            compact={false}
+            style={{ 
+              minHeight: 40,
+            }}
           >
-            {isOutOfStock ? 'Out of Stock' : 'Add'}
+            {isOutOfStock ? 'Out' : 'Add'}
           </Button>
-        </Card.Actions>
+        </View>
       </Card>
-    </TouchableOpacity>
+    </Pressable>
   );
 };

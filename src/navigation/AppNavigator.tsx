@@ -1,40 +1,43 @@
-import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import ProposeMovementScreen from '@screens/ProposeMovementScreen';
+import React from 'react';
+
+import { useAuth } from '@hooks/useAuth';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import type { 
-  BottomTabsParamList, 
-  POSStackParamList, 
-  DashboardStackParamList, 
-  InventoryStackParamList, 
-  TimeStackParamList,
+import type {
+  BottomTabsParamList,
+  DashboardStackParamList,
+  InventoryStackParamList,
   LeaveStackParamList,
-  SettingsStackParamList,
   MoreStackParamList,
+  POSStackParamList,
+  SettingsStackParamList,
+  TimeStackParamList,
 } from '../types/navigation-params';
 
 // Main screens
 import DashboardScreen from '@screens/DashboardScreen';
-import POSScreen from '@screens/POSScreen';
 import InventoryScreen from '@screens/InventoryScreen';
-import TimeClockScreen from '@screens/TimeClockScreen';
+import POSScreen from '@screens/POSScreen';
 import SettingsScreen from '@screens/SettingsScreen';
+import TimeClockScreen from '@screens/TimeClockScreen';
 
 // POS sub-screens (with strict type safety)
 import POSCheckoutScreen from '@screens/POSCheckoutScreen';
 import POSReceiptScreen from '@screens/POSReceiptScreen';
 
 // Leave sub-screens
-import LeaveRequestsScreen from '@screens/LeaveRequestsScreen';
 import LeaveApprovalsScreen from '@screens/LeaveApprovalsScreen';
 import LeaveBalanceScreen from '@screens/LeaveBalanceScreen';
+import LeaveRequestsScreen from '@screens/LeaveRequestsScreen';
 
 // More screens
+import AIChatScreen from '@screens/AIChatScreen';
+import AuditLogScreen from '@screens/AuditLogScreen';
+import EmployeeDirectoryScreen from '@screens/EmployeeDirectoryScreen';
 import MoreScreen from '@screens/MoreScreen';
 import PartnersScreen from '@screens/PartnersScreen';
-import EmployeeDirectoryScreen from '@screens/EmployeeDirectoryScreen';
-import AuditLogScreen from '@screens/AuditLogScreen';
-import AIChatScreen from '@screens/AIChatScreen';
 
 // Navigation instances
 const Tab = createBottomTabNavigator<BottomTabsParamList>();
@@ -101,6 +104,7 @@ function DashboardStackNavigator() {
   );
 }
 
+
 /**
  * Inventory Stack Navigator
  */
@@ -115,6 +119,11 @@ function InventoryStackNavigator() {
         name="InventoryScreen"
         component={InventoryScreen}
         options={{ title: 'Inventory' }}
+      />
+      <InventoryStack.Screen
+        name="ProposeMovement"
+        component={ProposeMovementScreen}
+        options={{ title: 'Propose Movement' }}
       />
     </InventoryStack.Navigator>
   );
@@ -234,6 +243,8 @@ function MoreStackNavigator() {
  * - Type-safe route names and parameters
  */
 export default function AppNavigator() {
+  const { hasPermission } = useAuth();
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -283,34 +294,47 @@ export default function AppNavigator() {
           tabBarLabel: 'Dashboard',
         }}
       />
-      <Tab.Screen
-        name="POSTab"
-        component={POSStackNavigator}
-        options={{
-          tabBarLabel: 'POS',
-        }}
-      />
-      <Tab.Screen
-        name="InventoryTab"
-        component={InventoryStackNavigator}
-        options={{
-          tabBarLabel: 'Inventory',
-        }}
-      />
-      <Tab.Screen
-        name="TimeTab"
-        component={TimeStackNavigator}
-        options={{
-          tabBarLabel: 'Time',
-        }}
-      />
-      <Tab.Screen
-        name="LeaveTab"
-        component={LeaveStackNavigator}
-        options={{
-          tabBarLabel: 'Leave',
-        }}
-      />
+
+      {hasPermission('POS', 'VIEW') && (
+        <Tab.Screen
+          name="POSTab"
+          component={POSStackNavigator}
+          options={{
+            tabBarLabel: 'POS',
+          }}
+        />
+      )}
+
+      {hasPermission('INVENTORY', 'VIEW') && (
+        <Tab.Screen
+          name="InventoryTab"
+          component={InventoryStackNavigator}
+          options={{
+            tabBarLabel: 'Inventory',
+          }}
+        />
+      )}
+
+      {hasPermission('TIME', 'VIEW') && (
+        <Tab.Screen
+          name="TimeTab"
+          component={TimeStackNavigator}
+          options={{
+            tabBarLabel: 'Time',
+          }}
+        />
+      )}
+
+      {hasPermission('LEAVE', 'VIEW') && (
+        <Tab.Screen
+          name="LeaveTab"
+          component={LeaveStackNavigator}
+          options={{
+            tabBarLabel: 'Leave',
+          }}
+        />
+      )}
+
       <Tab.Screen
         name="SettingsTab"
         component={SettingsStackNavigator}
@@ -318,13 +342,20 @@ export default function AppNavigator() {
           tabBarLabel: 'Settings',
         }}
       />
-      <Tab.Screen
-        name="MoreTab"
-        component={MoreStackNavigator}
-        options={{
-          tabBarLabel: 'More',
-        }}
-      />
+
+      {(hasPermission('CUSTOMERS', 'VIEW') ||
+        hasPermission('SUPPLIERS', 'VIEW') ||
+        hasPermission('EMPLOYEES', 'VIEW') ||
+        hasPermission('AUDIT', 'VIEW') ||
+        hasPermission('AI_ASSISTANT', 'CHAT')) && (
+          <Tab.Screen
+            name="MoreTab"
+            component={MoreStackNavigator}
+            options={{
+              tabBarLabel: 'More',
+            }}
+          />
+        )}
     </Tab.Navigator>
   );
 }

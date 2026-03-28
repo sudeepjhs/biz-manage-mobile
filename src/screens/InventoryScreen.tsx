@@ -13,12 +13,20 @@ import {
   LoadingOverlay,
   SearchBar
 } from '@components/index';
+import { useAuth } from '@hooks/useAuth';
 import { useInventoryProducts, useLowStockAlerts } from '@hooks/useInventory';
 import { LAYOUT, SHADOWS, SPACING } from '@lib/ui-utils';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { InventoryStackParamList } from '../types/navigation';
+
+type NavigationProp = NativeStackNavigationProp<InventoryStackParamList, 'ProposeMovement'>;
 
 export default function InventoryScreen() {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
+  const { hasPermission } = useAuth();
+  const navigation = useNavigation<NavigationProp>();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [showLowStockOnly, setShowLowStockOnly] = useState(false);
@@ -41,12 +49,11 @@ export default function InventoryScreen() {
   // Render product item
   const renderProduct = ({ item }: any) => {
     const currentStock = item.stockItems?.reduce(
-      (acc: number, si: any) => acc + si.quantityOnHand, 
+      (acc: number, si: any) => acc + si.quantityOnHand,
       0
     ) || 0;
     const isLowStock = currentStock <= (item.reorderPoint || 0);
     const stockStatus = isLowStock ? 'Low Stock ⚠️' : `${currentStock} in stock`;
-
     return (
       <Card
         style={{
@@ -155,13 +162,29 @@ export default function InventoryScreen() {
               </Text>
             </View>
 
-            <IconButton
-              icon="pencil"
-              size={20}
-              onPress={() => {
-                // Would navigate to edit stock or create stock movement
-              }}
-            />
+            <View style={{ flexDirection: 'row' }}>
+              {hasPermission('INVENTORY', 'PROPOSE_MOVE') && (
+                <IconButton
+                  icon="package-variant-plus"
+                  size={20}
+                  onPress={() => {
+                    navigation.navigate('ProposeMovement', {
+                      productId: item.id,
+                      productName: item.name,
+                    });
+                  }}
+                />
+              )}
+              {hasPermission('INVENTORY', 'EDIT') && (
+                <IconButton
+                  icon="pencil"
+                  size={20}
+                  onPress={() => {
+                    // Would navigate to edit stock or create stock movement
+                  }}
+                />
+              )}
+            </View>
           </View>
 
           {item.updatedAt && (

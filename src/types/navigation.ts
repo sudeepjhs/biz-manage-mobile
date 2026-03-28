@@ -51,6 +51,10 @@ export type InventoryStackParamList = {
   MovementList: undefined;
   LocationList: undefined;
   LocationDetail: { id: string };
+  ProposeMovement: {
+    productId: string;
+    productName: string;
+  };
 };
 
 /**

@@ -65,6 +65,10 @@ export type InventoryStackParamList = {
     productId: string;
     productName: string;
   };
+  ProposeMovement: {
+    productId: string;
+    productName: string;
+  };
 };
 
 // Time Stack (Nested within TimeTab)

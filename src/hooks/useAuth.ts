@@ -6,6 +6,7 @@ import { queryKeys } from '@lib/query-keys';
 import { useAuthStore } from '@store/authStore';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import type { AuthUser, LoginRequest, LoginResponse } from '../types/api';
+import { ROLE_PERMISSIONS } from '@config/index';
 
 // Declare global type for logout handler
 declare global {
@@ -99,6 +100,11 @@ export function useAuth() {
     login: (credentials: LoginRequest) => loginMutation.mutateAsync(credentials),
     logout: () => logoutMutation.mutateAsync(),
     hasRole: (role: string) => authStore.user?.role === role,
+    hasPermission: (feature: keyof typeof ROLE_PERMISSIONS.ADMIN, action: string) => {
+      const role = authStore.user?.role as keyof typeof ROLE_PERMISSIONS;
+      if (!role || !ROLE_PERMISSIONS[role]) return false;
+      return (ROLE_PERMISSIONS[role] as any)[feature]?.includes(action);
+    },
   };
 }
 

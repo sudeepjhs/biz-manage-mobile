@@ -14,18 +14,23 @@ import { usePOSCart } from '@hooks/usePOSCart';
 import { LAYOUT, SPACING } from '@lib/ui-utils';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
+  Animated,
   Dimensions,
   FlatList,
   RefreshControl,
   StyleSheet,
   View,
+  Pressable,
 } from 'react-native';
-import { FAB, useTheme } from 'react-native-paper';
+import { FAB, useTheme, Chip, Text } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const PRODUCT_COLUMNS = 2;
+// Touch target minimum: 44×48dp (iOS HIG standard)
 const PRODUCT_WIDTH = (SCREEN_WIDTH - SPACING.lg * 2 - SPACING.md) / PRODUCT_COLUMNS;
+// Ensure proper spacing between items (8dp minimum per Material Design)
+const PRODUCT_ITEM_GAP = SPACING.md;
 
 interface DisplayProduct extends POSProduct {
   key: string;
@@ -34,16 +39,39 @@ interface DisplayProduct extends POSProduct {
 export default function POSScreen() {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
-
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [cartVisible, setCartVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [cartBadgeScale] = useState(new Animated.Value(1));
 
   // Fetch data
   const productsQuery = useProducts();
   const categoriesQuery = useCategories();
   const { items, addItem, removeItem, updateQuantity, clearCart, subtotal, total } = usePOSCart();
+
+  // Animate cart badge on update
+  const animateCartBadge = useCallback(() => {
+    Animated.sequence([
+      Animated.timing(cartBadgeScale, {
+        toValue: 1.2,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+      Animated.timing(cartBadgeScale, {
+        toValue: 1,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [cartBadgeScale]);
+
+  // Trigger badge animation when cart updates
+  React.useEffect(() => {
+    if (items.length > 0) {
+      animateCartBadge();
+    }
+  }, [items.length, animateCartBadge]);
 
   // Handle refresh
   const onRefresh = useCallback(() => {
@@ -73,9 +101,18 @@ export default function POSScreen() {
     return filtered.map((p) => ({ ...p, key: p.id }));
   }, [productsQuery.data, selectedCategory, searchQuery]);
 
-  // Render product card
+  // Render product card with proper spacing
+  // Touch target size: 44×48dp minimum (Apple HIG, Material Design)
   const renderProduct = ({ item }: { item: DisplayProduct }) => (
-    <View style={{ width: PRODUCT_WIDTH, marginHorizontal: SPACING.sm / 2 }}>
+    <View 
+      style={{ 
+        width: PRODUCT_WIDTH, 
+        marginHorizontal: SPACING.md / 2,
+        marginBottom: PRODUCT_ITEM_GAP,
+      }}
+      accessible={true}
+      accessibilityRole="button"
+    >
       <ProductCard
         id={item.id}
         name={item.name}
@@ -84,6 +121,7 @@ export default function POSScreen() {
         category={item.category?.name}
         onAddToCart={() => {
           addItem(item);
+          animateCartBadge();
         }}
       />
     </View>
@@ -100,35 +138,113 @@ export default function POSScreen() {
   const categories: POSCategory[] = (categoriesQuery.data || []).filter((c) => c.id !== 'all');
 
   return (
-    <View style={[LAYOUT.fill, { backgroundColor: theme.colors.background }]}>
+    <View 
+      style={[LAYOUT.fill, { backgroundColor: theme.colors.background }]}
+    >
+      {/* Header - Matching Dashboard Style */}
+      <View
+        style={{
+          backgroundColor: theme.colors.primary,
+          paddingTop: insets.top + SPACING.lg,
+          paddingBottom: SPACING.lg,
+          paddingHorizontal: SPACING.lg,
+        }}
+      >
+        <Text
+          variant="headlineSmall"
+          style={{
+            color: theme.colors.onPrimary,
+            fontWeight: '700',
+          }}
+        >
+          Point of Sale
+        </Text>
+        <Text
+          variant="bodyMedium"
+          style={{
+            color: theme.colors.onPrimary,
+            opacity: 0.8,
+            marginTop: SPACING.sm,
+          }}
+        >
+          Browse and add products to cart
+        </Text>
+      </View>
+
       {/* Error Alert */}
-      <ErrorAlert
-        visible={!!errorMessage}
-        message={errorMessage}
-        onDismiss={() => setErrorMessage('')}
-        style={{ margin: SPACING.md }}
-      />
+      {!!errorMessage && (
+        <View
+          style={{
+            zIndex: 10,
+          }}
+          accessible={true}
+        >
+          <ErrorAlert
+            visible={!!errorMessage}
+            message={errorMessage}
+            onDismiss={() => setErrorMessage('')}
+            style={{ margin: SPACING.md, marginBottom: SPACING.sm }}
+          />
+        </View>
+      )}
 
-      {/* Search Bar */}
-      <SearchBar
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-        placeholder="Search products by name or SKU..."
-        style={{ marginHorizontal: SPACING.lg, marginVertical: SPACING.md }}
-      />
+      {/* Search Bar - Prominent placement for discoverability */}
+      <View
+        style={{
+          paddingHorizontal: SPACING.lg,
+          paddingVertical: SPACING.md,
+          backgroundColor: theme.colors.background,
+          borderBottomWidth: 1,
+          borderBottomColor: theme.colors.outlineVariant,
+        }}
+        accessible={true}
+        accessibilityRole="search"
+      >
+        <SearchBar
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          placeholder="Search products by name or SKU..."
+        />
+      </View>
 
-      {/* Category Tabs */}
-      <CategoryTabs
-        categories={[
-          { id: 'all', name: 'All Products' },
-          ...categories,
-        ]}
-        selected={selectedCategory || 'all'}
-        onSelect={(id) => setSelectedCategory(id === 'all' ? null : id)}
-      />
+      {/* Category Tabs with visual state indicator */}
+      <View
+        style={{
+          backgroundColor: theme.colors.surface,
+          borderBottomWidth: 1,
+          borderBottomColor: theme.colors.outlineVariant,
+        }}
+        accessible={true}
+        accessibilityRole="tablist"
+      >
+        <CategoryTabs
+          categories={[
+            { id: 'all', name: 'All Products' },
+            ...categories,
+          ]}
+          selected={selectedCategory || 'all'}
+          onSelect={(id) => setSelectedCategory(id === 'all' ? null : id)}
+        />
+      </View>
 
-      {/* Products Grid */}
-      {displayProducts.length > 0 ? (
+      {/* Products Grid with proper spacing and loading state */}
+      {productsQuery.isLoading || categoriesQuery.isLoading ? (
+        <View
+          style={[
+            LAYOUT.fill,
+            {
+              justifyContent: 'center',
+              alignItems: 'center',
+            },
+          ]}
+          accessible={true}
+        >
+          <LoadingOverlay 
+            visible={true} 
+            message="Loading products..." 
+          />
+        </View>
+      ) : displayProducts.length > 0 ? (
         <FlatList
           key={`cols-${PRODUCT_COLUMNS}`}
           data={displayProducts}
@@ -140,44 +256,89 @@ export default function POSScreen() {
           }}
           contentContainerStyle={{
             paddingVertical: SPACING.md,
-            paddingBottom: SPACING.lg + insets.bottom,
+            // Add extra bottom padding so FAB doesn't overlap product cards
+            paddingBottom: insets.bottom + SPACING.xxl + SPACING.lg * 3,
           }}
+          ListHeaderComponent={
+            displayProducts.length > 0 ? (
+              <View
+                style={{
+                  paddingBottom: SPACING.md,
+                  paddingHorizontal: SPACING.lg,
+                }}
+              >
+                {/* Product count with semantic chip */}
+                <Chip
+                  icon="package"
+                  onPress={() => {}}
+                  disabled
+                  style={{
+                    backgroundColor: theme.colors.secondaryContainer,
+                    alignSelf: 'flex-start',
+                  }}
+                  accessibilityLabel={`${displayProducts.length} products available`}
+                >
+                  {displayProducts.length} products
+                </Chip>
+              </View>
+            ) : undefined
+          }
           refreshControl={
             <RefreshControl
               refreshing={productsQuery.isRefetching}
               onRefresh={onRefresh}
               colors={[theme.colors.primary]}
+              accessibilityLabel="Pull down to refresh products"
             />
           }
           scrollEnabled={true}
+          accessible={true}
+          accessibilityRole="list"
         />
       ) : (
-        <EmptyState
-          icon="package-variant-closed"
-          title="No Products Found"
-          description="Try adjusting your search or filters"
-          onAction={() => setSearchQuery('')}
-          actionLabel="Clear search"
-        />
+        <View
+          style={[LAYOUT.fill, { justifyContent: 'center' }]}
+          accessible={true}
+
+        >
+          <EmptyState
+            icon="package-variant-closed"
+            title="No Products Found"
+            description="Try adjusting your search or filters"
+            onAction={() => setSearchQuery('')}
+            actionLabel="Clear search"
+          />
+        </View>
       )}
 
-      {/* Cart FAB */}
+      {/* Cart FAB with animated badge and better affordance */}
       {cartItemCount > 0 && (
-        <FAB
-          icon="cart"
-          label={`${cartItemCount} items - ₹${subtotal.toFixed(2)}`}
-          onPress={() => setCartVisible(true)}
+        <Animated.View
           style={{
             position: 'absolute',
             margin: SPACING.lg,
             right: 0,
             bottom: insets.bottom + SPACING.lg,
+            transform: [{ scale: cartBadgeScale }],
           }}
-          color={theme.colors.onPrimary}
-        />
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel={`${cartItemCount} items in cart, ₹${subtotal.toFixed(2)}`}
+          accessibilityHint="Double tap to open shopping cart"
+        >
+          <FAB
+            icon="cart"
+            label={`${cartItemCount} items`}
+            onPress={() => setCartVisible(true)}
+            color={theme.colors.onPrimary}
+            style={{
+              backgroundColor: theme.colors.primary,
+            }}
+          />
+        </Animated.View>
       )}
 
-      {/* Cart Bottom Sheet */}
+      {/* Cart Bottom Sheet with improved layout */}
       <BottomSheet
         visible={cartVisible}
         onClose={() => setCartVisible(false)}
@@ -186,7 +347,7 @@ export default function POSScreen() {
       >
         {items.length > 0 ? (
           <View style={LAYOUT.fill}>
-            {/* Cart Items */}
+            {/* Cart Items with proper spacing */}
             <FlatList
               data={items}
               renderItem={({ item: cartItem }) => (
@@ -208,13 +369,30 @@ export default function POSScreen() {
               )}
               keyExtractor={(item) => item.productId}
               scrollEnabled={true}
+              accessible={true}
+              accessibilityRole="list"
             />
 
-            {/* Summary */}
-            <CartSummary subtotal={subtotal} />
+            {/* Summary with visual separation */}
+            <View
+              style={{
+                borderTopWidth: 1,
+                borderTopColor: theme.colors.outlineVariant,
+              }}
+            >
+              <CartSummary subtotal={subtotal} />
+            </View>
 
-            {/* Checkout Button */}
-            <View style={{ padding: SPACING.lg, gap: SPACING.md }}>
+            {/* Action Buttons with proper spacing and semantic roles */}
+            <View 
+              style={{ 
+                padding: SPACING.lg, 
+                gap: SPACING.md,
+                borderTopWidth: 1,
+                borderTopColor: theme.colors.outlineVariant,
+              }}
+
+            >
               <FAB
                 icon="check"
                 label="Proceed to Checkout"
@@ -225,25 +403,43 @@ export default function POSScreen() {
                 }}
                 mode="elevated"
                 style={{ width: '100%' }}
+                accessibilityRole="button"
+                accessibilityLabel="Proceed to checkout"
               />
               <FAB
                 icon="trash-can"
                 label="Clear Cart"
                 onPress={clearCart}
-                style={{ width: '100%' }}
+                style={{ 
+                  width: '100%',
+                  backgroundColor: theme.colors.errorContainer,
+                }}
+                accessibilityRole="button"
+                accessibilityLabel="Clear cart"
+                accessibilityHint="Remove all items from cart"
               />
             </View>
           </View>
         ) : (
-          <EmptyState icon="cart-off" title="Cart is empty" />
+          <View
+            accessible={true}
+          >
+            <EmptyState 
+              icon="cart-off" 
+              title="Cart is empty" 
+              description="Add products from the catalog to get started"
+            />
+          </View>
         )}
       </BottomSheet>
 
-      {/* Loading Overlay */}
-      <LoadingOverlay
-        visible={productsQuery.isLoading}
-        message="Loading..."
-      />
+      {/* Loading Overlay - consolidated */}
+      {productsQuery.isLoading && (
+        <LoadingOverlay
+          visible={true}
+          message="Loading..."
+        />
+      )}
     </View>
   );
 }
