@@ -14,3 +14,10 @@ export { default as POSReceiptScreen } from '@screens/POSReceiptScreen';
 export { default as LeaveRequestsScreen } from '@screens/LeaveRequestsScreen';
 export { default as LeaveApprovalsScreen } from '@screens/LeaveApprovalsScreen';
 export { default as LeaveBalanceScreen } from '@screens/LeaveBalanceScreen';
+
+// More Features Screens
+export { default as MoreScreen } from '@screens/MoreScreen';
+export { default as PartnersScreen } from '@screens/PartnersScreen';
+export { default as EmployeeDirectoryScreen } from '@screens/EmployeeDirectoryScreen';
+export { default as AuditLogScreen } from '@screens/AuditLogScreen';
+export { default as AIChatScreen } from '@screens/AIChatScreen';

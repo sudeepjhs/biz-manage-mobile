@@ -13,6 +13,7 @@ export type BottomTabsParamList = {
   TimeTab: undefined;
   LeaveTab: undefined;
   SettingsTab: undefined;
+  MoreTab: undefined;
 };
 
 // POS Stack (Nested within POSTab)
@@ -90,6 +91,15 @@ export type SettingsStackParamList = {
   AppSettings?: undefined;
 };
 
+// More Stack (Nested within MoreTab)
+export type MoreStackParamList = {
+  MoreScreen: undefined;
+  Partners: undefined;
+  EmployeeDirectory: undefined;
+  AuditLogs: undefined;
+  AIChat: undefined;
+};
+
 // Root Navigation Stack (Auth + App)
 export type RootStackParamList = {
   Login: undefined;
@@ -105,6 +115,7 @@ export type AllNavigation =
   | InventoryStackParamList
   | TimeStackParamList
   | SettingsStackParamList
+  | MoreStackParamList
   | RootStackParamList;
 
 // Helper types for screen name validation

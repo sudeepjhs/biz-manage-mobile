@@ -10,6 +10,7 @@ import type {
   TimeStackParamList,
   LeaveStackParamList,
   SettingsStackParamList,
+  MoreStackParamList,
 } from '../types/navigation-params';
 
 // Main screens
@@ -28,6 +29,13 @@ import LeaveRequestsScreen from '@screens/LeaveRequestsScreen';
 import LeaveApprovalsScreen from '@screens/LeaveApprovalsScreen';
 import LeaveBalanceScreen from '@screens/LeaveBalanceScreen';
 
+// More screens
+import MoreScreen from '@screens/MoreScreen';
+import PartnersScreen from '@screens/PartnersScreen';
+import EmployeeDirectoryScreen from '@screens/EmployeeDirectoryScreen';
+import AuditLogScreen from '@screens/AuditLogScreen';
+import AIChatScreen from '@screens/AIChatScreen';
+
 // Navigation instances
 const Tab = createBottomTabNavigator<BottomTabsParamList>();
 const POSStack = createNativeStackNavigator<POSStackParamList>();
@@ -36,6 +44,7 @@ const InventoryStack = createNativeStackNavigator<InventoryStackParamList>();
 const TimeStack = createNativeStackNavigator<TimeStackParamList>();
 const LeaveStack = createNativeStackNavigator<LeaveStackParamList>();
 const SettingsStack = createNativeStackNavigator<SettingsStackParamList>();
+const MoreStack = createNativeStackNavigator<MoreStackParamList>();
 
 /**
  * POS Stack Navigator
@@ -180,6 +189,45 @@ function SettingsStackNavigator() {
 }
 
 /**
+ * More Stack Navigator
+ */
+function MoreStackNavigator() {
+  return (
+    <MoreStack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <MoreStack.Screen
+        name="MoreScreen"
+        component={MoreScreen}
+        options={{ title: 'More' }}
+      />
+      <MoreStack.Screen
+        name="Partners"
+        component={PartnersScreen}
+        options={{ title: 'Partners' }}
+      />
+      <MoreStack.Screen
+        name="EmployeeDirectory"
+        component={EmployeeDirectoryScreen}
+        options={{ title: 'Employees' }}
+      />
+      <MoreStack.Screen
+        name="AuditLogs"
+        component={AuditLogScreen}
+        options={{ title: 'Audit Logs' }}
+      />
+      <MoreStack.Screen
+        name="AIChat"
+        component={AIChatScreen}
+        options={{ title: 'AI Assistant' }}
+      />
+    </MoreStack.Navigator>
+  );
+}
+
+/**
  * Main App Navigator (Bottom Tab Navigator)
  * - Provides navigation between major app sections
  * - Maintains state for each tab independently
@@ -205,6 +253,8 @@ export default function AppNavigator() {
             iconName = 'calendar-heart';
           } else if (route.name === 'SettingsTab') {
             iconName = 'cog-outline';
+          } else if (route.name === 'MoreTab') {
+            iconName = 'dots-horizontal-circle-outline';
           }
 
           return (
@@ -266,6 +316,13 @@ export default function AppNavigator() {
         component={SettingsStackNavigator}
         options={{
           tabBarLabel: 'Settings',
+        }}
+      />
+      <Tab.Screen
+        name="MoreTab"
+        component={MoreStackNavigator}
+        options={{
+          tabBarLabel: 'More',
         }}
       />
     </Tab.Navigator>

@@ -106,4 +106,21 @@ export const queryKeys = {
   time,
   leave,
   employees,
+  partners: {
+    all: ['partners'] as const,
+    suppliers: {
+      all: ['partners', 'suppliers'] as const,
+      list: (filters?: Record<string, any>) => [...['partners', 'suppliers'], 'list', filters] as const,
+      detail: (id: string) => [...['partners', 'suppliers'], id] as const,
+    },
+    customers: {
+      all: ['partners', 'customers'] as const,
+      list: (filters?: Record<string, any>) => [...['partners', 'customers'], 'list', filters] as const,
+      detail: (id: string) => [...['partners', 'customers'], id] as const,
+    },
+  },
+  audit: {
+    all: ['audit'] as const,
+    logs: (filters?: Record<string, any>) => [...['audit'], 'logs', filters] as const,
+  },
 } as const;

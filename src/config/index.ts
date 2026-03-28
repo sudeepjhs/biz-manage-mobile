@@ -90,6 +90,11 @@ export const ROLE_PERMISSIONS = {
     TIME: ['VIEW', 'CLOCK', 'APPROVE'],
     LEAVE: ['VIEW', 'REQUEST', 'APPROVE'],
     DASHBOARD: ['VIEW', 'ALL_DATA'],
+    CUSTOMERS: ['VIEW', 'CREATE', 'EDIT', 'DELETE'],
+    SUPPLIERS: ['VIEW', 'CREATE', 'EDIT', 'DELETE'],
+    AUDIT: ['VIEW'],
+    EMPLOYEES: ['VIEW', 'CREATE', 'EDIT', 'DELETE'],
+    AI_ASSISTANT: ['CHAT'],
   },
   MANAGER: {
     INVENTORY: ['VIEW', 'CREATE', 'EDIT', 'APPROVE'],
@@ -97,6 +102,11 @@ export const ROLE_PERMISSIONS = {
     TIME: ['VIEW', 'CLOCK', 'APPROVE'],
     LEAVE: ['VIEW', 'REQUEST', 'APPROVE'],
     DASHBOARD: ['VIEW', 'DEPARTMENT_DATA'],
+    CUSTOMERS: ['VIEW', 'CREATE', 'EDIT'],
+    SUPPLIERS: ['VIEW', 'CREATE', 'EDIT'],
+    AUDIT: ['VIEW'],
+    EMPLOYEES: ['VIEW', 'CREATE', 'EDIT'],
+    AI_ASSISTANT: ['CHAT'],
   },
   WORKER: {
     INVENTORY: ['VIEW'],
@@ -104,6 +114,11 @@ export const ROLE_PERMISSIONS = {
     TIME: ['VIEW', 'CLOCK'],
     LEAVE: ['VIEW', 'REQUEST'],
     DASHBOARD: ['VIEW', 'OWN_DATA'],
+    CUSTOMERS: ['VIEW'],
+    SUPPLIERS: [],
+    AUDIT: [],
+    EMPLOYEES: ['VIEW'],
+    AI_ASSISTANT: [],
   },
 };
 
