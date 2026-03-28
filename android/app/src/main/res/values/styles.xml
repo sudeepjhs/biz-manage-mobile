@@ -1,9 +1,19 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+    <!-- Base application theme (Material 3) -->
+    <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="android:editTextBackground">@drawable/rn_edit_text_material</item>
+    </style>
+
+    <!-- Main app theme used by React Native -->
+    <style name="Theme.BizManageMobile" parent="AppTheme" />
+
+    <!-- Splash screen theme -->
+    <style name="Theme.BizManageMobile.Launcher" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher</item>
+        <item name="postSplashScreenTheme">@style/Theme.BizManageMobile</item>
     </style>
 
 </resources>
