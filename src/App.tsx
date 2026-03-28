@@ -12,7 +12,7 @@ import LoginScreen from '@screens/LoginScreen';
 import AppNavigator from '@navigation/AppNavigator';
 import { Snackbar } from 'react-native-paper';
 import { useUIStore } from '@store/uiStore';
-
+import { useThemeStore } from '@store/themeStore';
 
 // Create React Query client
 const queryClient = new QueryClient({
@@ -40,7 +40,8 @@ const Stack = createNativeStackNavigator<RootParamList>();
  * - Navigation based on auth state
  */
 export default function App() {
-  const colorScheme = useColorScheme();
+  const systemColorScheme = useColorScheme();
+  const { themeMode } = useThemeStore();
   const { token, isLoading } = useAuthStore();
   const [appReady, setAppReady] = useState(false);
 
@@ -49,13 +50,12 @@ export default function App() {
 
   const { toast, hideToast } = useUIStore();
 
-
   // Initialize app
   useEffect(() => {
     const initializeApp = async () => {
       try {
-        // Simulate app initialization time
-        // In production, load fonts, check persisted auth, etc.
+        // Wait for store to rehydrate if necessary
+        // In this case, Zustand persist handles it
         await new Promise<void>((resolve) => setTimeout(() => resolve(), 1000));
         setAppReady(true);
       } catch (error) {
@@ -72,8 +72,11 @@ export default function App() {
     return null;
   }
 
-  // Determine theme
-  const isDark = colorScheme === 'dark' || false; // Allow system preference override
+  // Determine theme based on manual preference or system default
+  const isDark = themeMode === 'system' 
+    ? systemColorScheme === 'dark' 
+    : themeMode === 'dark';
+    
   const theme = isDark ? darkTheme : lightTheme;
 
   if (DEBUG.LOG_NAVIGATION) {

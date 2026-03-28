@@ -20,60 +20,60 @@ const SLATE_COLORS = {
   slate950: '#020617',
 };
 
-// Primary Accent Colors (Interactive, Brand)
+// Primary Accent Colors (Interactive, Brand) - Now using VIOLET to match Web
 const ACCENT_COLORS = {
-  blue: {
-    light: '#0ea5e9',
-    main: '#0284c7',
-    dark: '#0369a1',
-    container: '#e0f2fe',
-    onContainer: '#001d33',
+  violet: {
+    light: '#a78bfa', // Violet 400
+    main: '#7c3aed',  // Violet 600
+    dark: '#5b21b6',  // Violet 800
+    container: '#f5f3ff', // Violet 50
+    onContainer: '#2e1065', // Violet 950
   },
-  teal: {
-    light: '#14b8a6',
-    main: '#0d9488',
-    dark: '#0f766e',
-    container: '#ccfbf1',
-    onContainer: '#001513',
+  emerald: {
+    light: '#34d399',
+    main: '#10b981',
+    dark: '#059669',
+    container: '#ecfdf5',
+    onContainer: '#064e3b',
   },
-  indigo: {
-    light: '#8366e7',
-    main: '#6366f1',
-    dark: '#4f46e5',
-    container: '#e0e7ff',
-    onContainer: '#1e1b4b',
+  rose: {
+    light: '#fb7185',
+    main: '#f43f5e',
+    dark: '#e11d48',
+    container: '#fff1f2',
+    onContainer: '#4c0519',
   },
 };
 
 // Semantic Status Colors
 const SEMANTIC_COLORS = {
   success: {
-    light: '#22c55e',
-    main: '#16a34a',
-    dark: '#15803d',
-    container: '#dcfce7',
-    onContainer: '#051005',
+    light: '#4ade80',
+    main: '#22c55e',
+    dark: '#16a34a',
+    container: '#f0fdf4',
+    onContainer: '#14532d',
   },
   warning: {
     light: '#fbbf24',
     main: '#f59e0b',
     dark: '#d97706',
-    container: '#fef3c7',
-    onContainer: '#331501',
+    container: '#fffbeb',
+    onContainer: '#78350f',
   },
   critical: {
-    light: '#ef4444',
-    main: '#dc2626',
-    dark: '#b91c1c',
-    container: '#fee2e2',
-    onContainer: '#4b0707',
+    light: '#f87171',
+    main: '#ef4444',
+    dark: '#dc2626',
+    container: '#fef2f2',
+    onContainer: '#7f1d1d',
   },
   info: {
-    light: '#06b6d4',
-    main: '#0891b2',
-    dark: '#0e7490',
-    container: '#cffafe',
-    onContainer: '#001819',
+    light: '#38bdf8',
+    main: '#0ea5e9',
+    dark: '#0284c7',
+    container: '#f0f9ff',
+    onContainer: '#0c4a6e',
   },
 };
 
@@ -82,9 +82,9 @@ const SEMANTIC_EXTENDED = {
   disabled: SLATE_COLORS.slate300,
   divider: SLATE_COLORS.slate200,
   disabled_text: SLATE_COLORS.slate400,
-  interactive_hover: ACCENT_COLORS.blue.container,
-  interactive_pressed: ACCENT_COLORS.blue.light,
-  focus_ring: ACCENT_COLORS.blue.main,
+  interactive_hover: ACCENT_COLORS.violet.container,
+  interactive_pressed: ACCENT_COLORS.violet.light,
+  focus_ring: ACCENT_COLORS.violet.main,
   success: SEMANTIC_COLORS.success.main,
   warning: SEMANTIC_COLORS.warning.main,
   critical: SEMANTIC_COLORS.critical.main,
@@ -99,28 +99,28 @@ export const lightTheme = {
   ...MD3LightTheme,
   colors: {
     ...MD3LightTheme.colors,
-    // Primary Brand
-    primary: ACCENT_COLORS.blue.main,
-    primaryContainer: ACCENT_COLORS.blue.container,
+    // Primary Brand (Violet)
+    primary: ACCENT_COLORS.violet.main,
+    primaryContainer: ACCENT_COLORS.violet.container,
     onPrimary: '#ffffff',
-    onPrimaryContainer: ACCENT_COLORS.blue.onContainer,
+    onPrimaryContainer: ACCENT_COLORS.violet.onContainer,
     
-    // Secondary
-    secondary: ACCENT_COLORS.teal.main,
-    secondaryContainer: ACCENT_COLORS.teal.container,
+    // Secondary (Emerald)
+    secondary: ACCENT_COLORS.emerald.main,
+    secondaryContainer: ACCENT_COLORS.emerald.container,
     onSecondary: '#ffffff',
-    onSecondaryContainer: ACCENT_COLORS.teal.onContainer,
+    onSecondaryContainer: ACCENT_COLORS.emerald.onContainer,
     
-    // Tertiary (Accent)
-    tertiary: ACCENT_COLORS.indigo.main,
-    tertiaryContainer: ACCENT_COLORS.indigo.container,
+    // Tertiary (Rose)
+    tertiary: ACCENT_COLORS.rose.main,
+    tertiaryContainer: ACCENT_COLORS.rose.container,
     onTertiary: '#ffffff',
-    onTertiaryContainer: ACCENT_COLORS.indigo.onContainer,
+    onTertiaryContainer: ACCENT_COLORS.rose.onContainer,
     
     // Surfaces
-    surface: SLATE_COLORS.slate50,
-    surfaceVariant: SLATE_COLORS.slate100,
-    background: SLATE_COLORS.slate50,
+    surface: '#ffffff', // White for cards (matches Web's bg.surface)
+    surfaceVariant: '#ffffff',
+    background: SLATE_COLORS.slate50, // Slate 50 for background
     onSurface: SLATE_COLORS.slate900,
     onSurfaceVariant: SLATE_COLORS.slate600,
     
@@ -161,36 +161,36 @@ export const darkTheme = {
   ...MD3DarkTheme,
   colors: {
     ...MD3DarkTheme.colors,
-    // Primary Brand
-    primary: ACCENT_COLORS.blue.light,
-    primaryContainer: '#003d5c',
-    onPrimary: '#001b2f',
-    onPrimaryContainer: ACCENT_COLORS.blue.container,
+    // Primary Brand (Violet Light)
+    primary: ACCENT_COLORS.violet.light,
+    primaryContainer: '#2e1065', // Deep violet
+    onPrimary: '#ffffff',
+    onPrimaryContainer: ACCENT_COLORS.violet.light,
     
-    // Secondary
-    secondary: ACCENT_COLORS.teal.light,
-    secondaryContainer: '#003d35',
-    onSecondary: '#001513',
-    onSecondaryContainer: ACCENT_COLORS.teal.container,
+    // Secondary (Emerald Light)
+    secondary: ACCENT_COLORS.emerald.light,
+    secondaryContainer: '#064e3b',
+    onSecondary: '#ffffff',
+    onSecondaryContainer: ACCENT_COLORS.emerald.light,
     
-    // Tertiary (Accent)
-    tertiary: ACCENT_COLORS.indigo.light,
-    tertiaryContainer: '#3730a3',
-    onTertiary: '#0d0d2b',
-    onTertiaryContainer: ACCENT_COLORS.indigo.container,
+    // Tertiary (Rose Light)
+    tertiary: ACCENT_COLORS.rose.light,
+    tertiaryContainer: '#4c0519',
+    onTertiary: '#ffffff',
+    onTertiaryContainer: ACCENT_COLORS.rose.light,
     
     // Surfaces
-    surface: SLATE_COLORS.slate900,
+    surface: SLATE_COLORS.slate900, // Slate 900 for cards (matches Web's bg.surface _dark)
     surfaceVariant: SLATE_COLORS.slate800,
-    background: SLATE_COLORS.slate950,
-    onSurface: SLATE_COLORS.slate50,
+    background: SLATE_COLORS.slate950, // Slate 950 for background (matches Web's bg.canvas _dark)
+    onSurface: SLATE_COLORS.slate100, // Slate 100 for primary text (matches Web's fg.default _dark)
     onSurfaceVariant: SLATE_COLORS.slate400,
     
     // Status
     error: SEMANTIC_COLORS.critical.light,
-    errorContainer: '#5c0a0a',
-    onError: '#5c0a0a',
-    onErrorContainer: SEMANTIC_COLORS.critical.container,
+    errorContainer: '#7f1d1d',
+    onError: '#ffffff',
+    onErrorContainer: SEMANTIC_COLORS.critical.light,
     
     // Outline
     outline: SLATE_COLORS.slate600,
@@ -198,19 +198,19 @@ export const darkTheme = {
     
     // Additional semantic tokens
     success: SEMANTIC_COLORS.success.light,
-    successContainer: '#1b4d1b',
-    onSuccess: '#001b00',
+    successContainer: '#052c16',
+    onSuccess: '#ffffff',
     
     warning: SEMANTIC_COLORS.warning.light,
-    warningContainer: '#663800',
-    onWarning: '#2b1700',
+    warningContainer: '#451a03',
+    onWarning: '#ffffff',
     
     info: SEMANTIC_COLORS.info.light,
-    infoContainer: '#003d4a',
-    onInfo: '#001819',
+    infoContainer: '#082f49',
+    onInfo: '#ffffff',
     
     // Extended
-    disabled: SEMANTIC_COLORS.critical.light,
+    disabled: SLATE_COLORS.slate700,
     divider: SLATE_COLORS.slate800,
   },
 };
@@ -229,9 +229,9 @@ export const COLORS = {
 // Component-specific theme variants
 export const COMPONENT_VARIANTS = {
   button: {
-    primary: { color: ACCENT_COLORS.blue.main },
-    secondary: { color: ACCENT_COLORS.teal.main },
-    tertiary: { color: ACCENT_COLORS.indigo.main },
+    primary: { color: ACCENT_COLORS.violet.main },
+    secondary: { color: ACCENT_COLORS.emerald.main },
+    tertiary: { color: ACCENT_COLORS.rose.main },
     success: { color: SEMANTIC_COLORS.success.main },
     warning: { color: SEMANTIC_COLORS.warning.main },
     critical: { color: SEMANTIC_COLORS.critical.main },

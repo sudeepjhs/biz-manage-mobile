@@ -22,11 +22,13 @@ import {
 } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useThemeStore } from '@store/themeStore';
 
 export default function SettingsScreen() {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const { logout } = useAuth();
+  const { themeMode, setThemeMode } = useThemeStore();
 
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
@@ -281,10 +283,13 @@ export default function SettingsScreen() {
                   Dark Mode
                 </Text>
                 <Text variant="bodySmall" style={{ color: theme.colors.outline }}>
-                  Use dark theme
+                  Use dark theme across the app
                 </Text>
               </View>
-              <Switch value={false} onValueChange={() => { }} />
+              <Switch 
+                value={themeMode === 'dark'} 
+                onValueChange={(val) => setThemeMode(val ? 'dark' : 'light')} 
+              />
             </View>
             <Divider />
             <View
