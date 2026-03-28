@@ -10,6 +10,47 @@ const LoginSchema = z.object({
 });
 
 type LoginFormData = z.infer<typeof LoginSchema>;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+  },
+  content: {
+    gap: 16,
+  },
+  title: {
+    textAlign: 'center',
+    marginBottom: 8,
+    fontWeight: 'bold',
+  },
+  subtitle: {
+    textAlign: 'center',
+    marginBottom: 24,
+    color: '#666',
+  },
+  input: {
+    marginBottom: 8,
+  },
+  button: {
+    marginTop: 16,
+    paddingVertical: 8,
+  },
+  errorMessage: {
+    marginBottom: 8,
+  },
+  info: {
+    textAlign: 'center',
+    marginTop: 16,
+    color: '#0066cc',
+  },
+  footer: {
+    textAlign: 'center',
+    marginTop: 24,
+    color: '#999',
+    lineHeight: 20,
+  },
+});
 
 export default function LoginScreen() {
   const { login, loginMutation } = useAuth();
@@ -24,22 +65,43 @@ export default function LoginScreen() {
       const validatedData = LoginSchema.parse({ email, password });
       setErrors({});
 
-      // Call login mutation
+      // Call login mutation (uses Next-Auth Credentials provider)
       await login(validatedData);
     } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         const fieldErrors = error.flatten().fieldErrors as Record<string, string[]>;
         const formErrors: Partial<LoginFormData> = {};
-        
+
         if (fieldErrors.email?.[0]) formErrors.email = fieldErrors.email[0];
         if (fieldErrors.password?.[0]) formErrors.password = fieldErrors.password[0];
-        
+
         setErrors(formErrors);
+      } else if (error instanceof Error) {
+        // Next-Auth specific error handling
+        console.error('Login error:', error.message);
       }
     }
   };
 
   const isLoading = loginMutation.isPending;
+
+  // Get error message from Next-Auth
+  const getErrorMessage = () => {
+    if (loginMutation.error) {
+      const message = loginMutation.error.message;
+      if (message.includes('Authentication failed')) {
+        return 'Invalid email or password';
+      }
+      if (message.includes('Network error')) {
+        return 'Network error - check your connection';
+      }
+      if (message.includes('session')) {
+        return 'Failed to establish session - check backend';
+      }
+      return message;
+    }
+    return null;
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -82,9 +144,9 @@ export default function LoginScreen() {
         />
         {errors.password && <HelperText type="error">{errors.password}</HelperText>}
 
-        {loginMutation.error && (
+        {getErrorMessage() && (
           <HelperText type="error" style={styles.errorMessage}>
-            {loginMutation.error.message || 'Login failed'}
+            {getErrorMessage()}
           </HelperText>
         )}
 
@@ -98,6 +160,10 @@ export default function LoginScreen() {
           Sign In
         </Button>
 
+        <Text variant="bodySmall" style={styles.info}>
+          Next-Auth: Secure credential-based authentication
+        </Text>
+
         <Text variant="bodySmall" style={styles.footer}>
           Demo credentials:{'\n'}
           Email: admin@bizmanage.com{'\n'}
@@ -108,39 +174,4 @@ export default function LoginScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 16,
-  },
-  content: {
-    gap: 16,
-  },
-  title: {
-    textAlign: 'center',
-    marginBottom: 8,
-    fontWeight: 'bold',
-  },
-  subtitle: {
-    textAlign: 'center',
-    marginBottom: 24,
-    color: '#666',
-  },
-  input: {
-    marginBottom: 8,
-  },
-  button: {
-    marginTop: 16,
-    paddingVertical: 8,
-  },
-  errorMessage: {
-    marginBottom: 8,
-  },
-  footer: {
-    textAlign: 'center',
-    marginTop: 24,
-    color: '#999',
-    lineHeight: 20,
-  },
-});
+

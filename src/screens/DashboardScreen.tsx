@@ -1,6 +1,8 @@
 import { ErrorAlert, LoadingOverlay } from '@components/index';
+import { API_ENDPOINTS } from '@config/API';
 import { useAuth } from '@hooks/useAuth';
 import { useDashboardActivity, useDashboardStats } from '@hooks/useDashboard';
+import API_CLIENT from '@lib/api-client';
 import { LAYOUT, SHADOWS, SPACING } from '@lib/ui-utils';
 import React, { useCallback } from 'react';
 import {
@@ -219,7 +221,7 @@ export default function DashboardScreen() {
               <StatCard
                 icon="cash-multiple"
                 title="Total Revenue"
-                value={`$${stats.totalRevenue.toFixed(0)}`}
+                value={`$${stats.totalRevenue?.toFixed(0)}`}
                 color={theme.colors.primary}
               />
               <StatCard
@@ -354,9 +356,28 @@ export default function DashboardScreen() {
           >
             Logout
           </Button>
+          <Button
+            mode="outlined"
+            onPress={async () => {
+              try {
+                const response = await API_CLIENT.get(API_ENDPOINTS.AUTH.MOBILE_DEBUG);
+                console.log('Mobile Debug Data:', response);
+              } catch (error) {
+                console.error('Debug error:', error);
+              }
+            }}
+            icon="bug"
+            style={{
+              marginTop: SPACING.md,
+              borderColor: theme.colors.error,
+            }}
+            textColor={theme.colors.error}
+          >
+            Debug Session
+          </Button>
         </View>
-      </ScrollView>
-    </View>
+      </ScrollView >
+    </View >
   );
 }
 

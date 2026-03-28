@@ -4,13 +4,32 @@
  * Production: Update URL via environment variable
  */
 
-export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
+import { Platform } from 'react-native';
 
+const getBaseUrl = () => {
+  if (process.env.EXPO_PUBLIC_API_URL) return process.env.EXPO_PUBLIC_API_URL;
+  if (__DEV__) {
+    // For USB Debugging on Physical Device:
+    // Option A: Use your PC's local IPv4 Address (e.g., 'http://[IP_ADDRESS]')
+    // Option B: Run `adb reverse tcp:3000 tcp:3000` in terminal and keep 'localhost'
+    return 'http://localhost:3000'; // NOTE: Change this to your PC's IP if Option B does not work
+  }
+  return 'https://your-production-url.com';
+};
+
+export const API_BASE_URL = getBaseUrl();
 export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: '/api/auth/login',
     LOGOUT: '/api/auth/logout',
     PROFILE: '/api/auth/profile',
+    // Next-Auth Endpoints
+    NEXTAUTH_SIGNIN: '/api/auth/callback/credentials',
+    NEXTAUTH_SESSION: '/api/auth/session',
+    NEXTAUTH_SIGNOUT: '/api/auth/signout',
+    NEXTAUTH_CSRF: '/api/auth/csrf',
+    MOBILE_LOGIN: '/api/auth/mobile-login',
+    MOBILE_DEBUG: '/api/mobile-debug',
   },
   LEAVE: {
     BALANCES: '/api/leave/balances',
