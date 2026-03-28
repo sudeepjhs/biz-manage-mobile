@@ -108,29 +108,36 @@ export default function POSScreen() {
 
   // Render product card with proper spacing
   // Touch target size: 44×48dp minimum (Apple HIG, Material Design)
-  const renderProduct = ({ item }: { item: DisplayProduct }) => (
-    <View 
-      style={{ 
-        width: PRODUCT_WIDTH, 
-        marginHorizontal: SPACING.md / 2,
-        marginBottom: PRODUCT_ITEM_GAP,
-      }}
-      accessible={true}
-      accessibilityRole="button"
-    >
-      <ProductCard
-        id={item.id}
-        name={item.name}
-        unitPrice={item.unitPrice}
-        stock={item.totalStock}
-        category={item.category?.name}
-        onAddToCart={() => {
-          addItem(item);
-          animateCartBadge();
+  const renderProduct = ({ item }: { item: DisplayProduct }) => {
+    // Calculate available stock by subtracting cart quantity
+    const cartItem = items.find((ci) => ci.productId === item.id);
+    const cartQuantity = cartItem?.quantity || 0;
+    const availableStock = Math.max(0, item.totalStock - cartQuantity);
+
+    return (
+      <View 
+        style={{ 
+          width: PRODUCT_WIDTH, 
+          marginHorizontal: SPACING.md / 2,
+          marginBottom: PRODUCT_ITEM_GAP,
         }}
-      />
-    </View>
-  );
+        accessible={true}
+        accessibilityRole="button"
+      >
+        <ProductCard
+          id={item.id}
+          name={item.name}
+          unitPrice={item.unitPrice}
+          stock={availableStock}
+          category={item.category?.name}
+          onAddToCart={() => {
+            addItem(item);
+            animateCartBadge();
+          }}
+        />
+      </View>
+    );
+  };
 
   // Loading state
   if (productsQuery.isLoading || categoriesQuery.isLoading) {

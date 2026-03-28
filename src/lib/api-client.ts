@@ -91,6 +91,10 @@ API_CLIENT.interceptors.response.use(
           responseData?.message ||
           error.message;
 
+        if (__DEV__) {
+          console.log(`[API Error] ${error.response.status} ${error.config?.url}:`, errorMessage);
+        }
+
         useUIStore.getState().showToast({
           message: errorMessage,
           type: 'error',

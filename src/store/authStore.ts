@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { z } from 'zod';
 
-const AuthResponseSchema = z.object({
+export const AuthResponseSchema = z.object({
   token: z.string(),
   user: z.object({
     id: z.string(),

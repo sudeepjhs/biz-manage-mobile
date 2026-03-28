@@ -103,50 +103,50 @@ export const lightTheme = {
     primary: ACCENT_COLORS.violet.main,
     primaryContainer: ACCENT_COLORS.violet.container,
     onPrimary: '#ffffff',
-    onPrimaryContainer: ACCENT_COLORS.violet.onContainer,
-    
+    onPrimaryContainer: ACCENT_COLORS.rose.container,
+
     // Secondary (Emerald)
     secondary: ACCENT_COLORS.emerald.main,
     secondaryContainer: ACCENT_COLORS.emerald.container,
     onSecondary: '#ffffff',
     onSecondaryContainer: ACCENT_COLORS.emerald.onContainer,
-    
+
     // Tertiary (Rose)
     tertiary: ACCENT_COLORS.rose.main,
     tertiaryContainer: ACCENT_COLORS.rose.container,
     onTertiary: '#ffffff',
     onTertiaryContainer: ACCENT_COLORS.rose.onContainer,
-    
+
     // Surfaces
     surface: '#ffffff', // White for cards (matches Web's bg.surface)
     surfaceVariant: '#ffffff',
     background: SLATE_COLORS.slate50, // Slate 50 for background
     onSurface: SLATE_COLORS.slate900,
     onSurfaceVariant: SLATE_COLORS.slate600,
-    
+
     // Status
     error: SEMANTIC_COLORS.critical.main,
     errorContainer: SEMANTIC_COLORS.critical.container,
     onError: '#ffffff',
     onErrorContainer: SEMANTIC_COLORS.critical.onContainer,
-    
+
     // Outline
     outline: SLATE_COLORS.slate300,
     outlineVariant: SLATE_COLORS.slate200,
-    
+
     // Additional semantic tokens
     success: SEMANTIC_COLORS.success.main,
     successContainer: SEMANTIC_COLORS.success.container,
     onSuccess: '#ffffff',
-    
+
     warning: SEMANTIC_COLORS.warning.main,
     warningContainer: SEMANTIC_COLORS.warning.container,
     onWarning: '#ffffff',
-    
+
     info: SEMANTIC_COLORS.info.main,
     infoContainer: SEMANTIC_COLORS.info.container,
     onInfo: '#ffffff',
-    
+
     // Extended
     disabled: SEMANTIC_EXTENDED.disabled,
     divider: SEMANTIC_EXTENDED.divider,
@@ -164,51 +164,51 @@ export const darkTheme = {
     // Primary Brand (Violet Light)
     primary: ACCENT_COLORS.violet.light,
     primaryContainer: '#2e1065', // Deep violet
-    onPrimary: '#ffffff',
-    onPrimaryContainer: ACCENT_COLORS.violet.light,
-    
+    onPrimary: '#461b3e',
+    onPrimaryContainer: ACCENT_COLORS.violet.onContainer,
+
     // Secondary (Emerald Light)
     secondary: ACCENT_COLORS.emerald.light,
     secondaryContainer: '#064e3b',
-    onSecondary: '#ffffff',
+    onSecondary: '#461b3e',
     onSecondaryContainer: ACCENT_COLORS.emerald.light,
-    
+
     // Tertiary (Rose Light)
     tertiary: ACCENT_COLORS.rose.light,
     tertiaryContainer: '#4c0519',
     onTertiary: '#ffffff',
     onTertiaryContainer: ACCENT_COLORS.rose.light,
-    
+
     // Surfaces
     surface: SLATE_COLORS.slate900, // Slate 900 for cards (matches Web's bg.surface _dark)
     surfaceVariant: SLATE_COLORS.slate800,
     background: SLATE_COLORS.slate950, // Slate 950 for background (matches Web's bg.canvas _dark)
     onSurface: SLATE_COLORS.slate100, // Slate 100 for primary text (matches Web's fg.default _dark)
     onSurfaceVariant: SLATE_COLORS.slate400,
-    
+
     // Status
     error: SEMANTIC_COLORS.critical.light,
     errorContainer: '#7f1d1d',
     onError: '#ffffff',
     onErrorContainer: SEMANTIC_COLORS.critical.light,
-    
+
     // Outline
     outline: SLATE_COLORS.slate600,
     outlineVariant: SLATE_COLORS.slate700,
-    
+
     // Additional semantic tokens
     success: SEMANTIC_COLORS.success.light,
     successContainer: '#052c16',
     onSuccess: '#ffffff',
-    
+
     warning: SEMANTIC_COLORS.warning.light,
     warningContainer: '#451a03',
     onWarning: '#ffffff',
-    
+
     info: SEMANTIC_COLORS.info.light,
     infoContainer: '#082f49',
     onInfo: '#ffffff',
-    
+
     // Extended
     disabled: SLATE_COLORS.slate700,
     divider: SLATE_COLORS.slate800,

@@ -1,6 +1,6 @@
 import type { NavigatorScreenParams } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { NavigationProp, RouteProp } from '@react-navigation/native';
+import type { RouteProp } from '@react-navigation/native';
 
 /**
  * Root Navigator Types

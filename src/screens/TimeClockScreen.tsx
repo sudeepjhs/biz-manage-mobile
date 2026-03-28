@@ -45,20 +45,29 @@ export default function TimeClockScreen() {
 
   // Update elapsed time every second
   useEffect(() => {
-    let interval: any;
+    let interval: NodeJS.Timeout | null = null;
     const data = clockStatusQuery.data;
-    if (data && (data.currentState === 'IN' || data.currentState === 'MEAL' || data.currentState === 'BREAK')) {
-      const lastTime = data.lastPunchTime;
-      if (lastTime) {
-        setClockInTime(lastTime);
-        interval = setInterval(() => {
-          const now = new Date();
-          const start = new Date(lastTime);
-          const elapsed = Math.floor((now.getTime() - start.getTime()) / 1000);
-          setElapsedSeconds(elapsed);
-        }, 1000);
-      }
+
+    // Reset when data changes or user clocks out
+    if (!data || !['IN', 'MEAL', 'BREAK'].includes(data.currentState)) {
+      setElapsedSeconds(0);
+      setClockInTime(null);
+      return;
     }
+
+    const lastTime = data.lastPunchTime;
+    if (lastTime) {
+      setClockInTime(lastTime);
+      const startTime = new Date(lastTime).getTime();
+      
+      // Update immediately
+      setElapsedSeconds(Math.floor((Date.now() - startTime) / 1000));
+
+      interval = setInterval(() => {
+        setElapsedSeconds(Math.floor((Date.now() - startTime) / 1000));
+      }, 1000);
+    }
+
     return () => { if (interval) clearInterval(interval); };
   }, [clockStatusQuery.data]);
 
@@ -72,17 +81,12 @@ export default function TimeClockScreen() {
     return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   };
 
-  // Loading state
-  if (clockStatusQuery.isLoading || timeEntriesQuery.isLoading) {
-    return <LoadingOverlay visible={true} message="Loading time clock..." />;
-  }
-
   const clockState = clockStatusQuery.data?.currentState || 'OUT';
   const isClocked = clockState === 'IN' || clockState === 'MEAL' || clockState === 'BREAK';
   const todayEntry = timeEntriesQuery.data?.[0]; // Assuming only one entry for current user/day
   const isDayCompleted = todayEntry?.status === 'COMPLETED';
 
-  // Animated pulse for clocked-in status (defined after isClocked)
+  // Animated pulse for clocked-in status
   const pulse = useRef(new Animated.Value(1)).current;
   useEffect(() => {
     let anim: Animated.CompositeAnimation | null = null;
@@ -97,6 +101,11 @@ export default function TimeClockScreen() {
     }
     return () => { if (anim) anim.stop(); };
   }, [isClocked, pulse]);
+
+  // Loading state
+  if (clockStatusQuery.isLoading || timeEntriesQuery.isLoading) {
+    return <LoadingOverlay visible={true} message="Loading time clock..." />;
+  }
 
   const renderTimeEntry = ({ item, index }: { item: any; index: number }) => (
     <View
@@ -172,8 +181,8 @@ export default function TimeClockScreen() {
               </Text>
               <View
                 style={{
-                  backgroundColor: item.status === 'COMPLETED' 
-                    ? (theme.colors as any).successContainer || '#dcfce7'
+                  backgroundColor: item.status === 'COMPLETED'
+                    ? (theme.colors as any).success || '#dcfce7'
                     : theme.colors.secondaryContainer,
                   paddingHorizontal: SPACING.sm,
                   paddingVertical: 2,
@@ -184,8 +193,8 @@ export default function TimeClockScreen() {
                   variant="labelSmall"
                   style={{
                     fontWeight: '600',
-                    color: item.status === 'COMPLETED' 
-                      ? (theme.colors as any).onSuccessContainer || '#051005'
+                    color: item.status === 'COMPLETED'
+                      ? (theme.colors as any).onSuccess || '#051005'
                       : theme.colors.onSecondaryContainer,
                   }}
                 >
@@ -425,9 +434,9 @@ export default function TimeClockScreen() {
               <Text
                 variant="titleSmall"
                 style={{
-                  color: todayEntry.status === 'COMPLETED' 
+                  color: todayEntry.status === 'COMPLETED'
                     ? (theme.colors as any).successContainer || '#dcfce7'
-                    : theme.colors.onPrimary,
+                    : (theme.colors as any).onSuccess,
                   fontWeight: '700',
                   fontSize: 10,
                 }}
@@ -459,8 +468,8 @@ export default function TimeClockScreen() {
           marginVertical: SPACING.lg,
           borderRadius: 16,
           overflow: 'hidden',
-          backgroundColor: isClocked 
-            ? theme.colors.primaryContainer 
+          backgroundColor: isClocked
+            ? theme.colors.primaryContainer
             : theme.colors.surface,
           ...SHADOWS.lg,
         }}
@@ -575,15 +584,15 @@ export default function TimeClockScreen() {
           >
             {isClocked ? (
               <Pressable
-                onPress={() => clockOutMutation.mutate({ 
-                  type: 'PUNCH_OUT', 
-                  latitude: 0, 
-                  longitude: 0 
+                onPress={() => clockOutMutation.mutate({
+                  type: 'PUNCH_OUT',
+                  latitude: 0,
+                  longitude: 0
                 })}
                 disabled={clockOutMutation.isPending || isDayCompleted}
                 style={{
-                  backgroundColor: isDayCompleted 
-                    ? theme.colors.outlineVariant 
+                  backgroundColor: isDayCompleted
+                    ? theme.colors.outlineVariant
                     : theme.colors.error,
                   paddingVertical: SPACING.lg,
                   borderRadius: 12,
@@ -595,8 +604,8 @@ export default function TimeClockScreen() {
                 <Text
                   variant="labelLarge"
                   style={{
-                    color: isDayCompleted 
-                      ? theme.colors.onSurfaceVariant 
+                    color: isDayCompleted
+                      ? theme.colors.onSurfaceVariant
                       : theme.colors.onError,
                     fontWeight: '700',
                   }}
@@ -606,15 +615,15 @@ export default function TimeClockScreen() {
               </Pressable>
             ) : (
               <Pressable
-                onPress={() => clockInMutation.mutate({ 
-                  type: 'PUNCH_IN', 
-                  latitude: 0, 
-                  longitude: 0 
+                onPress={() => clockInMutation.mutate({
+                  type: 'PUNCH_IN',
+                  latitude: 0,
+                  longitude: 0
                 })}
                 disabled={clockInMutation.isPending || isDayCompleted}
                 style={{
-                  backgroundColor: isDayCompleted 
-                    ? theme.colors.outlineVariant 
+                  backgroundColor: isDayCompleted
+                    ? theme.colors.outlineVariant
                     : (theme.colors as any).success || '#16a34a',
                   paddingVertical: SPACING.lg,
                   borderRadius: 12,
@@ -626,8 +635,8 @@ export default function TimeClockScreen() {
                 <Text
                   variant="labelLarge"
                   style={{
-                    color: isDayCompleted 
-                      ? theme.colors.onSurfaceVariant 
+                    color: isDayCompleted
+                      ? theme.colors.onSurfaceVariant
                       : '#ffffff',
                     fontWeight: '700',
                   }}
@@ -676,11 +685,12 @@ export default function TimeClockScreen() {
         <FlatList
           data={timeEntriesQuery.data}
           renderItem={renderTimeEntry}
-          keyExtractor={(item, index) => `${item.employeeId || index}`}
+          keyExtractor={(item) => `${item.employeeId}-${item.date}`}
           contentContainerStyle={{
             paddingVertical: SPACING.md,
             paddingBottom: insets.bottom + SPACING.lg,
           }}
+
           refreshControl={
             <RefreshControl
               refreshing={clockStatusQuery.isRefetching || timeEntriesQuery.isRefetching}
@@ -708,32 +718,3 @@ export default function TimeClockScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  timelineContainer: {
-    flexDirection: 'row',
-    gap: SPACING.md,
-    marginHorizontal: SPACING.md,
-    marginBottom: SPACING.md,
-  },
-  timelineIndicator: {
-    alignItems: 'center',
-    width: 40,
-  },
-  timelineConnector: {
-    width: 2,
-    height: 40,
-    marginTop: 4,
-  },
-  timeGridRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  divider: {
-    width: 1,
-    marginHorizontal: SPACING.sm,
-  },
-});

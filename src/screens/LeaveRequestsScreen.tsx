@@ -16,9 +16,12 @@ import {
   Text,
   TextInput,
   useTheme,
+  Portal,
 } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { en, registerTranslation, DatePickerModal } from 'react-native-paper-dates';
+import { format, isValid, parse, differenceInDays } from 'date-fns';
 import {
   EmptyState,
   ErrorAlert,
@@ -28,6 +31,8 @@ import {
 import { useApiError } from '@hooks/useApiError';
 import { LeaveRequest, LeaveType, useLeaveRequests, useLeaveTypes, useSubmitLeaveRequest } from '@hooks/useLeave';
 import { LAYOUT, SPACING } from '@lib/ui-utils';
+
+registerTranslation('en', en);
 
 /**
  * Leave Requests Screen
@@ -54,6 +59,25 @@ export default function LeaveRequestsScreen() {
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
   const [reason, setReason] = useState<string>('');
+  const [range, setRange] = React.useState<{ startDate: Date | undefined; endDate: Date | undefined }>({
+    startDate: undefined,
+    endDate: undefined,
+  });
+  const [open, setOpen] = React.useState(false);
+
+  const onDismiss = React.useCallback(() => {
+    setOpen(false);
+  }, [setOpen]);
+
+  const onConfirm = React.useCallback(
+    ({ startDate, endDate }: any) => {
+      setOpen(false);
+      setRange({ startDate, endDate });
+      if (startDate) setStartDate(format(startDate, 'yyyy-MM-dd'));
+      if (endDate) setEndDate(format(endDate, 'yyyy-MM-dd'));
+    },
+    [setOpen, setRange]
+  );
 
   // Handlers
   const onRefresh = useCallback(() => {
@@ -63,6 +87,34 @@ export default function LeaveRequestsScreen() {
   const handleSubmitRequest = useCallback(async () => {
     if (!selectedLeaveType || !startDate || !endDate || !reason.trim()) {
       handleError(new Error('Please fill in all required fields'));
+      return;
+    }
+
+    // Date validation
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(startDate)) {
+      handleError(new Error('Start Date must be in YYYY-MM-DD format'));
+      return;
+    }
+    if (!dateRegex.test(endDate)) {
+      handleError(new Error('End Date must be in YYYY-MM-DD format'));
+      return;
+    }
+
+    const start = parse(startDate, 'yyyy-MM-dd', new Date());
+    const end = parse(endDate, 'yyyy-MM-dd', new Date());
+
+    if (!isValid(start)) {
+      handleError(new Error('Invalid Start Date'));
+      return;
+    }
+    if (!isValid(end)) {
+      handleError(new Error('Invalid End Date'));
+      return;
+    }
+
+    if (start > end) {
+      handleError(new Error('Start Date cannot be after End Date'));
       return;
     }
 
@@ -104,7 +156,7 @@ export default function LeaveRequestsScreen() {
   // Render request item
   const renderRequestItem = ({ item }: { item: LeaveRequest }) => {
     const numberOfDays = Math.round(item.totalRequestedMins / (8 * 60) * 10) / 10;
-    
+
     return (
       <Card style={{ marginHorizontal: SPACING.lg, marginVertical: SPACING.sm }}>
         <Card.Content style={{ paddingVertical: SPACING.lg, gap: SPACING.md }}>
@@ -221,11 +273,14 @@ export default function LeaveRequestsScreen() {
         icon="plus"
         label="New Request"
         onPress={() => setDialogVisible(true)}
+        color={theme.colors.onPrimary}
         style={{
           position: 'absolute',
           margin: SPACING.lg,
           right: 0,
           bottom: insets.bottom + SPACING.lg,
+          backgroundColor: theme.colors.primary,
+
         }}
       />
 
@@ -249,23 +304,39 @@ export default function LeaveRequestsScreen() {
               />
             </View>
 
-            {/* Start Date */}
-            <TextInput
-              label="Start Date (YYYY-MM-DD) *"
-              value={startDate}
-              onChangeText={setStartDate}
-              placeholder="2026-03-27"
-              keyboardType="default"
-            />
+            {/* Date Range Picker */}
+            <View style={{ marginTop: SPACING.md }}>
+              <Text variant="labelMedium" style={{ marginBottom: SPACING.xs }}>Date Range *</Text>
+              <Button 
+                mode="outlined" 
+                onPress={() => setOpen(true)}
+                icon="calendar"
+                style={{ borderRadius: 8 }}
+                contentStyle={{ justifyContent: 'flex-start', paddingVertical: 4 }}
+              >
+                {startDate && endDate 
+                  ? `${startDate} to ${endDate}` 
+                  : 'Select Dates'
+                }
+              </Button>
+              {startDate && endDate && (
+                <Text variant="bodySmall" style={{ marginTop: 4, color: theme.colors.primary }}>
+                  {differenceInDays(new Date(endDate), new Date(startDate)) + 1} days selected
+                </Text>
+              )}
+            </View>
 
-            {/* End Date */}
-            <TextInput
-              label="End Date (YYYY-MM-DD) *"
-              value={endDate}
-              onChangeText={setEndDate}
-              placeholder="2026-03-29"
-              keyboardType="default"
-            />
+            <Portal>
+              <DatePickerModal
+                locale="en"
+                mode="range"
+                visible={open}
+                onDismiss={onDismiss}
+                startDate={range.startDate}
+                endDate={range.endDate}
+                onConfirm={onConfirm}
+              />
+            </Portal>
 
             {/* Reason */}
             <TextInput
@@ -275,6 +346,7 @@ export default function LeaveRequestsScreen() {
               placeholder="Personal leave, vacation, etc."
               multiline
               numberOfLines={3}
+              style={{ marginTop: SPACING.md }}
             />
           </ScrollView>
         </Dialog.ScrollArea>
