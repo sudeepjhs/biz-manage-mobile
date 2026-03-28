@@ -1,7 +1,7 @@
-import { useQuery } from '@tanstack/react-query';
-import type { UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
-import axios, { AxiosError } from 'axios';
 import API_CLIENT from '@lib/api-client';
+import type { UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 
 export interface ApiResponse<T> {
   success: boolean;
