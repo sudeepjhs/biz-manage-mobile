@@ -1,45 +1,50 @@
 import React from 'react';
 import { View, ViewStyle, Animated } from 'react-native';
-import { Text, Button, useTheme } from 'react-native-paper';
+import { Text, useTheme } from 'react-native-paper';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { SPACING, BORDER_RADIUS } from '@lib/ui-utils';
+import { SPACING } from '@lib/ui-utils';
+import { ModernButton } from './ModernButton';
 
-export interface EmptyStateProps {
+export interface ModernEmptyStateProps {
   icon?: string;
   title: string;
   description?: string;
   actionLabel?: string;
   onAction?: () => void;
   style?: ViewStyle;
+  animated?: boolean;
 }
 
-export const EmptyState: React.FC<EmptyStateProps> = ({
+export const ModernEmptyState: React.FC<ModernEmptyStateProps> = ({
   icon = 'inbox',
   title,
   description,
   actionLabel,
   onAction,
   style,
+  animated = true,
 }) => {
   const theme = useTheme();
   const scaleValue = React.useRef(new Animated.Value(0.8)).current;
   const opacityValue = React.useRef(new Animated.Value(0)).current;
 
   React.useEffect(() => {
-    Animated.parallel([
-      Animated.spring(scaleValue, {
-        toValue: 1,
-        useNativeDriver: true,
-        tension: 50,
-        friction: 8,
-      }),
-      Animated.timing(opacityValue, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [scaleValue, opacityValue]);
+    if (animated) {
+      Animated.parallel([
+        Animated.spring(scaleValue, {
+          toValue: 1,
+          useNativeDriver: true,
+          tension: 50,
+          friction: 8,
+        }),
+        Animated.timing(opacityValue, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+  }, [animated, scaleValue, opacityValue]);
 
   return (
     <Animated.View
@@ -50,18 +55,17 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           alignItems: 'center',
           padding: SPACING.xl,
           transform: [{ scale: scaleValue }],
-          opacity: opacityValue,
+          opacity: animated ? opacityValue : 1,
         },
         style,
       ]}
     >
-      {/* Icon container with background */}
       <View
         style={{
           width: 80,
           height: 80,
           borderRadius: 40,
-          backgroundColor: theme.colors.primaryContainer,
+          backgroundColor: theme.colors.surfaceVariant,
           justifyContent: 'center',
           alignItems: 'center',
           marginBottom: SPACING.lg,
@@ -69,7 +73,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       >
         <MaterialCommunityIcon
           name={icon}
-          size={44}
+          size={48}
           color={theme.colors.primary}
         />
       </View>
@@ -94,7 +98,6 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
             marginBottom: SPACING.xl,
             color: theme.colors.onSurfaceVariant,
             lineHeight: 20,
-            maxWidth: 280,
           }}
         >
           {description}
@@ -102,19 +105,12 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       )}
 
       {actionLabel && onAction && (
-        <Button
-          mode="contained"
+        <ModernButton
+          label={actionLabel}
           onPress={onAction}
-          buttonColor={theme.colors.primary}
-          textColor="#ffffff"
-          contentStyle={{
-            paddingVertical: SPACING.md,
-            paddingHorizontal: SPACING.xl,
-          }}
-          labelStyle={{ fontWeight: '600' }}
-        >
-          {actionLabel}
-        </Button>
+          variant="contained"
+          color="primary"
+        />
       )}
     </Animated.View>
   );

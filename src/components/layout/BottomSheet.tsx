@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Modal, Animated, PanResponder, Dimensions, ViewStyle } from 'react-native';
 import { useTheme, IconButton } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SPACING, BORDER_RADIUS, MICRO_INTERACTIONS } from '@lib/ui-utils';
 
 export interface BottomSheetProps {
   visible: boolean;
@@ -24,40 +25,66 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const screenHeight = Dimensions.get('window').height;
+  const [animationValue] = useState(new Animated.Value(0));
 
   const sheetHeight = typeof height === 'number' ? height : (screenHeight * parseFloat(height)) / 100;
+
+  useEffect(() => {
+    if (visible) {
+      Animated.timing(animationValue, {
+        toValue: 1,
+        duration: MICRO_INTERACTIONS.smooth,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(animationValue, {
+        toValue: 0,
+        duration: MICRO_INTERACTIONS.smooth,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [visible, animationValue]);
+
+  const translateY = animationValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [sheetHeight, 0],
+  });
 
   return (
     <Modal
       visible={visible}
       transparent
-      animationType="fade"
+      animationType="none"
       onRequestClose={onClose}
     >
-      <View
+      <Animated.View
         style={{
           flex: 1,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          backgroundColor: animationValue.interpolate({
+            inputRange: [0, 1],
+            outputRange: ['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.5)'],
+          }),
           justifyContent: 'flex-end',
         }}
         onTouchEnd={onClose}
       >
-        <View
+        <Animated.View
           style={[
             {
               backgroundColor: theme.colors.surface,
-              borderTopLeftRadius: 16,
-              borderTopRightRadius: 16,
+              borderTopLeftRadius: BORDER_RADIUS.xl,
+              borderTopRightRadius: BORDER_RADIUS.xl,
               height: sheetHeight,
               paddingBottom: insets.bottom,
-              paddingHorizontal: 16,
-              paddingTop: 12,
+              paddingHorizontal: SPACING.lg,
+              paddingTop: SPACING.md,
+              transform: [{ translateY }],
             },
             style,
           ]}
           onTouchEnd={(e) => e.stopPropagation()}
         >
-          {/* Handle bar */}
+          {/* Modern handle bar with gradient effect */}
           <View
             style={{
               width: 40,
@@ -65,15 +92,28 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
               backgroundColor: theme.colors.outline,
               borderRadius: 2,
               alignSelf: 'center',
-              marginBottom: 16,
+              marginBottom: SPACING.lg,
+              opacity: 0.5,
             }}
           />
 
           {/* Header with title and close button */}
           {title && (
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: SPACING.md,
+              }}
+            >
               <View style={{ flex: 1 }} />
-              <IconButton icon="close" onPress={onClose} />
+              <IconButton
+                icon="close"
+                onPress={onClose}
+                iconColor={theme.colors.onSurface}
+                size={24}
+              />
             </View>
           )}
 
@@ -81,8 +121,8 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
           <View style={{ flex: 1 }}>
             {children}
           </View>
-        </View>
-      </View>
+        </Animated.View>
+      </Animated.View>
     </Modal>
   );
 };

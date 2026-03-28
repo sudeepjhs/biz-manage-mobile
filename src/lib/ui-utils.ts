@@ -160,3 +160,156 @@ export const ANIMATION_TIMING = {
   easeOut: 'ease-out',
   linear: 'linear',
 } as const;
+
+/**
+ * MODERN UI/UX UTILITIES
+ * Theme-centric design with micro-interactions and interactive states
+ */
+
+// Interactive state feedback styles
+export const INTERACTIVE_STATES = {
+  pressed: {
+    opacity: 0.7,
+  },
+  hovered: {
+    opacity: 0.85,
+  },
+  disabled: {
+    opacity: 0.5,
+  },
+  focused: {
+    opacity: 0.9,
+  },
+} as const;
+
+// Button state animations
+export const BUTTON_ANIMATIONS = {
+  scale: {
+    pressed: 0.96,
+    normal: 1,
+  },
+  elevation: {
+    normal: 2,
+    pressed: 4,
+    disabled: 0,
+  },
+} as const;
+
+// Card elevation states for depth
+export const CARD_ELEVATION = {
+  resting: 2,
+  hover: 4,
+  active: 8,
+  disabled: 0,
+} as const;
+
+// Gradient utilities for modern design
+export const GRADIENTS = {
+  blueToTeal: ['#0284c7', '#0d9488'],
+  indigoToBlue: ['#6366f1', '#0284c7'],
+  warmSunset: ['#f59e0b', '#dc2626'],
+  coolMorning: ['#3b82f6', '#06b6d4'],
+  successGradient: ['#16a34a', '#10b981'],
+  dangerGradient: ['#dc2626', '#ef4444'],
+} as const;
+
+// Focus ring utilities for accessibility
+export const FOCUS_RING = {
+  width: 2,
+  offset: 2,
+  color: '#0284c7',
+} as const;
+
+// Loading skeleton animation configuration
+export const SKELETON_ANIMATION = {
+  duration: 1000,
+  timingFunction: 'linear',
+} as const;
+
+// Micro-interaction timing
+export const MICRO_INTERACTIONS = {
+  quick: 100,
+  snappy: 150,
+  smooth: 200,
+  flowing: 300,
+  graceful: 400,
+} as const;
+
+// Component-specific spacing patterns
+export const COMPONENT_SPACING = {
+  button: {
+    horizontal: SPACING.xl,
+    vertical: SPACING.md,
+  },
+  card: {
+    padding: SPACING.lg,
+    gap: SPACING.md,
+  },
+  list: {
+    item: SPACING.md,
+    section: SPACING.lg,
+  },
+  form: {
+    input: {
+      marginBottom: SPACING.lg,
+    },
+    label: {
+      marginBottom: SPACING.sm,
+    },
+  },
+} as const;
+
+// Accessibility helpers
+export const A11Y = {
+  minTouchSize: 48,
+  minTouchSpacing: 8,
+  minContrastRatio: 4.5,
+  focusOutlineWidth: 2,
+  disabledOpacity: 0.5,
+} as const;
+
+// Modern state layer colors (Material Design 3 concept)
+export const STATE_LAYERS = {
+  hover: 0.08,
+  focus: 0.12,
+  pressed: 0.12,
+  dragged: 0.16,
+} as const;
+
+// Component visual hierarchy
+export const VISUAL_HIERARCHY = {
+  prominent: { opacity: 1, fontWeight: '700' },
+  standard: { opacity: 1, fontWeight: '500' },
+  muted: { opacity: 0.7, fontWeight: '400' },
+  disabled: { opacity: 0.5, fontWeight: '400' },
+} as const;
+
+// Transition presets for smooth interactions
+export const TRANSITION_PRESETS = {
+  fast: {
+    duration: ANIMATION_DURATION.short,
+    useNativeDriver: true,
+  },
+  standard: {
+    duration: ANIMATION_DURATION.medium,
+    useNativeDriver: true,
+  },
+  slow: {
+    duration: ANIMATION_DURATION.long,
+    useNativeDriver: true,
+  },
+  smooth: {
+    duration: ANIMATION_DURATION.medium,
+    useNativeDriver: true,
+  },
+} as const;
+
+// Haptic feedback patterns
+export const HAPTIC_PATTERNS = {
+  light: 'light',
+  medium: 'medium',
+  heavy: 'heavy',
+  success: 'notificationSuccess',
+  warning: 'notificationWarning',
+  error: 'notificationError',
+} as const;

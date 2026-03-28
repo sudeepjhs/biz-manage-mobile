@@ -1,58 +1,103 @@
 import { ErrorAlert, LoadingOverlay } from '@components/index';
-import { API_ENDPOINTS } from '@config/API';
 import { useAuth } from '@hooks/useAuth';
 import { useDashboardActivity, useDashboardStats } from '@hooks/useDashboard';
-import API_CLIENT from '@lib/api-client';
-import { LAYOUT, SHADOWS, SPACING } from '@lib/ui-utils';
+import { LAYOUT, SPACING, BORDER_RADIUS } from '@lib/ui-utils';
+import { ModernCard } from '@components/modern';
 import React, { useCallback } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import {
   Dimensions,
   RefreshControl,
   ScrollView,
-  StyleSheet,
   View,
 } from 'react-native';
-import { Button, Card, Text, useTheme } from 'react-native-paper';
+import { Button, Text, useTheme } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
 /**
- * Stat Card Component
+ * Modern Stat Card Component
+ * Theme-centric design with interactive feedback and semantic colors
  */
 const StatCard: React.FC<{
   icon: string;
   title: string;
   value: string | number;
-  color: string;
+  variant?: 'primary' | 'secondary' | 'success' | 'warning' | 'critical';
   onPress?: () => void;
-}> = ({ icon, title, value, color, onPress }) => {
+}> = ({ icon, title, value, variant = 'primary', onPress }) => {
   const theme = useTheme();
 
+  const variantColors = {
+    primary: {
+      bg: theme.colors.primaryContainer,
+      icon: theme.colors.primary,
+      text: theme.colors.primary,
+    },
+    secondary: {
+      bg: (theme.colors as any).secondaryContainer,
+      icon: theme.colors.secondary,
+      text: theme.colors.secondary,
+    },
+    success: {
+      bg: (theme.colors as any).successContainer || '#dcfce7',
+      icon: (theme.colors as any).success || '#16a34a',
+      text: (theme.colors as any).success || '#16a34a',
+    },
+    warning: {
+      bg: (theme.colors as any).warningContainer || '#fef3c7',
+      icon: (theme.colors as any).warning || '#f59e0b',
+      text: (theme.colors as any).warning || '#f59e0b',
+    },
+    critical: {
+      bg: theme.colors.errorContainer,
+      icon: theme.colors.error,
+      text: theme.colors.error,
+    },
+  };
+
+  const colors = variantColors[variant];
+
   return (
-    <Card
+    <ModernCard
+      variant="filled"
+      interactive={!!onPress}
+      onPress={onPress}
       style={{
         flex: 1,
         marginHorizontal: SPACING.sm,
         marginVertical: SPACING.md,
-        ...SHADOWS.md,
+        backgroundColor: colors.bg,
       }}
-      onPress={onPress}
     >
-      <Card.Content
+      <View
         style={{
           padding: SPACING.lg,
           alignItems: 'center',
         }}
       >
-        <MaterialCommunityIcon name={icon} size={40} color={color} />
+        <View
+          style={{
+            width: 50,
+            height: 50,
+            borderRadius: 25,
+            backgroundColor: `${colors.icon}20`,
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginBottom: SPACING.md,
+          }}
+        >
+          <MaterialCommunityIcon name={icon} size={28} color={colors.icon} />
+        </View>
         <Text
           variant="bodySmall"
           style={{
-            marginTop: SPACING.md,
-            color: theme.colors.outline,
+            marginTop: SPACING.sm,
+            color: theme.colors.onSurfaceVariant,
+            fontSize: 12,
+            textAlign: 'center',
           }}
         >
           {title}
@@ -62,18 +107,19 @@ const StatCard: React.FC<{
           style={{
             marginTop: SPACING.sm,
             fontWeight: '700',
-            color: theme.colors.onSurface,
+            color: colors.text,
           }}
         >
           {value}
         </Text>
-      </Card.Content>
-    </Card>
+      </View>
+    </ModernCard>
   );
 };
 
 /**
  * Activity Item Component
+ * Theme-centric with improved visual hierarchy
  */
 const ActivityItemComponent: React.FC<{
   type: string;
@@ -84,15 +130,17 @@ const ActivityItemComponent: React.FC<{
   const theme = useTheme();
 
   const getActivityIcon = (activityType: string) => {
-    const iconMap: Record<string, string> = {
-      sale: 'cash-register',
-      order: 'clipboard-list',
-      leave: 'calendar-check',
-      inventory: 'package-variant',
-      timesheet: 'clock',
+    const iconMap: Record<string, { icon: string; color: string }> = {
+      sale: { icon: 'cash-register', color: (theme.colors as any).success || '#16a34a' },
+      order: { icon: 'clipboard-list', color: theme.colors.primary },
+      leave: { icon: 'calendar-check', color: (theme.colors as any).info || '#0891b2' },
+      inventory: { icon: 'package-variant', color: theme.colors.secondary },
+      timesheet: { icon: 'clock', color: (theme.colors as any).warning || '#f59e0b' },
     };
-    return iconMap[activityType] || 'bell';
+    return iconMap[activityType] || { icon: 'bell', color: theme.colors.primary };
   };
+
+  const activity = getActivityIcon(type);
 
   return (
     <View
@@ -100,16 +148,27 @@ const ActivityItemComponent: React.FC<{
         paddingVertical: SPACING.md,
         paddingHorizontal: SPACING.lg,
         borderBottomWidth: 1,
-        borderBottomColor: theme.colors.outline,
+        borderBottomColor: theme.colors.outlineVariant,
       }}
     >
       <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: SPACING.md }}>
-        <MaterialCommunityIcon
-          name={getActivityIcon(type)}
-          size={24}
-          color={theme.colors.primary}
-          style={{ marginTop: SPACING.sm }}
-        />
+        <View
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: 20,
+            backgroundColor: `${activity.color}15`,
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginTop: SPACING.sm,
+          }}
+        >
+          <MaterialCommunityIcon
+            name={activity.icon}
+            size={20}
+            color={activity.color}
+          />
+        </View>
         <View style={{ flex: 1 }}>
           <Text variant="bodyMedium" style={{ fontWeight: '600', marginBottom: SPACING.sm }}>
             {title}
@@ -117,12 +176,12 @@ const ActivityItemComponent: React.FC<{
           {description && (
             <Text
               variant="bodySmall"
-              style={{ color: theme.colors.outline, marginBottom: SPACING.sm }}
+              style={{ color: theme.colors.onSurfaceVariant, marginBottom: SPACING.sm }}
             >
               {description}
             </Text>
           )}
-          <Text variant="labelSmall" style={{ color: theme.colors.outline }}>
+          <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>
             {new Date(timestamp).toLocaleString()}
           </Text>
         </View>
@@ -170,39 +229,43 @@ export default function DashboardScreen() {
           paddingBottom: insets.bottom + SPACING.lg,
         }}
       >
-        {/* Header */}
+        {/* Modern Header with Gradient Effect */}
         <View
           style={{
             backgroundColor: theme.colors.primary,
             paddingTop: insets.top + SPACING.lg,
-            paddingBottom: SPACING.lg,
+            paddingBottom: SPACING.xl,
             paddingHorizontal: SPACING.lg,
+            borderBottomLeftRadius: BORDER_RADIUS.xl,
+            borderBottomRightRadius: BORDER_RADIUS.xl,
+            overflow: 'hidden',
           }}
         >
-          <Text
-            variant="headlineSmall"
-            style={{
-              color: theme.colors.onPrimary,
-              fontWeight: '700',
-            }}
-          >
-            Welcome, {user?.name || 'User'}!
-          </Text>
-          <Text
-            variant="bodyMedium"
-            style={{
-              color: theme.colors.onPrimary,
-              opacity: 0.8,
-              marginTop: SPACING.sm,
-            }}
-          >
-            {new Date().toLocaleDateString('en-US', {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
-          </Text>
+          <View style={{ marginBottom: SPACING.md }}>
+            <Text
+              variant="headlineSmall"
+              style={{
+                color: theme.colors.onPrimary,
+                fontWeight: '700',
+                marginBottom: SPACING.sm,
+              }}
+            >
+              Welcome, {user?.name || 'User'}!
+            </Text>
+            <Text
+              variant="bodyMedium"
+              style={{
+                color: theme.colors.onPrimary,
+                opacity: 0.9,
+              }}
+            >
+              {new Date().toLocaleDateString('en-US', {
+                weekday: 'long',
+                month: 'short',
+                day: 'numeric',
+              })}
+            </Text>
+          </View>
         </View>
 
         {/* Error Alert */}
@@ -210,67 +273,83 @@ export default function DashboardScreen() {
           <ErrorAlert
             visible={true}
             message="Failed to load dashboard stats"
+            type="error"
             style={{ margin: SPACING.md }}
-            onDismiss={() => statsQuery.refetch()}
+            onRetry={() => statsQuery.refetch()}
           />
         )}
 
-        {/* Stats Grid */}
+        {/* Stats Grid - Theme Centric */}
         {stats && (
           <View>
-            {/* Row 1: Revenue & Orders (Admin/Manager only) */}
+            {/* Row 1: Revenue & Orders */}
             {(hasPermission('DASHBOARD', 'ALL_DATA') || hasPermission('DASHBOARD', 'DEPARTMENT_DATA')) && (
               <View style={{ flexDirection: 'row', paddingHorizontal: SPACING.md }}>
                 <StatCard
                   icon="cash-multiple"
                   title="Total Revenue"
                   value={`₹${(stats.totalSales || 0).toFixed(0)}`}
-                  color={theme.colors.primary}
+                  variant="primary"
                 />
                 <StatCard
                   icon="cart"
                   title="Total Orders"
                   value={stats.totalOrders || 0}
-                  color={theme.colors.secondary}
+                  variant="success"
                 />
               </View>
             )}
 
-            {/* Row 2: Staff & Stock (Admin/Manager only) */}
+            {/* Row 2: Staff & Stock */}
             {(hasPermission('DASHBOARD', 'ALL_DATA') || hasPermission('DASHBOARD', 'DEPARTMENT_DATA')) && (
               <View style={{ flexDirection: 'row', paddingHorizontal: SPACING.md }}>
                 <StatCard
                   icon="briefcase"
                   title="Active Staff"
                   value={stats.activeEmployees}
-                  color="#4CAF50"
+                  variant="secondary"
                 />
                 <StatCard
                   icon="alert-circle"
                   title="Low Stock"
                   value={stats.lowStock}
-                  color="#FF9800"
+                  variant="warning"
                 />
               </View>
             )}
 
-            {/* Worker specific stats if needed - for now just welcome them */}
+            {/* Welcome message for workers */}
             {!(hasPermission('DASHBOARD', 'ALL_DATA') || hasPermission('DASHBOARD', 'DEPARTMENT_DATA')) && (
-               <View style={{ padding: SPACING.xl, alignItems: 'center' }}>
-                 <MaterialCommunityIcon name="star-outline" size={48} color={theme.colors.primary} />
-                 <Text variant="titleMedium" style={{ marginTop: SPACING.md }}>Have a productive day!</Text>
-               </View>
+              <View style={{ padding: SPACING.xl, alignItems: 'center' }}>
+                <View
+                  style={{
+                    width: 64,
+                    height: 64,
+                    borderRadius: 32,
+                    backgroundColor: theme.colors.primaryContainer,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginBottom: SPACING.lg,
+                  }}
+                >
+                  <MaterialCommunityIcon name="star" size={32} color={theme.colors.primary} />
+                </View>
+                <Text variant="titleMedium" style={{ marginTop: SPACING.md, fontWeight: '600' }}>
+                  Have a productive day!
+                </Text>
+              </View>
             )}
           </View>
         )}
 
         {/* Quick Actions */}
-        <View style={{ paddingHorizontal: SPACING.lg, marginTop: SPACING.xl }}>
+        <View style={{ paddingHorizontal: SPACING.lg, marginTop: SPACING.xl, marginBottom: SPACING.lg }}>
           <Text
             variant="titleMedium"
             style={{
               marginBottom: SPACING.md,
-              fontWeight: '600',
+              fontWeight: '700',
+              color: theme.colors.onSurface,
             }}
           >
             Quick Actions
@@ -278,17 +357,13 @@ export default function DashboardScreen() {
           <View style={{ flexDirection: 'row', gap: SPACING.md }}>
             {hasPermission('POS', 'CREATE') && (
               <Button
-                mode="contained-tonal"
+                mode="contained"
                 icon="cash-register"
                 onPress={() => {
-                  // Navigate to POS tab
-                  // If the POS tab exists, this will activate it
-                  // and show the POSScreen
-                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                  // @ts-ignore
-                  navigation.navigate('POSTab');
+                  (navigation as any).navigate('POSTab');
                 }}
                 style={{ flex: 1 }}
+                buttonColor={theme.colors.primary}
               >
                 POS
               </Button>
@@ -298,9 +373,7 @@ export default function DashboardScreen() {
                 mode="contained-tonal"
                 icon="package-variant"
                 onPress={() => {
-                  // Navigate to Inventory tab
-                  // @ts-ignore
-                  navigation.navigate('InventoryTab');
+                  (navigation as any).navigate('InventoryTab');
                 }}
                 style={{ flex: 1 }}
               >
@@ -312,9 +385,7 @@ export default function DashboardScreen() {
                 mode="contained-tonal"
                 icon="clock"
                 onPress={() => {
-                  // Navigate to Time tab
-                  // @ts-ignore
-                  navigation.navigate('TimeTab');
+                  (navigation as any).navigate('TimeTab');
                 }}
                 style={{ flex: 1 }}
               >
@@ -324,24 +395,25 @@ export default function DashboardScreen() {
           </View>
         </View>
 
-        {/* Activity Feed (Admin/Manager only) */}
+        {/* Activity Feed */}
         {(hasPermission('DASHBOARD', 'ALL_DATA') || hasPermission('DASHBOARD', 'DEPARTMENT_DATA')) && (
-          <View style={{ marginTop: SPACING.xl }}>
+          <View style={{ marginTop: SPACING.md, marginBottom: SPACING.lg }}>
             <View style={{ paddingHorizontal: SPACING.lg, marginBottom: SPACING.md }}>
               <Text
                 variant="titleMedium"
                 style={{
-                  fontWeight: '600',
+                  fontWeight: '700',
+                  color: theme.colors.onSurface,
                 }}
               >
                 Recent Activity
               </Text>
             </View>
 
-            <Card
+            <ModernCard
+              variant="elevated"
               style={{
                 marginHorizontal: SPACING.lg,
-                ...SHADOWS.md,
               }}
             >
               {activities.length > 0 ? (
@@ -359,23 +431,23 @@ export default function DashboardScreen() {
                   <MaterialCommunityIcon
                     name="history"
                     size={40}
-                    color={theme.colors.outline}
+                    color={theme.colors.outlineVariant}
                     style={{ marginBottom: SPACING.md }}
                   />
                   <Text
                     variant="bodyMedium"
-                    style={{ color: theme.colors.outline }}
+                    style={{ color: theme.colors.onSurfaceVariant }}
                   >
                     No recent activity
                   </Text>
                 </View>
               )}
-            </Card>
+            </ModernCard>
           </View>
         )}
 
         {/* Logout Button */}
-        <View style={{ paddingHorizontal: SPACING.lg, marginTop: SPACING.xl }}>
+        <View style={{ paddingHorizontal: SPACING.lg, marginTop: SPACING.md, marginBottom: SPACING.lg }}>
           <Button
             mode="outlined"
             onPress={logout}
@@ -387,30 +459,8 @@ export default function DashboardScreen() {
           >
             Logout
           </Button>
-          <Button
-            mode="outlined"
-            onPress={async () => {
-              try {
-                const response = await API_CLIENT.get(API_ENDPOINTS.AUTH.MOBILE_DEBUG);
-                console.log('Mobile Debug Data:', response);
-              } catch (error) {
-                console.error('Debug error:', error);
-              }
-            }}
-            icon="bug"
-            style={{
-              marginTop: SPACING.md,
-              borderColor: theme.colors.error,
-            }}
-            textColor={theme.colors.error}
-          >
-            Debug Session
-          </Button>
         </View>
-      </ScrollView >
-    </View >
+      </ScrollView>
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-});

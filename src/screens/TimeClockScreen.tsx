@@ -58,24 +58,10 @@ export default function TimeClockScreen() {
         }, 1000);
       }
     }
-    return () => interval && clearInterval(interval);
+    return () => { if (interval) clearInterval(interval); };
   }, [clockStatusQuery.data]);
 
-  // Animated pulse for clocked-in status
-  const pulse = useRef(new Animated.Value(1)).current;
-  useEffect(() => {
-    let anim: Animated.CompositeAnimation | null = null;
-    if (isClocked) {
-      anim = Animated.loop(
-        Animated.sequence([
-          Animated.timing(pulse, { toValue: 1.15, duration: 700, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
-          Animated.timing(pulse, { toValue: 1, duration: 700, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
-        ])
-      );
-      anim.start();
-    }
-    return () => anim && anim.stop();
-  }, [isClocked, pulse]);
+
 
   // Format elapsed time
   const formatElapsedTime = (seconds: number) => {
@@ -94,6 +80,22 @@ export default function TimeClockScreen() {
   const isClocked = clockState === 'IN' || clockState === 'MEAL' || clockState === 'BREAK';
   const todayEntry = timeEntriesQuery.data?.[0]; // Assuming only one entry for current user/day
   const isDayCompleted = todayEntry?.status === 'COMPLETED';
+
+  // Animated pulse for clocked-in status (defined after isClocked)
+  const pulse = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    let anim: Animated.CompositeAnimation | null = null;
+    if (isClocked) {
+      anim = Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulse, { toValue: 1.15, duration: 700, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+          Animated.timing(pulse, { toValue: 1, duration: 700, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+        ])
+      );
+      anim.start();
+    }
+    return () => { if (anim) anim.stop(); };
+  }, [isClocked, pulse]);
 
   const renderTimeEntry = ({ item }: { item: any }) => (
     <Card
@@ -255,17 +257,36 @@ export default function TimeClockScreen() {
 
           {isClocked && (
             <>
-              <Text
-                variant="displaySmall"
-                style={{
-                  fontWeight: '700',
-                  marginBottom: SPACING.lg,
-                  fontFamily: 'monospace',
-                  color: theme.colors.primary,
-                }}
-              >
-                {formatElapsedTime(elapsedSeconds)}
-              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: SPACING.lg }}>
+                <Animated.View
+                  style={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: 6,
+                    marginRight: SPACING.sm,
+                    backgroundColor: theme.colors.primary,
+                    transform: [{ scale: pulse }],
+                  }}
+                />
+                <View style={{
+                  backgroundColor: theme.colors.primaryContainer,
+                  paddingHorizontal: SPACING.md,
+                  paddingVertical: 6,
+                  borderRadius: 20,
+                }}>
+                  <Text
+                    variant="titleLarge"
+                    style={{
+                      fontWeight: '700',
+                      color: theme.colors.onPrimaryContainer,
+                      fontFamily: 'monospace',
+                    }}
+                  >
+                    {formatElapsedTime(elapsedSeconds)}
+                  </Text>
+                </View>
+              </View>
+
               <Text
                 variant="bodyMedium"
                 style={{
@@ -297,7 +318,8 @@ export default function TimeClockScreen() {
                 loading={clockOutMutation.isPending}
                 disabled={clockOutMutation.isPending || isDayCompleted}
                 icon="logout"
-                style={{ flex: 1 }}
+                style={{ flex: 1, height: 48, justifyContent: 'center' }}
+                accessibilityLabel={isDayCompleted ? 'Day completed' : 'Clock out'}
               >
                 {isDayCompleted ? 'Completed' : 'Clock Out'}
               </Button>
@@ -312,12 +334,19 @@ export default function TimeClockScreen() {
                 loading={clockInMutation.isPending}
                 disabled={clockInMutation.isPending || isDayCompleted}
                 icon="login"
-                style={{ flex: 1 }}
+                style={{ flex: 1, height: 48, justifyContent: 'center' }}
+                accessibilityLabel={isDayCompleted ? 'Day completed' : 'Clock in'}
               >
                 {isDayCompleted ? 'Day Completed' : 'Clock In'}
               </Button>
             )}
           </View>
+          {/* Explain disabled state when applicable */}
+          {isDayCompleted && (
+            <Text variant="bodySmall" style={{ color: theme.colors.outline, marginTop: SPACING.md, textAlign: 'center' }}>
+              Today's timesheet is completed. Contact admin to reopen or make edits.
+            </Text>
+          )}
         </Card.Content>
       </Card>
 
