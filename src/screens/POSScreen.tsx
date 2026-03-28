@@ -164,7 +164,7 @@ export default function POSScreen() {
       {/* Cart FAB */}
       {cartItemCount > 0 && (
         <FAB
-          icon="shopping-cart"
+          icon="cart"
           label={`${cartItemCount} items - ₹${subtotal.toFixed(2)}`}
           onPress={() => setCartVisible(true)}
           style={{
@@ -235,7 +235,7 @@ export default function POSScreen() {
             </View>
           </View>
         ) : (
-          <EmptyState icon="shopping-cart-off" title="Cart is empty" />
+          <EmptyState icon="cart-off" title="Cart is empty" />
         )}
       </BottomSheet>
 

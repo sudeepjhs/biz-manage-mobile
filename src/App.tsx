@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useColorScheme } from 'react-native';
-import { PaperProvider } from 'react-native-paper';
+import { PaperProvider, Text } from 'react-native-paper';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -10,6 +10,9 @@ import { lightTheme, darkTheme } from '@lib/theme';
 import { DEBUG } from '@config/index';
 import LoginScreen from '@screens/LoginScreen';
 import AppNavigator from '@navigation/AppNavigator';
+import { Snackbar } from 'react-native-paper';
+import { useUIStore } from '@store/uiStore';
+
 
 // Create React Query client
 const queryClient = new QueryClient({
@@ -43,6 +46,9 @@ export default function App() {
 
   // Initialize auth interceptor for 401 handling
   useAuthInterceptor();
+
+  const { toast, hideToast } = useUIStore();
+
 
   // Initialize app
   useEffect(() => {
@@ -102,6 +108,22 @@ export default function App() {
           </Stack.Navigator>
         </NavigationContainer>
       </QueryClientProvider>
+      <Snackbar
+        visible={!!toast}
+        onDismiss={hideToast}
+        duration={toast?.duration || 4000}
+        action={{
+          label: 'Dismiss',
+          onPress: hideToast,
+        }}
+        style={{
+          backgroundColor: toast?.type === 'error' ? '#ef4444' :
+            toast?.type === 'success' ? '#10b981' :
+              '#3b82f6',
+        }}
+      >
+        <Text style={{ color: '#fff' }}>{toast?.message}</Text>
+      </Snackbar>
     </PaperProvider>
   );
 }

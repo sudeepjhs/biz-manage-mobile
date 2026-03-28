@@ -225,7 +225,7 @@ export default function DashboardScreen() {
                 color={theme.colors.primary}
               />
               <StatCard
-                icon="shopping-cart"
+                icon="cart"
                 title="Total Orders"
                 value={stats.totalOrders || 0}
                 color={theme.colors.secondary}

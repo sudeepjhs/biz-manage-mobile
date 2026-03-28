@@ -132,7 +132,7 @@ export default function LeaveApprovalsScreen() {
           {/* Submitted Date */}
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACING.sm }}>
             <MaterialCommunityIcon
-              name="calendar-time"
+              name="calendar-clock"
               size={16}
               color={theme.colors.onSurfaceVariant}
             />

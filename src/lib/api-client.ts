@@ -32,6 +32,8 @@ const processQueue = (error: Error | null) => {
 };
 
 import { useAuthStore } from '@store/authStore';
+import { useUIStore } from '@store/uiStore';
+
 
 // Request interceptor: Add JWT token
 API_CLIENT.interceptors.request.use(
@@ -74,8 +76,30 @@ API_CLIENT.interceptors.response.use(
   },
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+    const responseData = error.response?.data as any;
+
+    // Show error toast for non-401 errors
+    if (error.response?.status && error.response.status >= 400 && error.response.status !== 401) {
+      // Handle various error structures: 
+      // 1. { error: { message: '...' } } (user's case)
+      // 2. { error: '...' }
+      // 3. { message: '...' }
+      if (error.response?.status !== 404) {
+
+        const errorMessage = responseData?.error?.message ||
+          (typeof responseData?.error === 'string' ? responseData.error : null) ||
+          responseData?.message ||
+          error.message;
+
+        useUIStore.getState().showToast({
+          message: errorMessage,
+          type: 'error',
+        });
+      }
+    }
 
     if (error.response?.status === 401 && !originalRequest._retry) {
+
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
