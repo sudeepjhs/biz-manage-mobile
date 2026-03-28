@@ -43,15 +43,18 @@ export default function TimeClockScreen() {
   // Update elapsed time every second
   useEffect(() => {
     let interval: any;
-    if (clockStatusQuery.data && clockStatusQuery.data.status === 'in') {
-      const clockInTime = clockStatusQuery.data.clockIn;
-      setClockInTime(clockInTime);
-      interval = setInterval(() => {
-        const now = new Date();
-        const clockIn = new Date(clockInTime);
-        const elapsed = Math.floor((now.getTime() - clockIn.getTime()) / 1000);
-        setElapsedSeconds(elapsed);
-      }, 1000);
+    const data = clockStatusQuery.data;
+    if (data && (data.currentState === 'IN' || data.currentState === 'MEAL' || data.currentState === 'BREAK')) {
+      const lastTime = data.lastPunchTime;
+      if (lastTime) {
+        setClockInTime(lastTime);
+        interval = setInterval(() => {
+          const now = new Date();
+          const start = new Date(lastTime);
+          const elapsed = Math.floor((now.getTime() - start.getTime()) / 1000);
+          setElapsedSeconds(elapsed);
+        }, 1000);
+      }
     }
     return () => interval && clearInterval(interval);
   }, [clockStatusQuery.data]);
@@ -69,10 +72,11 @@ export default function TimeClockScreen() {
     return <LoadingOverlay visible={true} message="Loading time clock..." />;
   }
 
-  const isClocked = clockStatusQuery.data?.status === 'in';
-  const todayEntries = timeEntriesQuery.data?.entries || [];
+  const clockState = clockStatusQuery.data?.currentState || 'OUT';
+  const isClocked = clockState === 'IN' || clockState === 'MEAL' || clockState === 'BREAK';
+  const todayEntry = timeEntriesQuery.data?.[0]; // Assuming only one entry for current user/day
 
-  const renderTimeEntry = ({ item, index }: { item: any; index: number }) => (
+  const renderTimeEntry = ({ item }: { item: any }) => (
     <Card
       style={{
         marginHorizontal: SPACING.lg,
@@ -90,9 +94,13 @@ export default function TimeClockScreen() {
           }}
         >
           <Text variant="titleMedium" style={{ fontWeight: '600' }}>
-            Entry #{index + 1}
+            {item.date}
           </Text>
-          <MaterialCommunityIcon name="clock" size={20} color={theme.colors.primary} />
+          <MaterialCommunityIcon 
+            name={item.status === 'COMPLETED' ? 'check-decagram' : 'clock-outline'} 
+            size={20} 
+            color={item.status === 'COMPLETED' ? theme.colors.primary : theme.colors.secondary} 
+          />
         </View>
 
         <View
@@ -104,37 +112,43 @@ export default function TimeClockScreen() {
         >
           <View>
             <Text variant="labelSmall" style={{ color: theme.colors.outline }}>
-              Clock In
+              First Punch
             </Text>
             <Text variant="bodyMedium" style={{ fontWeight: '600' }}>
-              {new Date(item.clockIn).toLocaleTimeString()}
+              {item.firstPunch ? new Date(item.firstPunch).toLocaleTimeString() : '—'}
             </Text>
           </View>
           <View>
             <Text variant="labelSmall" style={{ color: theme.colors.outline }}>
-              Clock Out
+              Last Punch
             </Text>
             <Text variant="bodyMedium" style={{ fontWeight: '600' }}>
-              {item.clockOut ? new Date(item.clockOut).toLocaleTimeString() : '—'}
+              {item.lastPunch ? new Date(item.lastPunch).toLocaleTimeString() : '—'}
             </Text>
           </View>
-          {item.totalHours !== undefined && (
-            <View>
-              <Text variant="labelSmall" style={{ color: theme.colors.outline }}>
-                Duration
-              </Text>
-              <Text variant="bodyMedium" style={{ fontWeight: '600', color: theme.colors.primary }}>
-                {item.totalHours.toFixed(1)}h
-              </Text>
-            </View>
-          )}
+          <View>
+            <Text variant="labelSmall" style={{ color: theme.colors.outline }}>
+              Total Hours
+            </Text>
+            <Text variant="bodyMedium" style={{ fontWeight: '600', color: theme.colors.primary }}>
+              {item.totalHours?.toFixed(2)}h
+            </Text>
+          </View>
         </View>
 
-        {item.breakDuration && item.breakDuration > 0 && (
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <Text variant="bodySmall" style={{ color: theme.colors.outline }}>
-            Break: {Math.floor(item.breakDuration / 60)} min
+            Punches: {item.punchCount}
           </Text>
-        )}
+          <View style={{ 
+            backgroundColor: theme.colors.surfaceVariant, 
+            paddingHorizontal: SPACING.sm, 
+            paddingVertical: 2, 
+            borderRadius: 4 
+          }}>
+            <Text variant="labelSmall">{item.status}</Text>
+          </View>
+        </View>
       </Card.Content>
     </Card>
   );
@@ -256,7 +270,11 @@ export default function TimeClockScreen() {
             {isClocked ? (
               <Button
                 mode="contained"
-                onPress={() => clockOutMutation.mutate()}
+                onPress={() => clockOutMutation.mutate({ 
+                  type: 'PUNCH_OUT', 
+                  latitude: 0, 
+                  longitude: 0 
+                })}
                 loading={clockOutMutation.isPending}
                 disabled={clockOutMutation.isPending}
                 icon="logout"
@@ -267,7 +285,11 @@ export default function TimeClockScreen() {
             ) : (
               <Button
                 mode="contained"
-                onPress={() => clockInMutation.mutate()}
+                onPress={() => clockInMutation.mutate({ 
+                  type: 'PUNCH_IN', 
+                  latitude: 0, 
+                  longitude: 0 
+                })}
                 loading={clockInMutation.isPending}
                 disabled={clockInMutation.isPending}
                 icon="login"
@@ -293,11 +315,11 @@ export default function TimeClockScreen() {
         Today's Entries
       </Text>
 
-      {todayEntries.length > 0 ? (
+      {timeEntriesQuery.data && timeEntriesQuery.data.length > 0 ? (
         <FlatList
-          data={todayEntries}
+          data={timeEntriesQuery.data}
           renderItem={renderTimeEntry}
-          keyExtractor={(item, index) => `${item.id || index}`}
+          keyExtractor={(item, index) => `${item.employeeId || index}`}
           contentContainerStyle={{
             paddingVertical: SPACING.md,
             paddingBottom: insets.bottom + SPACING.lg,

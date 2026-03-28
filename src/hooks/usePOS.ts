@@ -10,14 +10,17 @@ export interface POSProduct {
   id: string;
   name: string;
   sku: string;
-  price: number;
-  cost?: number;
-  stock: number;
-  category?: string;
+  unitPrice: number;
+  totalStock: number;
   categoryId?: string;
-  image?: string;
+  category?: {
+    id: string;
+    name: string;
+  };
   description?: string;
-  active: boolean;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface POSCategory {
@@ -27,27 +30,32 @@ export interface POSCategory {
 }
 
 export interface CheckoutPayload {
-  paymentMethod: 'cash' | 'card' | 'check';
-  amountPaid: number;
+  customerId?: string;
   customerName?: string;
   customerPhone?: string;
-  notes?: string;
+  discount?: number;
   items: Array<{
     productId: string;
     quantity: number;
-    price: number;
+    unitPrice: number;
+    locationId: string;
   }>;
 }
 
 export interface SaleResponse {
   id: string;
-  saleNumber: string;
-  total: number;
-  tax: number;
+  orderId: string;
   subtotal: number;
-  paymentMethod: string;
-  change: number;
+  discount: number;
+  totalAmount: number;
+  currency: string;
+  customerId?: string;
+  customerName?: string;
+  customerPhone?: string;
+  userId: string;
+  status: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 /**

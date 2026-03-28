@@ -10,13 +10,13 @@ export function usePOSCart() {
   const store = usePOSStore();
 
   const addItem = useCallback(
-    (product: { id: string; name: string; price: number }, quantity: number = 1) => {
+    (product: { id: string; name: string; unitPrice: number }, quantity: number = 1) => {
       const cartItem: CartItem = {
         productId: product.id,
         productName: product.name,
         quantity,
-        price: product.price,
-        subtotal: quantity * product.price,
+        price: product.unitPrice,
+        subtotal: quantity * product.unitPrice,
       };
       store.addItem(cartItem);
     },

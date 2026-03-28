@@ -6,7 +6,7 @@ import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIc
 export interface ProductCardProps {
   id: string;
   name: string;
-  price: number;
+  unitPrice: number;
   stock?: number;
   category?: string;
   image?: string;
@@ -17,7 +17,7 @@ export interface ProductCardProps {
 export const ProductCard: React.FC<ProductCardProps> = ({
   id,
   name,
-  price,
+  unitPrice,
   stock = 0,
   category,
   image,
@@ -82,7 +82,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 fontWeight: '700',
               }}
             >
-              ${price.toFixed(2)}
+              ${unitPrice.toFixed(2)}
             </Text>
             {stock !== undefined && (
               <Text

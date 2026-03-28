@@ -8,49 +8,76 @@ import { queryKeys } from '@lib/query-keys';
  */
 export interface LeaveType {
   id: string;
+  code: string;
   name: string;
-  annualDays: number;
-  description?: string;
+  isPaid: boolean;
+  countsAgainstBalance: boolean;
+  requiresApproval: boolean;
+  allowsPartialDay: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface LeaveBalance {
-  leaveTypeId: string;
-  leaveTypeName: string;
-  totalDays: number;
-  usedDays: number;
-  remainingDays: number;
-  year: number;
+  id: string;
+  employeeId: string;
+  typeId: string;
+  periodStart: string;
+  periodEnd: string;
+  accruedMins: number;
+  usedMins: number;
+  carryoverMins: number;
+  availableMins: number;
+  lastAccrualRunAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  type: {
+    name: string;
+    isPaid: boolean;
+    requiresApproval: boolean;
+  };
 }
 
 export interface LeaveRequest {
   id: string;
   employeeId: string;
-  employeeName: string;
-  leaveTypeId: string;
-  leaveTypeName: string;
-  startDate: string;
-  endDate: string;
-  numberOfDays: number;
-  reason: string;
-  status: 'SUBMITTED' | 'APPROVED' | 'REJECTED' | 'CANCELLED';
-  managerId?: string;
-  managerName?: string;
-  approvalDate?: string;
-  approvalNotes?: string;
+  typeId: string;
+  startDateLocal: string;
+  endDateLocal: string;
+  startTimeLocal?: string;
+  endTimeLocal?: string;
+  totalRequestedMins: number;
+  state: 'DRAFT' | 'SUBMITTED' | 'PENDING' | 'APPROVED' | 'REJECTED' | 'SCHEDULED' | 'TAKEN' | 'CLOSED' | 'CANCELLED';
+  approverId?: string;
+  reason?: string;
+  notes?: string;
+  attachmentUrl?: string;
   createdAt: string;
   updatedAt: string;
+  employee: {
+    name: string;
+    department?: {
+      name: string;
+    };
+  };
+  type: {
+    name: string;
+  };
+  approver?: {
+    name: string;
+  };
 }
 
 export interface CreateLeaveRequestPayload {
-  leaveTypeId: string;
+  typeId: string;
   startDate: string;
   endDate: string;
-  reason: string;
+  reason?: string;
 }
 
 export interface ApproveLeaveRequestPayload {
   status: 'APPROVED' | 'REJECTED';
-  notes?: string;
+  reason?: string;
 }
 
 /**
@@ -163,7 +190,7 @@ export const useApproveLeaveRequest = () => {
       requestId: string;
       payload: ApproveLeaveRequestPayload;
     }) => {
-      const response = await apiClient.put<LeaveRequest>(
+      const response = await apiClient.post<LeaveRequest>(
         `${API_ENDPOINTS.LEAVE.REQUESTS}/${requestId}/approve`,
         payload
       );

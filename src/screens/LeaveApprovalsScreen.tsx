@@ -85,7 +85,7 @@ export default function LeaveApprovalsScreen() {
           requestId: selectedRequest.id,
           payload: {
             status: approvalAction,
-            notes: approvalNotes.trim(),
+            reason: approvalNotes.trim(),
           },
         }
       );
@@ -100,68 +100,72 @@ export default function LeaveApprovalsScreen() {
   }, [selectedRequest, approvalAction, approvalNotes, approveMutation, handleError]);
 
   // Render request item with approval actions
-  const renderApprovalItem = ({ item }: { item: LeaveRequest }) => (
-    <Card style={{ marginHorizontal: SPACING.lg, marginVertical: SPACING.sm }}>
-      <Card.Content style={{ paddingVertical: SPACING.lg, gap: SPACING.md }}>
-        {/* Employee & Leave Info */}
-        <View>
-          <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>
-            {item.employeeName}
-          </Text>
-          <Text variant="bodySmall" style={{ opacity: 0.7, marginTop: SPACING.xs }}>
-            {item.leaveTypeName} • {item.numberOfDays} day{item.numberOfDays !== 1 ? 's' : ''}
-          </Text>
-          <Text variant="labelSmall" style={{ opacity: 0.6, marginTop: SPACING.xs }}>
-            {item.startDate} to {item.endDate}
-          </Text>
-        </View>
+  const renderApprovalItem = ({ item }: { item: LeaveRequest }) => {
+    const numberOfDays = Math.round(item.totalRequestedMins / (8 * 60) * 10) / 10;
 
-        {/* Reason */}
-        {item.reason && (
-          <View style={{ backgroundColor: theme.colors.surfaceVariant, padding: SPACING.md, borderRadius: 8 }}>
-            <Text variant="labelSmall" style={{ opacity: 0.6 }}>
-              Reason
+    return (
+      <Card style={{ marginHorizontal: SPACING.lg, marginVertical: SPACING.sm }}>
+        <Card.Content style={{ paddingVertical: SPACING.lg, gap: SPACING.md }}>
+          {/* Employee & Leave Info */}
+          <View>
+            <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>
+              {item.employee.name}
             </Text>
-            <Text variant="bodySmall">{item.reason}</Text>
+            <Text variant="bodySmall" style={{ opacity: 0.7, marginTop: SPACING.xs }}>
+              {item.type.name} • {numberOfDays} day{numberOfDays !== 1 ? 's' : ''}
+            </Text>
+            <Text variant="labelSmall" style={{ opacity: 0.6, marginTop: SPACING.xs }}>
+              {item.startDateLocal} to {item.endDateLocal}
+            </Text>
           </View>
-        )}
 
-        {/* Submitted Date */}
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACING.sm }}>
-          <MaterialCommunityIcon
-            name="calendar-time"
-            size={16}
-            color={theme.colors.onSurfaceVariant}
-          />
-          <Text variant="labelSmall">
-            Submitted on {item.createdAt}
-          </Text>
-        </View>
+          {/* Reason */}
+          {item.reason && (
+            <View style={{ backgroundColor: theme.colors.surfaceVariant, padding: SPACING.md, borderRadius: 8 }}>
+              <Text variant="labelSmall" style={{ opacity: 0.6 }}>
+                Reason
+              </Text>
+              <Text variant="bodySmall">{item.reason}</Text>
+            </View>
+          )}
 
-        {/* Action Buttons */}
-        <View style={{ flexDirection: 'row', gap: SPACING.md, marginTop: SPACING.md }}>
-          <Button
-            mode="contained"
-            onPress={() => handleOpenApprovalDialog(item, 'APPROVED')}
-            icon="check-circle"
-            style={{ flex: 1 }}
-            buttonColor={theme.colors.primary}
-          >
-            Approve
-          </Button>
-          <Button
-            mode="outlined"
-            onPress={() => handleOpenApprovalDialog(item, 'REJECTED')}
-            icon="close-circle"
-            style={{ flex: 1 }}
-            textColor={theme.colors.error}
-          >
-            Reject
-          </Button>
-        </View>
-      </Card.Content>
-    </Card>
-  );
+          {/* Submitted Date */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACING.sm }}>
+            <MaterialCommunityIcon
+              name="calendar-time"
+              size={16}
+              color={theme.colors.onSurfaceVariant}
+            />
+            <Text variant="labelSmall">
+              Submitted on {new Date(item.createdAt).toLocaleDateString()}
+            </Text>
+          </View>
+
+          {/* Action Buttons */}
+          <View style={{ flexDirection: 'row', gap: SPACING.md, marginTop: SPACING.md }}>
+            <Button
+              mode="contained"
+              onPress={() => handleOpenApprovalDialog(item, 'APPROVED')}
+              icon="check-circle"
+              style={{ flex: 1 }}
+              buttonColor={theme.colors.primary}
+            >
+              Approve
+            </Button>
+            <Button
+              mode="outlined"
+              onPress={() => handleOpenApprovalDialog(item, 'REJECTED')}
+              icon="close-circle"
+              style={{ flex: 1 }}
+              textColor={theme.colors.error}
+            >
+              Reject
+            </Button>
+          </View>
+        </Card.Content>
+      </Card>
+    );
+  };
 
   return (
     <View style={[LAYOUT.fill, { backgroundColor: theme.colors.background }]}>
@@ -226,7 +230,7 @@ export default function LeaveApprovalsScreen() {
                   Employee
                 </Text>
                 <Text variant="bodyMedium" style={{ fontWeight: 'bold' }}>
-                  {selectedRequest.employeeName}
+                  {selectedRequest.employee.name}
                 </Text>
               </View>
 
@@ -234,7 +238,7 @@ export default function LeaveApprovalsScreen() {
                 <Text variant="bodySmall" style={{ opacity: 0.6 }}>
                   Leave Type
                 </Text>
-                <Text variant="bodyMedium">{selectedRequest.leaveTypeName}</Text>
+                <Text variant="bodyMedium">{selectedRequest.type.name}</Text>
               </View>
 
               <View>
@@ -242,7 +246,7 @@ export default function LeaveApprovalsScreen() {
                   Duration
                 </Text>
                 <Text variant="bodyMedium">
-                  {selectedRequest.startDate} to {selectedRequest.endDate} ({selectedRequest.numberOfDays} days)
+                  {selectedRequest.startDateLocal} to {selectedRequest.endDateLocal} ({Math.round(selectedRequest.totalRequestedMins / (8 * 60) * 10) / 10} days)
                 </Text>
               </View>
 

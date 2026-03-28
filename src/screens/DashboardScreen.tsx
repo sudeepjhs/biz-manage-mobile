@@ -151,7 +151,7 @@ export default function DashboardScreen() {
   }
 
   const stats = statsQuery.data;
-  const activities = activityQuery.data?.items || [];
+  const activities = activityQuery.data?.data || [];
 
   return (
     <View style={[LAYOUT.fill, { backgroundColor: theme.colors.background }]}>
@@ -221,13 +221,13 @@ export default function DashboardScreen() {
               <StatCard
                 icon="cash-multiple"
                 title="Total Revenue"
-                value={`$${stats.totalRevenue?.toFixed(0)}`}
+                value={`$${(stats.totalSales || 0).toFixed(0)}`}
                 color={theme.colors.primary}
               />
               <StatCard
                 icon="shopping-cart"
                 title="Total Orders"
-                value={stats.totalOrders}
+                value={stats.totalOrders || 0}
                 color={theme.colors.secondary}
               />
             </View>
@@ -243,7 +243,7 @@ export default function DashboardScreen() {
               <StatCard
                 icon="alert-circle"
                 title="Low Stock"
-                value={stats.lowStockProducts}
+                value={stats.lowStock}
                 color="#FF9800"
               />
             </View>
@@ -318,9 +318,9 @@ export default function DashboardScreen() {
               activities.slice(0, 5).map((activity, index) => (
                 <ActivityItemComponent
                   key={index}
-                  type={activity.type}
-                  title={activity.title}
-                  description={activity.description}
+                  type={activity.entityType.toLowerCase()}
+                  title={`${activity.actor.name} ${activity.action}`}
+                  description={`${activity.entityType} #${activity.entityId.slice(-5)}`}
                   timestamp={activity.timestamp}
                 />
               ))

@@ -10,14 +10,27 @@ export interface InventoryProduct {
   id: string;
   name: string;
   sku: string;
-  category: string;
-  currentStock: number;
-  reorderLevel: number;
-  reorderQuantity: number;
-  unit: string;
-  unitCost: number;
-  lastRestockDate: string;
-  supplier?: string;
+  description?: string;
+  categoryId?: string;
+  status: 'DRAFT' | 'ACTIVE' | 'DISCONTINUED' | 'ARCHIVED';
+  reorderPoint?: number;
+  unitPrice?: number;
+  createdAt: string;
+  updatedAt: string;
+  category?: {
+    id: string;
+    name: string;
+  };
+  stockItems: Array<{
+    id: string;
+    locationId: string;
+    quantityOnHand: number;
+    location: {
+      id: string;
+      name: string;
+      code: string;
+    };
+  }>;
 }
 
 export interface StockMovement {

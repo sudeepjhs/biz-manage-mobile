@@ -65,7 +65,13 @@ API_CLIENT.interceptors.request.use(
 
 // Response interceptor: Handle 401 and refresh token
 API_CLIENT.interceptors.response.use(
-  (response) => response,
+  (response: any) => {
+    // Update response.data to be the inner data, as requested (data = data.data)
+    if (response.data && response.data.data !== undefined) {
+      response.data = response.data.data;
+    }
+    return response;
+  },
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 

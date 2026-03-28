@@ -68,7 +68,7 @@ export default function LeaveRequestsScreen() {
 
     try {
       await submitMutation.mutateAsync({
-        leaveTypeId: selectedLeaveType,
+        typeId: selectedLeaveType,
         startDate,
         endDate,
         reason,
@@ -86,7 +86,7 @@ export default function LeaveRequestsScreen() {
   }, [selectedLeaveType, startDate, endDate, reason, submitMutation, handleError]);
 
   // Status color mapping
-  const getStatusColor = (status: LeaveRequest['status']): string => {
+  const getStatusColor = (status: LeaveRequest['state']): string => {
     switch (status) {
       case 'APPROVED':
         return theme.colors.primary;
@@ -94,69 +94,75 @@ export default function LeaveRequestsScreen() {
         return theme.colors.error;
       case 'SUBMITTED':
         return theme.colors.tertiary;
+      case 'PENDING':
+        return theme.colors.tertiary;
       default:
         return theme.colors.onSurface;
     }
   };
 
   // Render request item
-  const renderRequestItem = ({ item }: { item: LeaveRequest }) => (
-    <Card style={{ marginHorizontal: SPACING.lg, marginVertical: SPACING.sm }}>
-      <Card.Content style={{ paddingVertical: SPACING.lg, gap: SPACING.md }}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <View style={{ flex: 1 }}>
-            <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>
-              {item.leaveTypeName}
-            </Text>
-            <Text variant="bodySmall" style={{ opacity: 0.7, marginTop: SPACING.xs }}>
-              {item.startDate} to {item.endDate}
-            </Text>
+  const renderRequestItem = ({ item }: { item: LeaveRequest }) => {
+    const numberOfDays = Math.round(item.totalRequestedMins / (8 * 60) * 10) / 10;
+    
+    return (
+      <Card style={{ marginHorizontal: SPACING.lg, marginVertical: SPACING.sm }}>
+        <Card.Content style={{ paddingVertical: SPACING.lg, gap: SPACING.md }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <View style={{ flex: 1 }}>
+              <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>
+                {item.type.name}
+              </Text>
+              <Text variant="bodySmall" style={{ opacity: 0.7, marginTop: SPACING.xs }}>
+                {item.startDateLocal} to {item.endDateLocal}
+              </Text>
+            </View>
+            <Chip
+              mode="flat"
+              textStyle={{ color: theme.colors.onPrimary }}
+              style={{
+                backgroundColor: getStatusColor(item.state),
+                marginLeft: SPACING.md,
+              }}
+            >
+              {item.state}
+            </Chip>
           </View>
-          <Chip
-            mode="flat"
-            textStyle={{ color: theme.colors.onPrimary }}
-            style={{
-              backgroundColor: getStatusColor(item.status),
-              marginLeft: SPACING.md,
-            }}
-          >
-            {item.status}
-          </Chip>
-        </View>
 
-        <Text variant="bodyMedium" style={{ opacity: 0.8 }}>
-          {item.numberOfDays} day{item.numberOfDays !== 1 ? 's' : ''}
-        </Text>
+          <Text variant="bodyMedium" style={{ opacity: 0.8 }}>
+            {numberOfDays} day{numberOfDays !== 1 ? 's' : ''}
+          </Text>
 
-        {item.reason && (
-          <View>
-            <Text variant="labelSmall" style={{ opacity: 0.6 }}>
-              Reason
-            </Text>
-            <Text variant="bodySmall">{item.reason}</Text>
-          </View>
-        )}
+          {item.reason && (
+            <View>
+              <Text variant="labelSmall" style={{ opacity: 0.6 }}>
+                Reason
+              </Text>
+              <Text variant="bodySmall">{item.reason}</Text>
+            </View>
+          )}
 
-        {item.status === 'APPROVED' && item.managerName && (
-          <View style={{ flexDirection: 'row', gap: SPACING.sm }}>
-            <MaterialCommunityIcon name="check-circle" size={16} color={theme.colors.primary} />
-            <Text variant="labelSmall">
-              Approved by {item.managerName} on {item.approvalDate}
-            </Text>
-          </View>
-        )}
+          {item.state === 'APPROVED' && item.approver?.name && (
+            <View style={{ flexDirection: 'row', gap: SPACING.sm }}>
+              <MaterialCommunityIcon name="check-circle" size={16} color={theme.colors.primary} />
+              <Text variant="labelSmall">
+                Approved by {item.approver.name} {item.createdAt ? `on ${new Date(item.createdAt).toLocaleDateString()}` : ''}
+              </Text>
+            </View>
+          )}
 
-        {item.status === 'REJECTED' && item.approvalNotes && (
-          <View style={{ flexDirection: 'row', gap: SPACING.sm }}>
-            <MaterialCommunityIcon name="close-circle" size={16} color={theme.colors.error} />
-            <Text variant="labelSmall" style={{ color: theme.colors.error, flex: 1 }}>
-              {item.approvalNotes}
-            </Text>
-          </View>
-        )}
-      </Card.Content>
-    </Card>
-  );
+          {item.state === 'REJECTED' && item.notes && (
+            <View style={{ flexDirection: 'row', gap: SPACING.sm }}>
+              <MaterialCommunityIcon name="close-circle" size={16} color={theme.colors.error} />
+              <Text variant="labelSmall" style={{ color: theme.colors.error, flex: 1 }}>
+                {item.notes}
+              </Text>
+            </View>
+          )}
+        </Card.Content>
+      </Card>
+    );
+  };
 
   return (
     <View style={[LAYOUT.fill, { backgroundColor: theme.colors.background }]}>

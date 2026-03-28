@@ -9,26 +9,51 @@ import { queryKeys } from '@lib/query-keys';
 export interface ClockEntry {
   id: string;
   employeeId: string;
-  clockIn: string;
-  clockOut?: string;
-  breakDuration?: number;
-  totalHours?: number;
-  date: string;
-  status: 'in' | 'out';
+  type: 'PUNCH_IN' | 'PUNCH_OUT' | 'MEAL_START' | 'MEAL_END' | 'BREAK_START' | 'BREAK_END';
+  timestamp: string;
+  latitude?: number;
+  longitude?: number;
+  deviceInfo?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ClockPunchPayload {
+  type: 'PUNCH_IN' | 'PUNCH_OUT' | 'MEAL_START' | 'MEAL_END' | 'BREAK_START' | 'BREAK_END';
+  latitude: number;
+  longitude: number;
+  deviceInfo?: string;
+  notes?: string;
 }
 
 export interface DailyTimeEntry {
+  employeeId: string;
+  employeeName: string;
+  department?: string;
   date: string;
-  entries: ClockEntry[];
   totalHours: number;
-  breakTime: number;
+  status: 'INCOMPLETE' | 'ACTIVE' | 'COMPLETED';
+  firstPunch?: string;
+  lastPunch?: string;
+  firstPunchLocation?: { lat: number; lng: number };
+  lastPunchLocation?: { lat: number; lng: number };
+  punchCount: number;
 }
 
 export interface ClockResponse {
-  success: boolean;
-  status: 'in' | 'out';
+  id: string;
+  employeeId: string;
+  type: string;
   timestamp: string;
-  message: string;
+}
+
+export interface ClockState {
+  currentState: 'IN' | 'OUT' | 'MEAL' | 'BREAK' | 'LEAVE' | 'COMPLETED';
+  lastPunchTime?: string;
+  lastPunchType?: string;
+  todayPunches: number;
+  activeLeave: { id: string; state: string } | null;
 }
 
 /**
@@ -38,9 +63,10 @@ export const useClockIn = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async () => {
+    mutationFn: async (payload: ClockPunchPayload) => {
       const response = await apiClient.post<ClockResponse>(
-        `${API_ENDPOINTS.TIME.CLOCK}/in`
+        API_ENDPOINTS.TIME.CLOCK,
+        payload
       );
       return response.data;
     },
@@ -59,28 +85,30 @@ export const useClockOut = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async () => {
+    mutationFn: async (payload: ClockPunchPayload) => {
       const response = await apiClient.post<ClockResponse>(
-        `${API_ENDPOINTS.TIME.CLOCK}/out`
+        API_ENDPOINTS.TIME.CLOCK,
+        payload
       );
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.time.clock.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.time.timesheets.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.activity() });
     },
   });
 };
 
 /**
- * Get current clock-in status
+ * Get current clock status
  */
 export const useClockStatus = () => {
   return useQuery({
     queryKey: queryKeys.time.clock.status(),
     queryFn: async () => {
-      const response = await apiClient.get<ClockEntry | null>(
-        `${API_ENDPOINTS.TIME.CLOCK}/status`
+      const response = await apiClient.get<ClockState>(
+        API_ENDPOINTS.TIME.CLOCK
       );
       return response.data;
     },
@@ -97,7 +125,7 @@ export const useTodayTimeEntries = () => {
     queryKey: queryKeys.time.timesheets.list({ date: new Date().toISOString().split('T')[0] }),
     queryFn: async () => {
       const today = new Date().toISOString().split('T')[0];
-      const response = await apiClient.get<DailyTimeEntry>(
+      const response = await apiClient.get<DailyTimeEntry[]>(
         `${API_ENDPOINTS.TIME.TIMESHEETS}?date=${today}`
       );
       return response.data;

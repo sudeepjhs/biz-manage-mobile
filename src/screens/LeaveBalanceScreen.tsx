@@ -55,12 +55,12 @@ export default function LeaveBalanceScreen() {
 
   // Render balance card with progress
   const renderBalanceItem = (balance: LeaveBalance) => {
-    const leaveType = getLeaveType(balance.leaveTypeId);
+    const leaveType = getLeaveType(balance.typeId);
     if (!leaveType) return null;
 
-    const used = balance.usedDays;
-    const totalAllocated = balance.totalDays;
-    const remaining = balance.remainingDays;
+    const used = Math.round(balance.usedMins / (8 * 60) * 10) / 10;
+    const totalAllocated = Math.round((balance.accruedMins + balance.carryoverMins) / (8 * 60) * 10) / 10;
+    const remaining = Math.round(balance.availableMins / (8 * 60) * 10) / 10;
     const progress = totalAllocated > 0 ? used / totalAllocated : 0;
 
     // Color based on remaining days
@@ -72,7 +72,7 @@ export default function LeaveBalanceScreen() {
     }
 
     return (
-      <Card key={balance.leaveTypeId} style={{ marginHorizontal: SPACING.lg, marginVertical: SPACING.sm }}>
+      <Card key={balance.typeId} style={{ marginHorizontal: SPACING.lg, marginVertical: SPACING.sm }}>
         <Card.Content style={{ paddingVertical: SPACING.lg, gap: SPACING.md }}>
           {/* Header with type name */}
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>

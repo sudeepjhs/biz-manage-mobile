@@ -79,9 +79,9 @@ export default function POSScreen() {
       <ProductCard
         id={item.id}
         name={item.name}
-        price={item.price}
-        stock={item.stock}
-        category={item.category}
+        unitPrice={item.unitPrice}
+        stock={item.totalStock}
+        category={item.category?.name}
         onAddToCart={() => {
           addItem(item);
         }}

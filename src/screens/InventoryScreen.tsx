@@ -40,8 +40,12 @@ export default function InventoryScreen() {
 
   // Render product item
   const renderProduct = ({ item }: any) => {
-    const isLowStock = item.currentStock <= item.reorderLevel;
-    const stockStatus = isLowStock ? 'Low Stock ⚠️' : `${item.currentStock} in stock`;
+    const currentStock = item.stockItems?.reduce(
+      (acc: number, si: any) => acc + si.quantityOnHand, 
+      0
+    ) || 0;
+    const isLowStock = currentStock <= (item.reorderPoint || 0);
+    const stockStatus = isLowStock ? 'Low Stock ⚠️' : `${currentStock} in stock`;
 
     return (
       <Card
@@ -85,7 +89,7 @@ export default function InventoryScreen() {
                   color: theme.colors.outline,
                 }}
               >
-                Category: {item.category}
+                Category: {item.category?.name || 'Uncategorized'}
               </Text>
             </View>
             {isLowStock && (
@@ -118,7 +122,7 @@ export default function InventoryScreen() {
                   marginBottom: SPACING.sm,
                 }}
               >
-                Current Stock
+                Current Stock (Total)
               </Text>
               <Text
                 variant="headlineSmall"
@@ -127,7 +131,7 @@ export default function InventoryScreen() {
                   color: isLowStock ? theme.colors.error : theme.colors.primary,
                 }}
               >
-                {item.currentStock} {item.unit}
+                {currentStock}
               </Text>
             </View>
 
@@ -147,7 +151,7 @@ export default function InventoryScreen() {
                   fontWeight: '600',
                 }}
               >
-                {item.reorderLevel} {item.unit}
+                {item.reorderPoint || 0}
               </Text>
             </View>
 
@@ -160,7 +164,7 @@ export default function InventoryScreen() {
             />
           </View>
 
-          {item.lastRestockDate && (
+          {item.updatedAt && (
             <Text
               variant="labelSmall"
               style={{
@@ -168,7 +172,7 @@ export default function InventoryScreen() {
                 marginTop: SPACING.md,
               }}
             >
-              Last restocked: {new Date(item.lastRestockDate).toLocaleDateString()}
+              Last updated: {new Date(item.updatedAt).toLocaleDateString()}
             </Text>
           )}
         </Card.Content>

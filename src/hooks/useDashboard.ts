@@ -7,30 +7,29 @@ import { queryKeys } from '@lib/query-keys';
  * Dashboard Stats Types
  */
 export interface DashboardStats {
-  totalSales: number;
-  totalRevenue: number;
-  totalOrders: number;
+  lowStock: number;
   activeEmployees: number;
-  lowStockProducts: number;
-  pendingLeaveRequests: number;
-  averageOrderValue?: number;
-  salesTrend?: Array<{ date: string; value: number }>;
+  pendingTimesheets: number;
+  pendingLeaves: number;
+  totalOrders?: number;
+  totalSales?: number;
 }
 
 export interface ActivityItem {
   id: string;
-  type: 'sale' | 'order' | 'leave' | 'inventory' | 'timesheet';
-  title: string;
-  description?: string;
+  action: string;
+  entityType: string;
+  entityId: string;
   timestamp: string;
-  metadata?: Record<string, any>;
+  before?: string;
+  after?: string;
+  actor: {
+    name: string;
+  };
 }
 
 export interface DashboardActivity {
-  items: ActivityItem[];
-  total: number;
-  limit: number;
-  offset: number;
+  data: ActivityItem[];
 }
 
 /**
