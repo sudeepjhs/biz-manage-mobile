@@ -13,20 +13,20 @@ import type {
 } from '../types/navigation-params';
 
 // Main screens
-import DashboardScreen from '../screens/DashboardScreen';
-import POSScreen from '../screens/POSScreen';
-import InventoryScreen from '../screens/InventoryScreen';
-import TimeClockScreen from '../screens/TimeClockScreen';
-import SettingsScreen from '../screens/SettingsScreen';
+import DashboardScreen from '@screens/DashboardScreen';
+import POSScreen from '@screens/POSScreen';
+import InventoryScreen from '@screens/InventoryScreen';
+import TimeClockScreen from '@screens/TimeClockScreen';
+import SettingsScreen from '@screens/SettingsScreen';
 
 // POS sub-screens (with strict type safety)
-import POSCheckoutScreen from '../screens/POSCheckoutScreen';
-import POSReceiptScreen from '../screens/POSReceiptScreen';
+import POSCheckoutScreen from '@screens/POSCheckoutScreen';
+import POSReceiptScreen from '@screens/POSReceiptScreen';
 
 // Leave sub-screens
-import LeaveRequestsScreen from '../screens/LeaveRequestsScreen';
-import LeaveApprovalsScreen from '../screens/LeaveApprovalsScreen';
-import LeaveBalanceScreen from '../screens/LeaveBalanceScreen';
+import LeaveRequestsScreen from '@screens/LeaveRequestsScreen';
+import LeaveApprovalsScreen from '@screens/LeaveApprovalsScreen';
+import LeaveBalanceScreen from '@screens/LeaveBalanceScreen';
 
 // Navigation instances
 const Tab = createBottomTabNavigator<BottomTabsParamList>();

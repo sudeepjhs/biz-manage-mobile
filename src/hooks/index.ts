@@ -1,8 +1,8 @@
 // Export all hooks for easier imports
-export { useAuth } from './useAuth';
-export { useApi } from './useApi';
-export { usePOSCart } from './usePOSCart';
-export { useApiError } from './useApiError';
+export { useAuth } from '@hooks/useAuth';
+export { useApi } from '@hooks/useApi';
+export { usePOSCart } from '@hooks/usePOSCart';
+export { useApiError } from '@hooks/useApiError';
 export {
   useProducts,
   useProductsByCategory,
@@ -10,18 +10,18 @@ export {
   useCategories,
   useCheckout,
   useOrders,
-} from './usePOS';
+} from '@hooks/usePOS';
 export {
   useDashboardStats,
   useDashboardActivity,
-} from './useDashboard';
+} from '@hooks/useDashboard';
 export {
   useInventoryProducts,
   useInventoryProduct,
   useUpdateStock,
   useLowStockAlerts,
   useInventoryCategories,
-} from './useInventory';
+} from '@hooks/useInventory';
 export {
   useClockIn,
   useClockOut,
@@ -29,7 +29,7 @@ export {
   useTodayTimeEntries,
   useTimeEntries,
   useShifts,
-} from './useTime';
+} from '@hooks/useTime';
 export {
   useUserProfile,
   useUpdateProfile,
@@ -37,4 +37,4 @@ export {
   useUpdateNotificationSettings,
   useAppSettings,
   useUpdateAppSettings,
-} from './useSettings';
+} from '@hooks/useSettings';

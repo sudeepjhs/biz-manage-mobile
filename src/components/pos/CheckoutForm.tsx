@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import { TextInput, Button, useTheme, SegmentedButtons, Text } from 'react-native-paper';
-import { CurrencyInput } from '../inputs/CurrencyInput';
+import { CurrencyInput } from '@components/inputs/CurrencyInput';
 
 export interface CheckoutFormProps {
   totalAmount: number;

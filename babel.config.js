@@ -17,5 +17,6 @@ module.exports = {
         },
       },
     ],
+    '@babel/plugin-transform-export-namespace-from',
   ],
 };
