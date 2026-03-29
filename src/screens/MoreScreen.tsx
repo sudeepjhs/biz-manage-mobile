@@ -13,7 +13,7 @@ import {
   useTheme,
 } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MobileIcon from '@components/ui/MobileIcon';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MoreStackParamList } from '../types/navigation-params';
@@ -127,7 +127,7 @@ export default function MoreScreen() {
                       marginRight: SPACING.lg,
                     }}
                   >
-                    <MaterialCommunityIcon
+                    <MobileIcon
                       name={item.icon}
                       size={28}
                       color={item.color}
@@ -141,11 +141,7 @@ export default function MoreScreen() {
                       {item.subtitle}
                     </Text>
                   </View>
-                  <MaterialCommunityIcon
-                    name="chevron-right"
-                    size={24}
-                    color={theme.colors.outline}
-                  />
+                  <MobileIcon name="chevron-right" size={24} color={theme.colors.outline} />
                 </TouchableOpacity>
                 {index < visibleItems.length - 1 && <Divider />}
               </React.Fragment>

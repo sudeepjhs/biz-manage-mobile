@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, ViewStyle, Animated } from 'react-native';
 import { Text, useTheme } from 'react-native-paper';
-import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MobileIcon from '@components/ui/MobileIcon';
 import { SPACING } from '@lib/ui-utils';
 import { ModernButton } from './ModernButton';
 
@@ -71,7 +71,7 @@ export const ModernEmptyState: React.FC<ModernEmptyStateProps> = ({
           marginBottom: SPACING.lg,
         }}
       >
-        <MaterialCommunityIcon
+        <MobileIcon
           name={icon}
           size={48}
           color={theme.colors.primary}

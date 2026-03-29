@@ -21,7 +21,7 @@ import {
   useTheme,
 } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MobileIcon from '@components/ui/MobileIcon';
 import { useThemeStore } from '@store/themeStore';
 
 export default function SettingsScreen() {
@@ -128,7 +128,7 @@ export default function SettingsScreen() {
                       alignItems: 'center',
                     }}
                   >
-                    <MaterialCommunityIcon
+                    <MobileIcon
                       name="account"
                       size={32}
                       color={theme.colors.onPrimary}

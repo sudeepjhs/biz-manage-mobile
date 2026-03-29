@@ -17,7 +17,7 @@ import {
   Chip,
 } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MobileIcon from '@components/ui/MobileIcon';
 import {
   SafeHeader,
   LoadingOverlay,
@@ -131,7 +131,7 @@ export default function LeaveApprovalsScreen() {
 
           {/* Submitted Date */}
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACING.sm }}>
-            <MaterialCommunityIcon
+            <MobileIcon
               name="calendar-clock"
               size={16}
               color={theme.colors.onSurfaceVariant}

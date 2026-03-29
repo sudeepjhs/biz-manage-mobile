@@ -22,7 +22,7 @@ import {
   useTheme,
 } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MobileIcon from '@components/ui/MobileIcon';
 
 /**
  * Leave Balance Screen
@@ -147,7 +147,7 @@ export default function LeaveBalanceScreen() {
                 marginTop: SPACING.sm,
               }}
             >
-              <MaterialCommunityIcon
+              <MobileIcon
                 name="alert-circle"
                 size={18}
                 color={theme.colors.error}
@@ -176,7 +176,7 @@ export default function LeaveBalanceScreen() {
                 marginTop: SPACING.sm,
               }}
             >
-              <MaterialCommunityIcon
+              <MobileIcon
                 name="alert"
                 size={18}
                 color={theme.colors.tertiary}
@@ -246,7 +246,7 @@ export default function LeaveBalanceScreen() {
                 paddingVertical: SPACING.lg,
               }}
             >
-              <MaterialCommunityIcon
+              <MobileIcon
                 name="information"
                 size={24}
                 color={theme.colors.primary}

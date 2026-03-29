@@ -17,7 +17,7 @@ import {
   FAB,
 } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MobileIcon from '@components/ui/MobileIcon';
 import {
   EmptyState,
   ErrorAlert,
@@ -96,7 +96,7 @@ export default function PartnersScreen() {
             </Text>
             {item.email && (
               <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: SPACING.xs }}>
-                <MaterialCommunityIcon name="email-outline" size={14} color={theme.colors.outline} />
+                <MobileIcon name="email-outline" size={14} color={theme.colors.outline} />
                 <Text variant="bodySmall" style={{ color: theme.colors.outline, marginLeft: SPACING.xs }}>
                   {item.email}
                 </Text>
@@ -104,7 +104,7 @@ export default function PartnersScreen() {
             )}
             {item.phone && (
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <MaterialCommunityIcon name="phone-outline" size={14} color={theme.colors.outline} />
+                <MobileIcon name="phone-outline" size={14} color={theme.colors.outline} />
                 <Text variant="bodySmall" style={{ color: theme.colors.outline, marginLeft: SPACING.xs }}>
                   {item.phone}
                 </Text>

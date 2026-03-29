@@ -1,7 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, View, Pressable } from 'react-native';
 import { Card, Text, useTheme, Button } from 'react-native-paper';
-import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MobileIcon from '@components/ui/MobileIcon';
 
 export interface ProductCardProps {
   id: string;
@@ -54,7 +54,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           {image ? (
             <Text>Image</Text>
           ) : (
-            <MaterialCommunityIcon
+            <MobileIcon
               name="package-variant"
               size={48}
               color={theme.colors.outline}

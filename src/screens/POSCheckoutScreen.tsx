@@ -15,7 +15,7 @@ import {
   ActivityIndicator,
 } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+// Material icons are provided via MobileIcon wrapper when needed
 import {
   SafeHeader,
   CurrencyInput,
@@ -244,7 +244,7 @@ export default function POSCheckoutScreen(params?: CheckoutParams) {
               borderRadius: SPACING.sm,
             }}
           >
-            <MaterialCommunityIcon
+            <MobileIcon
               name="alert-circle"
               size={20}
               color={theme.colors.error}

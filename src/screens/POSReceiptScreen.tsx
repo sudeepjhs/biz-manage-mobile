@@ -14,7 +14,7 @@ import {
   useTheme,
 } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MobileIcon from '@components/ui/MobileIcon';
 import { SafeHeader } from '@components/ui';
 import { LAYOUT, SPACING } from '@lib/ui-utils';
 import type { POSStackParamList } from "../types/navigation-params";
@@ -119,7 +119,7 @@ export default function POSReceiptScreen({ route, navigation }: Props) {
               alignItems: 'center',
             }}
           >
-            <MaterialCommunityIcon
+            <MobileIcon
               name="check-circle"
               size={50}
               color={theme.colors.primary}

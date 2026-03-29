@@ -16,7 +16,7 @@ import {
   ActivityIndicator,
 } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MobileIcon from '@components/ui/MobileIcon';
 import apiClient from '@lib/api-client';
 import { LAYOUT, SHADOWS, SPACING } from '@lib/ui-utils';
 
@@ -141,7 +141,7 @@ export default function AIChatScreen() {
               marginRight: SPACING.md,
             }}
           >
-            <MaterialCommunityIcon name="robot" size={24} color={theme.colors.primary} />
+            <MobileIcon name="robot" size={24} color={theme.colors.primary} />
           </View>
           <View>
             <Text variant="titleMedium" style={{ color: theme.colors.onPrimary, fontWeight: '700' }}>
@@ -175,7 +175,7 @@ export default function AIChatScreen() {
         onLayout={() => flatListRef.current?.scrollToEnd({ animated: true })}
         ListEmptyComponent={
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: SPACING.xl }}>
-            <MaterialCommunityIcon name="sparkles" size={64} color={theme.colors.outline} style={{ opacity: 0.2 }} />
+            <MobileIcon name="sparkles" size={64} color={theme.colors.outline} style={{ opacity: 0.2 }} />
             <Text variant="titleMedium" style={{ color: theme.colors.outline, marginTop: SPACING.lg, textAlign: 'center' }}>
               How can I help you today?
             </Text>

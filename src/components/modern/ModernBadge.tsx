@@ -2,7 +2,7 @@ import React from 'react';
 import { View, ViewStyle } from 'react-native';
 import { Text, useTheme } from 'react-native-paper';
 import { SPACING, BORDER_RADIUS } from '@lib/ui-utils';
-import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MobileIcon from '@components/ui/MobileIcon';
 
 export interface ModernBadgeProps {
   label: string;
@@ -69,7 +69,7 @@ export const ModernBadge: React.FC<ModernBadgeProps> = ({
       ]}
     >
       {icon && (
-        <MaterialCommunityIcon
+        <MobileIcon
           name={icon}
           size={sizeConfig.fontSize}
           color={colors.text}

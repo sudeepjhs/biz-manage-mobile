@@ -14,7 +14,7 @@ import {
   useTheme,
 } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MobileIcon from '@components/ui/MobileIcon';
 import {
   EmptyState,
   ErrorAlert,
@@ -70,7 +70,7 @@ export default function AuditLogScreen() {
               marginTop: SPACING.xs,
             }}
           >
-            <MaterialCommunityIcon
+            <MobileIcon
               name={getActivityIcon(item.entityType)}
               size={20}
               color={theme.colors.primary}

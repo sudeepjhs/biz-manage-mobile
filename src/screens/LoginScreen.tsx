@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { useAuth } from '@hooks/useAuth';
 import { SPACING, SHADOWS } from '@lib/ui-utils';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MobileIcon from '@components/ui/MobileIcon';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
@@ -20,7 +20,7 @@ export default function LoginScreen() {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const { login, loginMutation } = useAuth();
-  
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<Partial<LoginFormData>>({});
@@ -128,7 +128,7 @@ export default function LoginScreen() {
             marginBottom: SPACING.lg,
           }}
         >
-          <MaterialCommunityIcon
+          <MobileIcon
             name="briefcase"
             size={48}
             color={theme.colors.onPrimary}
@@ -274,7 +274,7 @@ export default function LoginScreen() {
                   gap: SPACING.md,
                 }}
               >
-                <MaterialCommunityIcon
+                <MobileIcon
                   name="alert-circle"
                   size={20}
                   color={theme.colors.error}
@@ -297,8 +297,8 @@ export default function LoginScreen() {
               onPress={handleLogin}
               disabled={isLoading || !email || !password}
               style={{
-                backgroundColor: isLoading || !email || !password 
-                  ? theme.colors.outlineVariant 
+                backgroundColor: isLoading || !email || !password
+                  ? theme.colors.outlineVariant
                   : theme.colors.primary,
                 paddingVertical: SPACING.lg,
                 borderRadius: 12,
@@ -311,8 +311,8 @@ export default function LoginScreen() {
               <Text
                 variant="labelLarge"
                 style={{
-                  color: isLoading || !email || !password 
-                    ? theme.colors.onSurfaceVariant 
+                  color: isLoading || !email || !password
+                    ? theme.colors.onSurfaceVariant
                     : theme.colors.onPrimary,
                   fontWeight: '700',
                 }}
@@ -321,61 +321,6 @@ export default function LoginScreen() {
               </Text>
             </Pressable>
 
-            {/* Divider or additional options */}
-            <View style={{ marginTop: SPACING.lg }}>
-              <Text
-                variant="bodySmall"
-                style={{
-                  color: theme.colors.onSurfaceVariant,
-                  textAlign: 'center',
-                  fontWeight: '500',
-                  marginBottom: SPACING.sm,
-                }}
-              >
-                Demo Credentials
-              </Text>
-              <View
-                style={{
-                  backgroundColor: theme.colors.surfaceVariant,
-                  borderRadius: 8,
-                  padding: SPACING.md,
-                  gap: SPACING.sm,
-                }}
-              >
-                <View style={{ flexDirection: 'row', gap: SPACING.sm }}>
-                  <MaterialCommunityIcon
-                    name="email"
-                    size={14}
-                    color={theme.colors.onSurfaceVariant}
-                  />
-                  <Text
-                    variant="labelSmall"
-                    style={{
-                      color: theme.colors.onSurfaceVariant,
-                      fontFamily: 'monospace',
-                    }}
-                  >
-                    admin@bizmanage.com
-                  </Text>
-                </View>
-                <View style={{ flexDirection: 'row', gap: SPACING.sm }}>
-                  <MaterialCommunityIcon
-                    name="lock"
-                    size={14}
-                    color={theme.colors.onSurfaceVariant}
-                  />
-                  <Text
-                    variant="labelSmall"
-                    style={{
-                      color: theme.colors.onSurfaceVariant,
-                      fontFamily: 'monospace',
-                    }}
-                  >
-                    password123
-                  </Text>
-                </View>
-              </View>
-            </View>
           </Card.Content>
         </Card>
 

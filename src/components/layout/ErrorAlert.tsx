@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, ViewStyle, Animated } from 'react-native';
 import { Banner, Text, useTheme, IconButton } from 'react-native-paper';
 import { SPACING, BORDER_RADIUS, MICRO_INTERACTIONS } from '@lib/ui-utils';
-import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MobileIcon from '@components/ui/MobileIcon';
 
 export interface ErrorAlertProps {
   visible: boolean;
@@ -108,7 +108,7 @@ export const ErrorAlert: React.FC<ErrorAlertProps> = ({
           borderLeftColor: colors.text,
         }}
       >
-        <MaterialCommunityIcon
+        <MobileIcon
           name={colors.icon}
           size={24}
           color={colors.text}

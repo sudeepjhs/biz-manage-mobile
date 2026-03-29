@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { Button, Card, Text, useTheme, IconButton } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MobileIcon from '@components/ui/MobileIcon';
 import {
   EmptyState,
   ErrorAlert,
@@ -133,7 +133,7 @@ export default function TimeClockScreen() {
             justifyContent: 'center',
           }}
         >
-          <MaterialCommunityIcon
+          <MobileIcon
             name={item.status === 'COMPLETED' ? 'check' : 'clock-outline'}
             size={18}
             color={theme.colors.onSurface}
@@ -492,12 +492,12 @@ export default function TimeClockScreen() {
                 marginBottom: SPACING.lg,
               }}
             >
-              <Animated.View
+                <Animated.View
                 style={{
                   transform: [{ scale: pulse }],
                 }}
               >
-                <MaterialCommunityIcon
+                <MobileIcon
                   name="check-circle"
                   size={60}
                   color={theme.colors.onPrimary}
@@ -507,7 +507,7 @@ export default function TimeClockScreen() {
           )}
 
           {!isClocked && (
-            <MaterialCommunityIcon
+            <MobileIcon
               name="clock-outline"
               size={64}
               color={theme.colors.outline}

@@ -4,7 +4,7 @@ import ProposeMovementScreen from '@screens/ProposeMovementScreen';
 import React from 'react';
 
 import { useAuth } from '@hooks/useAuth';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import MobileIcon from '@components/ui/MobileIcon';
 import type {
   BottomTabsParamList,
   DashboardStackParamList,
@@ -250,31 +250,19 @@ export default function AppNavigator() {
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarIcon: ({ color, size }) => {
-          let iconName: string = 'home';
+          const routeKeyMap: Record<string, string> = {
+            POSTab: 'pos',
+            DashboardTab: 'dashboard',
+            InventoryTab: 'inventory',
+            TimeTab: 'time',
+            LeaveTab: 'leave',
+            SettingsTab: 'settings',
+            MoreTab: 'list',
+          };
 
-          if (route.name === 'POSTab') {
-            iconName = 'cash-register';
-          } else if (route.name === 'DashboardTab') {
-            iconName = 'home-outline';
-          } else if (route.name === 'InventoryTab') {
-            iconName = 'package-variant';
-          } else if (route.name === 'TimeTab') {
-            iconName = 'clock-outline';
-          } else if (route.name === 'LeaveTab') {
-            iconName = 'calendar-heart';
-          } else if (route.name === 'SettingsTab') {
-            iconName = 'cog-outline';
-          } else if (route.name === 'MoreTab') {
-            iconName = 'dots-horizontal-circle-outline';
-          }
+          const key = routeKeyMap[route.name] || 'default';
 
-          return (
-            <MaterialCommunityIcons
-              name={iconName as string}
-              size={size}
-              color={color}
-            />
-          );
+          return <MobileIcon iconKey={key} size={size} color={color} />;
         },
         tabBarActiveTintColor: '#3b82f6',
         tabBarInactiveTintColor: '#cbd5e1',

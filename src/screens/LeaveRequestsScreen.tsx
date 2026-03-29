@@ -19,7 +19,7 @@ import {
   Portal,
 } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MobileIcon from '@components/ui/MobileIcon';
 import { en, registerTranslation, DatePickerModal } from 'react-native-paper-dates';
 import { format, isValid, parse, differenceInDays } from 'date-fns';
 import {
@@ -194,9 +194,9 @@ export default function LeaveRequestsScreen() {
             </View>
           )}
 
-          {item.state === 'APPROVED' && item.approver?.name && (
+            {item.state === 'APPROVED' && item.approver?.name && (
             <View style={{ flexDirection: 'row', gap: SPACING.sm }}>
-              <MaterialCommunityIcon name="check-circle" size={16} color={theme.colors.primary} />
+              <MobileIcon name="check-circle" size={16} color={theme.colors.primary} />
               <Text variant="labelSmall">
                 Approved by {item.approver.name} {item.createdAt ? `on ${new Date(item.createdAt).toLocaleDateString()}` : ''}
               </Text>
@@ -205,7 +205,7 @@ export default function LeaveRequestsScreen() {
 
           {item.state === 'REJECTED' && item.notes && (
             <View style={{ flexDirection: 'row', gap: SPACING.sm }}>
-              <MaterialCommunityIcon name="close-circle" size={16} color={theme.colors.error} />
+              <MobileIcon name="close-circle" size={16} color={theme.colors.error} />
               <Text variant="labelSmall" style={{ color: theme.colors.error, flex: 1 }}>
                 {item.notes}
               </Text>

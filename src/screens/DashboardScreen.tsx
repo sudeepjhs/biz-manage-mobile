@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import { Button, Text, useTheme, Card } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MobileIcon from '@components/ui/MobileIcon';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
@@ -128,7 +128,7 @@ const StatCard: React.FC<{
                 marginBottom: SPACING.md,
               }}
             >
-              <MaterialCommunityIcon name={icon} size={32} color={colors.icon} />
+              <MobileIcon name={icon} size={32} color={colors.icon} />
             </View>
 
             {/* Title */}
@@ -198,23 +198,19 @@ const ActivityItemComponent: React.FC<{
       }}
     >
       <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: SPACING.md }}>
-        <View
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            backgroundColor: `${activity.color}15`,
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginTop: SPACING.sm,
-          }}
-        >
-          <MaterialCommunityIcon
-            name={activity.icon}
-            size={20}
-            color={activity.color}
-          />
-        </View>
+          <View
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 20,
+              backgroundColor: `${activity.color}15`,
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: SPACING.sm,
+            }}
+          >
+            <MobileIcon name={activity.icon} size={20} color={activity.color} />
+          </View>
         <View style={{ flex: 1 }}>
           <Text variant="bodyMedium" style={{ fontWeight: '600', marginBottom: SPACING.sm }}>
             {title}
@@ -378,7 +374,7 @@ export default function DashboardScreen() {
                     marginBottom: SPACING.lg,
                   }}
                 >
-                  <MaterialCommunityIcon name="star" size={32} color={theme.colors.primary} />
+                  <MobileIcon name="star" size={32} color={theme.colors.primary} />
                 </View>
                 <Text variant="titleMedium" style={{ marginTop: SPACING.md, fontWeight: '600' }}>
                   Have a productive day!
@@ -425,7 +421,7 @@ export default function DashboardScreen() {
                     }}
                   >
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACING.md }}>
-                      <MaterialCommunityIcon
+                      <MobileIcon
                         name="cash-register"
                         size={28}
                         color={theme.colors.onPrimary}
@@ -440,11 +436,7 @@ export default function DashboardScreen() {
                         Start POS
                       </Text>
                     </View>
-                    <MaterialCommunityIcon
-                      name="chevron-right"
-                      size={24}
-                      color={`${theme.colors.onPrimary}80`}
-                    />
+                    <MobileIcon name="chevron-right" size={24} color={`${theme.colors.onPrimary}80`} />
                   </View>
                 </Card>
               </Pressable>
@@ -473,11 +465,7 @@ export default function DashboardScreen() {
                         paddingHorizontal: SPACING.md,
                       }}
                     >
-                      <MaterialCommunityIcon
-                        name="package-variant"
-                        size={32}
-                        color={theme.colors.secondary}
-                      />
+                      <MobileIcon name="package-variant" size={32} color={theme.colors.secondary} />
                       <Text
                         variant="labelSmall"
                         style={{
@@ -516,11 +504,7 @@ export default function DashboardScreen() {
                         paddingHorizontal: SPACING.md,
                       }}
                     >
-                      <MaterialCommunityIcon
-                        name="clock"
-                        size={32}
-                        color={theme.colors.tertiary}
-                      />
+                      <MobileIcon name="clock" size={32} color={theme.colors.tertiary} />
                       <Text
                         variant="labelSmall"
                         style={{
@@ -573,12 +557,7 @@ export default function DashboardScreen() {
                 ))
               ) : (
                 <View style={{ padding: SPACING.lg, alignItems: 'center' }}>
-                  <MaterialCommunityIcon
-                    name="history"
-                    size={40}
-                    color={theme.colors.outlineVariant}
-                    style={{ marginBottom: SPACING.md }}
-                  />
+                  <MobileIcon name="history" size={40} color={theme.colors.outlineVariant} style={{ marginBottom: SPACING.md }} />
                   <Text
                     variant="bodyMedium"
                     style={{ color: theme.colors.onSurfaceVariant }}
@@ -615,11 +594,7 @@ export default function DashboardScreen() {
                   gap: SPACING.md,
                 }}
               >
-                <MaterialCommunityIcon
-                  name="logout"
-                  size={20}
-                  color={theme.colors.error}
-                />
+                <MobileIcon name="logout" size={20} color={theme.colors.error} />
                 <Text
                   variant="labelLarge"
                   style={{

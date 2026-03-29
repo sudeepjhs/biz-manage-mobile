@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text, Button } from 'react-native-paper';
-import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MobileIcon from './MobileIcon';
 import { SPACING, LAYOUT } from '@lib/ui-utils';
 
 interface ErrorBoundaryProps {
@@ -40,7 +40,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
     if (this.state.hasError) {
       return (
         <View style={[LAYOUT.fill, LAYOUT.centerContent]}>
-          <MaterialCommunityIcon name="alert-circle" size={60} color="#ef5350" />
+          <MobileIcon name="alert-circle" size={60} color="#ef5350" />
           <Text variant="titleLarge" style={{ marginTop: SPACING.lg, textAlign: 'center' }}>
             Oops! Something went wrong
           </Text>
