@@ -93,6 +93,13 @@ export const API_ENDPOINTS = {
     LIST: '/api/customers',
     DETAIL: (id: string) => `/api/customers/${id}`,
   },
+  NOTIFICATIONS: {
+    SEND: '/api/notifications/send',
+    HISTORY: '/api/notifications/history',
+    CONFIG: '/api/notifications/config',
+    REGISTER_DEVICE: '/api/notifications/register-device',
+    UNREGISTER_DEVICE: '/api/notifications/unregister-device',
+  },
 } as const;
 
 // API configuration

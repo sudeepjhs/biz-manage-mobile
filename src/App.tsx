@@ -13,6 +13,11 @@ import AppNavigator from '@navigation/AppNavigator';
 import { Snackbar } from 'react-native-paper';
 import { useUIStore } from '@store/uiStore';
 import { useThemeStore } from '@store/themeStore';
+import { 
+  requestUserPermission, 
+  registerDeviceWithBackend, 
+  setupNotificationListeners 
+} from '@lib/notifications';
 
 // Create React Query client
 const queryClient = new QueryClient({
@@ -42,7 +47,7 @@ const Stack = createNativeStackNavigator<RootParamList>();
 export default function App() {
   const systemColorScheme = useColorScheme();
   const { themeMode } = useThemeStore();
-  const { token, isLoading } = useAuthStore();
+  const { token, user, isLoading } = useAuthStore();
   const [appReady, setAppReady] = useState(false);
 
   // Initialize auth interceptor for 401 handling
@@ -66,6 +71,24 @@ export default function App() {
 
     initializeApp();
   }, []);
+
+  // Initialize notifications when user is logged in
+  useEffect(() => {
+    if (token && user?.id) {
+      const initNotifications = async () => {
+        const hasPermission = await requestUserPermission();
+        if (hasPermission) {
+          await registerDeviceWithBackend(user.id);
+        }
+      };
+
+      initNotifications();
+      const unsubscribe = setupNotificationListeners();
+      return () => {
+        if (unsubscribe) unsubscribe();
+      };
+    }
+  }, [token, user?.id]);
 
   if (!appReady) {
     // Show splash screen or loading indicator
