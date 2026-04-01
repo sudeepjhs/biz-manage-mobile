@@ -12,9 +12,12 @@ export interface UserProfile {
   email: string;
   phone?: string;
   role: string;
+  position?: string;
+  departmentId?: string;
   department?: string;
   avatar?: string;
   hireDate?: string;
+  status: string;
   active: boolean;
 }
 

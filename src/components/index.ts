@@ -2,6 +2,9 @@
 export { SafeHeader } from '@components/layout/SafeHeader';
 export type { SafeHeaderProps } from '@components/layout/SafeHeader';
 
+export { PageHeader } from '@components/layout/PageHeader';
+export type { PageHeaderProps } from '@components/layout/PageHeader';
+
 export { LoadingOverlay } from '@components/layout/LoadingOverlay';
 export type { LoadingOverlayProps } from '@components/layout/LoadingOverlay';
 

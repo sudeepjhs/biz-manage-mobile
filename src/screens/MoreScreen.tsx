@@ -14,6 +14,7 @@ import {
 } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MobileIcon from '@components/ui/MobileIcon';
+import { PageHeader } from '@components/index';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MoreStackParamList } from '../types/navigation-params';
@@ -78,24 +79,9 @@ export default function MoreScreen() {
 
   return (
     <View style={[LAYOUT.fill, { backgroundColor: theme.colors.background }]}>
-      <View
-        style={{
-          backgroundColor: theme.colors.primary,
-          paddingHorizontal: SPACING.lg,
-          paddingTop: insets.top + SPACING.lg,
-          paddingBottom: SPACING.lg,
-        }}
-      >
-        <Text
-          variant="headlineSmall"
-          style={{
-            color: theme.colors.onPrimary,
-            fontWeight: '700',
-          }}
-        >
-          More Features
-        </Text>
-      </View>
+      <PageHeader
+        title="More Features"
+      />
 
       <ScrollView
         contentContainerStyle={{

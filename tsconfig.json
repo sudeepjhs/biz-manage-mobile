@@ -9,27 +9,54 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "react-native",
-    "lib": ["ES2020"],
+    "lib": [
+      "ES2020"
+    ],
     "module": "ESNext",
     "moduleResolution": "bundler",
     "noEmit": true,
     "noImplicitAny": true,
     "paths": {
-      "@lib/*": ["src/lib/*"],
-      "@store/*": ["src/store/*"],
-      "@hooks/*": ["src/hooks/*"],
-      "@screens/*": ["src/screens/*"],
-      "@navigation/*": ["src/navigation/*"],
-      "@components/*": ["src/components/*"],
-      "@types/*": ["src/types/*"],
-      "@config/*": ["src/config/*"]
+      "@lib/*": [
+        "src/lib/*"
+      ],
+      "@store/*": [
+        "src/store/*"
+      ],
+      "@hooks/*": [
+        "src/hooks/*"
+      ],
+      "@screens/*": [
+        "src/screens/*"
+      ],
+      "@navigation/*": [
+        "src/navigation/*"
+      ],
+      "@components/*": [
+        "src/components/*"
+      ],
+      "@types/*": [
+        "src/types/*"
+      ],
+      "@config/*": [
+        "src/config/*"
+      ]
     },
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
     "target": "ES2020",
-    "types": ["react-native", "jest", "node"]
+    "types": [
+      "react-native",
+      "jest",
+      "node"
+    ]
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "**/*.spec.ts"]
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts"
+  ]
 }

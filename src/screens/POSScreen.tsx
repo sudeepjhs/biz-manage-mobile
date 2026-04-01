@@ -6,6 +6,7 @@ import {
   EmptyState,
   ErrorAlert,
   LoadingOverlay,
+  PageHeader,
   ProductCard,
   SearchBar,
 } from '@components/index';
@@ -151,35 +152,10 @@ export default function POSScreen() {
       style={[LAYOUT.fill, { backgroundColor: theme.colors.background }]}
     >
       {/* Enhanced Header with Stats */}
-      <View
-        style={{
-          backgroundColor: theme.colors.primary,
-          paddingTop: insets.top + SPACING.lg,
-          paddingBottom: SPACING.lg,
-          paddingHorizontal: SPACING.lg,
-        }}
+      <PageHeader
+        title="Point of Sale"
+        subtitle="Browse and add products to cart"
       >
-        <View style={{ marginBottom: SPACING.md }}>
-          <Text
-            variant="headlineSmall"
-            style={{
-              color: theme.colors.onPrimary,
-              fontWeight: '800',
-              marginBottom: SPACING.xs,
-            }}
-          >
-            Point of Sale
-          </Text>
-          <Text
-            variant="bodySmall"
-            style={{
-              color: theme.colors.onPrimaryContainer,
-            }}
-          >
-            Browse and add products to cart
-          </Text>
-        </View>
-
         {/* Quick Stats */}
         <View
           style={{
@@ -187,6 +163,7 @@ export default function POSScreen() {
             justifyContent: 'space-between',
             marginBottom: SPACING.md,
             gap: SPACING.sm,
+            marginTop: SPACING.sm,
           }}
         >
           <View
@@ -283,7 +260,7 @@ export default function POSScreen() {
           onChangeText={setSearchQuery}
           placeholder="Search products by name or SKU..."
         />
-      </View>
+      </PageHeader>
 
 
       {/* Error Alert */}

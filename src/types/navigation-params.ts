@@ -74,18 +74,27 @@ export type InventoryStackParamList = {
 // Time Stack (Nested within TimeTab)
 export type TimeStackParamList = {
   TimeClockScreen: undefined;
-  TimeEntries?: {
+  TimesheetHistory: {
     startDate?: string;
     endDate?: string;
+    employeeId?: string;
   };
 };
+
 
 // Leave Stack (Nested within LeaveTab)
 export type LeaveStackParamList = {
   LeaveRequests: undefined;
   LeaveApprovals: undefined;
   LeaveBalance: undefined;
+  LeaveHistory: {
+    startDate?: string;
+    endDate?: string;
+    status?: string;
+    employeeId?: string;
+  };
 };
+
 
 // Settings Stack (Nested within SettingsTab)
 export type SettingsStackParamList = {

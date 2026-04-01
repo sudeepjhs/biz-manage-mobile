@@ -18,6 +18,7 @@ import {
   EmptyState,
   ErrorAlert,
   LoadingOverlay,
+  PageHeader,
   SearchBar,
 } from '@components/index';
 import { useShifts } from '@hooks/useTime'; // We can use this or create a new useEmployees hook if needed.
@@ -127,29 +128,15 @@ export default function EmployeeDirectoryScreen() {
   return (
     <View style={[LAYOUT.fill, { backgroundColor: theme.colors.background }]}>
       {/* Header */}
-      <View
-        style={{
-          backgroundColor: theme.colors.primary,
-          padding: SPACING.lg,
-          paddingTop: insets.top + SPACING.lg,
-        }}
+      <PageHeader
+        title="Employee Directory"
       >
-        <Text
-          variant="headlineSmall"
-          style={{
-            color: theme.colors.onPrimary,
-            fontWeight: '700',
-            marginBottom: SPACING.md,
-          }}
-        >
-          Employee Directory
-        </Text>
         <SearchBar
           value={searchQuery}
           onChangeText={setSearchQuery}
           placeholder="Search employees..."
         />
-      </View>
+      </PageHeader>
 
       {employeesQuery.isError && (
         <ErrorAlert

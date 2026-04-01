@@ -1,9 +1,10 @@
 import {
   ConfirmDialog,
   ErrorAlert,
-  LoadingOverlay
+  LoadingOverlay,
+  PageHeader,
 } from '@components/index';
-import { useAuth, useNotificationSettings, useUserProfile } from "@hooks/index";
+import { useAuth, useUserProfile } from "@hooks/index";
 import { LAYOUT, SHADOWS, SPACING } from '@lib/ui-utils';
 import React, { useCallback, useState } from 'react';
 import {
@@ -31,25 +32,20 @@ export default function SettingsScreen() {
   const { themeMode, setThemeMode } = useThemeStore();
 
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-
   // Fetch data
   const profileQuery = useUserProfile();
-  const notificationsQuery = useNotificationSettings();
 
   // Handle refresh
   const onRefresh = useCallback(() => {
     profileQuery.refetch();
-    notificationsQuery.refetch();
-  }, [profileQuery, notificationsQuery]);
+  }, [profileQuery]);
 
   // Loading state
-  if (profileQuery.isLoading || notificationsQuery.isLoading) {
+  if (profileQuery.isLoading) {
     return <LoadingOverlay visible={true} message="Loading settings..." />;
   }
 
   const profile = profileQuery.data;
-  const notifications = notificationsQuery.data;
 
   return (
     <View style={[LAYOUT.fill, { backgroundColor: theme.colors.background }]}>
@@ -57,7 +53,7 @@ export default function SettingsScreen() {
         scrollEnabled={true}
         refreshControl={
           <RefreshControl
-            refreshing={profileQuery.isRefetching || notificationsQuery.isRefetching}
+            refreshing={profileQuery.isRefetching}
             onRefresh={onRefresh}
             colors={[theme.colors.primary]}
           />
@@ -68,35 +64,19 @@ export default function SettingsScreen() {
         }}
       >
         {/* Header */}
-        <View
-          style={{
-            backgroundColor: theme.colors.primary,
-            paddingHorizontal: SPACING.lg,
-            paddingTop: insets.top + SPACING.lg,
-            paddingBottom: SPACING.lg,
-            marginBottom: SPACING.lg,
-          }}
-        >
-          <Text
-            variant="headlineSmall"
-            style={{
-              color: theme.colors.onPrimary,
-              fontWeight: '700',
-            }}
-          >
-            Settings & Preferences
-          </Text>
-        </View>
+        <PageHeader
+          title="Settings & Preferences"
+          style={{ marginBottom: SPACING.lg }}
+        />
 
         {/* Error Alert */}
-        {(profileQuery.isError || notificationsQuery.isError) && (
+        {profileQuery.isError && (
           <ErrorAlert
             visible={true}
             message="Failed to load settings"
             style={{ marginHorizontal: SPACING.lg, marginBottom: SPACING.md }}
             onDismiss={() => {
               profileQuery.refetch();
-              notificationsQuery.refetch();
             }}
           />
         )}
@@ -160,18 +140,31 @@ export default function SettingsScreen() {
                   </View>
                 </View>
 
+                {(profile.phone || profile.position || profile.department || profile.hireDate) && (
+                  <Divider style={{ marginVertical: SPACING.md }} />
+                )}
+
                 {profile.phone && (
-                  <>
-                    <Divider style={{ marginVertical: SPACING.md }} />
-                    <Text variant="bodySmall" style={{ color: theme.colors.outline }}>
-                      Phone: {profile.phone}
-                    </Text>
-                  </>
+                  <Text variant="bodySmall" style={{ color: theme.colors.outline, marginTop: SPACING.xs }}>
+                    Phone: {profile.phone}
+                  </Text>
+                )}
+
+                {profile.position && (
+                  <Text variant="bodySmall" style={{ color: theme.colors.outline, marginTop: SPACING.xs }}>
+                    Position: {profile.position}
+                  </Text>
                 )}
 
                 {profile.department && (
-                  <Text variant="bodySmall" style={{ color: theme.colors.outline, marginTop: SPACING.sm }}>
+                  <Text variant="bodySmall" style={{ color: theme.colors.outline, marginTop: SPACING.xs }}>
                     Department: {profile.department}
+                  </Text>
+                )}
+
+                {profile.hireDate && (
+                  <Text variant="bodySmall" style={{ color: theme.colors.outline, marginTop: SPACING.xs }}>
+                    Hired on: {new Date(profile.hireDate).toLocaleDateString()}
                   </Text>
                 )}
               </Card.Content>
@@ -190,71 +183,6 @@ export default function SettingsScreen() {
           </>
         )}
 
-        {/* Notification Settings Section */}
-        <Text
-          variant="titleMedium"
-          style={{
-            fontWeight: '600',
-            marginHorizontal: SPACING.lg,
-            marginBottom: SPACING.md,
-          }}
-        >
-          Notifications
-        </Text>
-
-        <Card style={{ marginHorizontal: SPACING.lg, marginBottom: SPACING.lg, ...SHADOWS.md }}>
-          <Card.Content>
-            {[
-              {
-                label: 'Email Notifications',
-                description: 'Receive notifications via email',
-                value: notifications?.emailNotifications ?? true,
-              },
-              {
-                label: 'Push Notifications',
-                description: 'Receive app notifications',
-                value: notifications?.pushNotifications ?? true,
-              },
-              {
-                label: 'SMS Notifications',
-                description: 'Receive text messages',
-                value: notifications?.smsNotifications ?? false,
-              },
-              {
-                label: 'Leave Notifications',
-                description: 'Notifications about leave requests',
-                value: notifications?.leaveNotifications ?? true,
-              },
-              {
-                label: 'Order Notifications',
-                description: 'Notifications about sales and orders',
-                value: notifications?.orderNotifications ?? true,
-              },
-            ].map((setting, index) => (
-              <View key={index}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    paddingVertical: SPACING.md,
-                  }}
-                >
-                  <View style={{ flex: 1 }}>
-                    <Text variant="bodyMedium" style={{ fontWeight: '600', marginBottom: SPACING.sm }}>
-                      {setting.label}
-                    </Text>
-                    <Text variant="bodySmall" style={{ color: theme.colors.outline }}>
-                      {setting.description}
-                    </Text>
-                  </View>
-                  <Switch value={setting.value} onValueChange={() => { }} />
-                </View>
-                {index < 4 && <Divider />}
-              </View>
-            ))}
-          </Card.Content>
-        </Card>
 
         {/* App Settings Section */}
         <Text
@@ -286,9 +214,9 @@ export default function SettingsScreen() {
                   Use dark theme across the app
                 </Text>
               </View>
-              <Switch 
-                value={themeMode === 'dark'} 
-                onValueChange={(val) => setThemeMode(val ? 'dark' : 'light')} 
+              <Switch
+                value={themeMode === 'dark'}
+                onValueChange={(val) => setThemeMode(val ? 'dark' : 'light')}
               />
             </View>
             <Divider />
@@ -398,7 +326,7 @@ export default function SettingsScreen() {
 
       {/* Loading Overlay */}
       <LoadingOverlay
-        visible={profileQuery.isLoading || notificationsQuery.isLoading}
+        visible={profileQuery.isLoading}
         message="Loading settings..."
       />
     </View>

@@ -17,8 +17,11 @@ import {
   TextInput,
   useTheme,
   Portal,
+  Appbar,
 } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+
 import MobileIcon from '@components/ui/MobileIcon';
 import { en, registerTranslation, DatePickerModal } from 'react-native-paper-dates';
 import { format, isValid, parse, differenceInDays } from 'date-fns';
@@ -26,11 +29,13 @@ import {
   EmptyState,
   ErrorAlert,
   LoadingOverlay,
+  PageHeader,
   SafeHeader,
 } from '@components/index';
 import { useApiError } from '@hooks/useApiError';
-import { LeaveRequest, LeaveType, useLeaveRequests, useLeaveTypes, useSubmitLeaveRequest } from '@hooks/useLeave';
-import { LAYOUT, SPACING } from '@lib/ui-utils';
+import { LeaveRequest, LeaveType, useLeaveRequests, useLeaveTypes, useSubmitLeaveRequest, useLeaveBalance } from '@hooks/useLeave';
+
+import { LAYOUT, SHADOWS, SPACING } from '@lib/ui-utils';
 
 registerTranslation('en', en);
 
@@ -46,12 +51,16 @@ registerTranslation('en', en);
 export default function LeaveRequestsScreen() {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
+  const navigation = useNavigation<any>();
+
 
   // Queries
   const requestsQuery = useLeaveRequests();
+  const balanceQuery = useLeaveBalance();
   const leaveTypesQuery = useLeaveTypes();
   const submitMutation = useSubmitLeaveRequest();
   const { error, handleError, clear: clearError } = useApiError();
+
 
   // Form state
   const [dialogVisible, setDialogVisible] = useState(false);
@@ -138,76 +147,71 @@ export default function LeaveRequestsScreen() {
   }, [selectedLeaveType, startDate, endDate, reason, submitMutation, handleError]);
 
   // Status color mapping
-  const getStatusColor = (status: LeaveRequest['state']): string => {
+  const getStatusDetails = (status: LeaveRequest['state']) => {
     switch (status) {
       case 'APPROVED':
-        return theme.colors.primary;
+        return { color: (theme.colors as any).success || '#16a34a', icon: 'check-circle' };
       case 'REJECTED':
-        return theme.colors.error;
-      case 'SUBMITTED':
-        return theme.colors.tertiary;
+        return { color: theme.colors.error, icon: 'close-circle' };
       case 'PENDING':
-        return theme.colors.tertiary;
+      case 'SUBMITTED':
+        return { color: (theme.colors as any).warning || '#f59e0b', icon: 'clock-outline' };
+      case 'CANCELLED':
+        return { color: theme.colors.outline, icon: 'minus-circle' };
       default:
-        return theme.colors.onSurface;
+        return { color: theme.colors.onSurface, icon: 'help-circle' };
     }
   };
+
 
   // Render request item
   const renderRequestItem = ({ item }: { item: LeaveRequest }) => {
     const numberOfDays = Math.round(item.totalRequestedMins / (8 * 60) * 10) / 10;
+    const status = getStatusDetails(item.state);
 
     return (
-      <Card style={{ marginHorizontal: SPACING.lg, marginVertical: SPACING.sm }}>
-        <Card.Content style={{ paddingVertical: SPACING.lg, gap: SPACING.md }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <Card style={[styles.requestCard, { borderLeftColor: status.color, backgroundColor: theme.colors.surface }]}>
+        <Card.Content style={{ padding: SPACING.md }}>
+          <View style={styles.cardHeader}>
             <View style={{ flex: 1 }}>
-              <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>
+              <Text variant="titleMedium" style={{ fontWeight: '800' }}>
                 {item.type.name}
               </Text>
-              <Text variant="bodySmall" style={{ opacity: 0.7, marginTop: SPACING.xs }}>
-                {item.startDateLocal} to {item.endDateLocal}
+              <View style={styles.dateRow}>
+                <MobileIcon name="calendar-range" size={12} color={theme.colors.outline} />
+                <Text variant="bodySmall" style={[styles.dateText, { color: theme.colors.onSurfaceVariant }]}>
+                  {format(parse(item.startDateLocal, 'yyyy-MM-dd', new Date()), 'MMM d')} - {format(parse(item.endDateLocal, 'yyyy-MM-dd', new Date()), 'MMM d, yyyy')}
+                </Text>
+              </View>
+            </View>
+            <View style={[styles.statusBadge, { backgroundColor: `${status.color}15`, borderColor: status.color }]}>
+              <MobileIcon name={status.icon} size={14} color={status.color} />
+              <Text variant="labelSmall" style={{ color: status.color, fontWeight: '800', marginLeft: 4 }}>
+                {item.state}
               </Text>
             </View>
-            <Chip
-              mode="flat"
-              textStyle={{ color: theme.colors.onPrimary }}
-              style={{
-                backgroundColor: getStatusColor(item.state),
-                marginLeft: SPACING.md,
-              }}
-            >
-              {item.state}
-            </Chip>
           </View>
 
-          <Text variant="bodyMedium" style={{ opacity: 0.8 }}>
-            {numberOfDays} day{numberOfDays !== 1 ? 's' : ''}
-          </Text>
-
-          {item.reason && (
-            <View>
-              <Text variant="labelSmall" style={{ opacity: 0.6 }}>
-                Reason
-              </Text>
-              <Text variant="bodySmall">{item.reason}</Text>
+          <View style={styles.infoGrid}>
+            <View style={styles.infoItem}>
+              <Text variant="labelSmall" style={[styles.infoLabel, { color: theme.colors.onSurfaceVariant }]}>Duration</Text>
+              <Text variant="bodyMedium" style={{ fontWeight: '700', color: theme.colors.onSurface }}>{numberOfDays} days</Text>
             </View>
-          )}
+            {item.reason && (
+              <View style={[styles.infoItem, { flex: 2 }]}>
+                <Text variant="labelSmall" style={[styles.infoLabel, { color: theme.colors.onSurfaceVariant }]}>Reason</Text>
+                <Text variant="bodySmall" numberOfLines={1} style={{ color: theme.colors.onSurfaceVariant }}>{item.reason}</Text>
+              </View>
+            )}
+          </View>
 
-            {item.state === 'APPROVED' && item.approver?.name && (
-            <View style={{ flexDirection: 'row', gap: SPACING.sm }}>
-              <MobileIcon name="check-circle" size={16} color={theme.colors.primary} />
-              <Text variant="labelSmall">
-                Approved by {item.approver.name} {item.createdAt ? `on ${new Date(item.createdAt).toLocaleDateString()}` : ''}
+          {(item.state === 'APPROVED' || item.state === 'REJECTED') && (item.approver?.name || item.notes) && (
+            <View style={[styles.decisionBox, { backgroundColor: `${status.color}08` }]}>
+              <Text variant="labelSmall" style={{ color: status.color, marginBottom: 2, fontWeight: '700' }}>
+                {item.state === 'APPROVED' ? 'Approval Note' : 'Rejection Reason'}
               </Text>
-            </View>
-          )}
-
-          {item.state === 'REJECTED' && item.notes && (
-            <View style={{ flexDirection: 'row', gap: SPACING.sm }}>
-              <MobileIcon name="close-circle" size={16} color={theme.colors.error} />
-              <Text variant="labelSmall" style={{ color: theme.colors.error, flex: 1 }}>
-                {item.notes}
+              <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
+                {item.notes || `Processed by ${item.approver?.name}`}
               </Text>
             </View>
           )}
@@ -216,15 +220,21 @@ export default function LeaveRequestsScreen() {
     );
   };
 
+
   return (
     <View style={[LAYOUT.fill, { backgroundColor: theme.colors.background }]}>
       {/* Header */}
-      <SafeHeader
+      <PageHeader
         title="Leave Requests"
         subtitle="Manage your time off"
-        insets={insets}
+        rightAction={
+          <Appbar.Action
+            icon="history"
+            onPress={() => navigation.navigate('LeaveHistory')}
+            color={theme.colors.onPrimaryContainer}
+          />
+        }
       />
-
       {/* Error Alert */}
       {error && (
         <ErrorAlert
@@ -237,7 +247,35 @@ export default function LeaveRequestsScreen() {
         />
       )}
 
+      {/* My Balances Summary */}
+      {!balanceQuery.isLoading && balanceQuery.data && balanceQuery.data.length > 0 && (
+        <View style={styles.summarySection}>
+          <Text variant="labelLarge" style={styles.sectionTitle}>My Balances</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.statsContainer}
+            contentContainerStyle={{ paddingHorizontal: SPACING.lg, paddingBottom: SPACING.sm }}
+          >
+            {balanceQuery.data.map((bal) => (
+              <Card key={bal.id} style={[styles.statCard, { backgroundColor: theme.colors.surface }]}>
+                <Card.Content style={{ alignItems: 'center', padding: SPACING.sm }}>
+                  <Text variant="labelSmall" style={[styles.balName, { color: theme.colors.onSurfaceVariant }]}>{bal.type.name}</Text>
+                  <Text variant="titleLarge" style={[styles.balValue, { color: theme.colors.primary }]}>
+                    {(bal.availableMins / (8 * 60)).toFixed(1)}
+                  </Text>
+                  <Text variant="labelSmall" style={[styles.balUnit, { color: theme.colors.onSurfaceVariant }]}>days left</Text>
+                </Card.Content>
+              </Card>
+            ))}
+          </ScrollView>
+        </View>
+      )}
+
       {/* Leave Requests List */}
+      <Text variant="labelLarge" style={[styles.sectionTitle, { marginTop: SPACING.sm }]}>My Requests</Text>
+
+
       {requestsQuery.isLoading ? (
         <LoadingOverlay visible={true} message="Loading leave requests..." />
       ) : (requestsQuery.data?.length || 0) > 0 ? (
@@ -307,15 +345,15 @@ export default function LeaveRequestsScreen() {
             {/* Date Range Picker */}
             <View style={{ marginTop: SPACING.md }}>
               <Text variant="labelMedium" style={{ marginBottom: SPACING.xs }}>Date Range *</Text>
-              <Button 
-                mode="outlined" 
+              <Button
+                mode="outlined"
                 onPress={() => setOpen(true)}
                 icon="calendar"
                 style={{ borderRadius: 8 }}
                 contentStyle={{ justifyContent: 'flex-start', paddingVertical: 4 }}
               >
-                {startDate && endDate 
-                  ? `${startDate} to ${endDate}` 
+                {startDate && endDate
+                  ? `${startDate} to ${endDate}`
                   : 'Select Dates'
                 }
               </Button>
@@ -376,4 +414,81 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  summarySection: {
+    paddingVertical: SPACING.sm,
+  },
+  sectionTitle: {
+    paddingHorizontal: SPACING.lg,
+    marginBottom: SPACING.xs,
+    fontWeight: '800',
+    opacity: 0.8,
+  },
+  statsContainer: {
+    paddingVertical: SPACING.xs,
+  },
+  statCard: {
+    marginRight: SPACING.md,
+    borderRadius: 20,
+    minWidth: 100,
+    ...SHADOWS.sm,
+  },
+  balName: {
+    textAlign: 'center',
+    fontSize: 10,
+    textTransform: 'uppercase',
+  },
+  balValue: {
+    fontWeight: '900',
+    marginVertical: 2,
+  },
+  balUnit: {
+    fontSize: 9,
+  },
+  requestCard: {
+    marginHorizontal: SPACING.lg,
+    marginVertical: SPACING.xs,
+    borderRadius: 16,
+    borderLeftWidth: 4,
+    ...SHADOWS.sm,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: SPACING.sm,
+  },
+  dateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 2,
+  },
+  dateText: {
+    marginLeft: 4,
+  },
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 8,
+    borderWidth: 1,
+  },
+  infoGrid: {
+    flexDirection: 'row',
+    marginTop: SPACING.sm,
+    gap: SPACING.md,
+  },
+  infoItem: {
+    flex: 1,
+  },
+  infoLabel: {
+    fontSize: 10,
+    textTransform: 'uppercase',
+  },
+  decisionBox: {
+    marginTop: SPACING.md,
+    padding: SPACING.sm,
+    borderRadius: 8,
+  },
 });
+

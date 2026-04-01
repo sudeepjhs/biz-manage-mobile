@@ -22,6 +22,10 @@ import InventoryScreen from '@screens/InventoryScreen';
 import POSScreen from '@screens/POSScreen';
 import SettingsScreen from '@screens/SettingsScreen';
 import TimeClockScreen from '@screens/TimeClockScreen';
+import TimesheetHistoryScreen from '@screens/TimesheetHistoryScreen';
+
+
+
 
 // POS sub-screens (with strict type safety)
 import POSCheckoutScreen from '@screens/POSCheckoutScreen';
@@ -31,6 +35,9 @@ import POSReceiptScreen from '@screens/POSReceiptScreen';
 import LeaveApprovalsScreen from '@screens/LeaveApprovalsScreen';
 import LeaveBalanceScreen from '@screens/LeaveBalanceScreen';
 import LeaveRequestsScreen from '@screens/LeaveRequestsScreen';
+import LeaveHistoryScreen from '@screens/LeaveHistoryScreen';
+
+
 
 // More screens
 import AIChatScreen from '@screens/AIChatScreen';
@@ -144,6 +151,12 @@ function TimeStackNavigator() {
         component={TimeClockScreen}
         options={{ title: 'Time Clock' }}
       />
+      <TimeStack.Screen
+        name="TimesheetHistory"
+        component={TimesheetHistoryScreen}
+        options={{ title: 'Timesheet History' }}
+      />
+
     </TimeStack.Navigator>
   );
 }
@@ -174,6 +187,12 @@ function LeaveStackNavigator() {
         component={LeaveBalanceScreen}
         options={{ title: 'Leave Balance' }}
       />
+      <LeaveStack.Screen
+        name="LeaveHistory"
+        component={LeaveHistoryScreen}
+        options={{ title: 'Leave History' }}
+      />
+
     </LeaveStack.Navigator>
   );
 }

@@ -22,6 +22,7 @@ import {
   EmptyState,
   ErrorAlert,
   LoadingOverlay,
+  PageHeader,
   SearchBar,
 } from '@components/index';
 import { useSuppliers, useCustomers, useDeletePartner } from '@hooks/usePartners';
@@ -149,29 +150,13 @@ export default function PartnersScreen() {
   return (
     <View style={[LAYOUT.fill, { backgroundColor: theme.colors.background }]}>
       {/* Header */}
-      <View
-        style={{
-          backgroundColor: theme.colors.primary,
-          padding: SPACING.lg,
-          paddingTop: insets.top + SPACING.lg,
-        }}
-      >
-        <Text
-          variant="headlineSmall"
-          style={{
-            color: theme.colors.onPrimary,
-            fontWeight: '700',
-            marginBottom: SPACING.md,
-          }}
-        >
-          Partners Management
-        </Text>
+      <PageHeader title="Partners Management">
         <SearchBar
           value={searchQuery}
           onChangeText={setSearchQuery}
           placeholder={`Search ${partnerType.toLowerCase()}s...`}
         />
-      </View>
+      </PageHeader>
 
       {showTabs && (
         <View style={{ padding: SPACING.lg }}>

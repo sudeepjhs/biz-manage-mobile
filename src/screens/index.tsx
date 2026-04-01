@@ -5,6 +5,9 @@ export { default as LoginScreen } from '@screens/LoginScreen';
 export { default as POSScreen } from '@screens/POSScreen';
 export { default as SettingsScreen } from '@screens/SettingsScreen';
 export { default as TimeClockScreen } from '@screens/TimeClockScreen';
+export { default as TimesheetHistoryScreen } from '@screens/TimesheetHistoryScreen';
+
+
 
 // POS Flow Screens
 export { default as POSCheckoutScreen } from '@screens/POSCheckoutScreen';
@@ -14,6 +17,8 @@ export { default as POSReceiptScreen } from '@screens/POSReceiptScreen';
 export { default as LeaveRequestsScreen } from '@screens/LeaveRequestsScreen';
 export { default as LeaveApprovalsScreen } from '@screens/LeaveApprovalsScreen';
 export { default as LeaveBalanceScreen } from '@screens/LeaveBalanceScreen';
+export { default as LeaveHistoryScreen } from '@screens/LeaveHistoryScreen';
+
 
 // More Features Screens
 export { default as MoreScreen } from '@screens/MoreScreen';

@@ -1,4 +1,4 @@
-import { ErrorAlert, LoadingOverlay } from '@components/index';
+import { ErrorAlert, LoadingOverlay, PageHeader } from '@components/index';
 import { useAuth } from '@hooks/useAuth';
 import { useDashboardActivity, useDashboardStats } from '@hooks/useDashboard';
 import { LAYOUT, SPACING, BORDER_RADIUS, SHADOWS } from '@lib/ui-utils';
@@ -272,43 +272,15 @@ export default function DashboardScreen() {
         }}
       >
         {/* Modern Header with Gradient Effect */}
-        <View
-          style={{
-            backgroundColor: theme.colors.primary,
-            paddingTop: insets.top + SPACING.lg,
-            paddingBottom: SPACING.xl,
-            paddingHorizontal: SPACING.lg,
-            borderBottomLeftRadius: BORDER_RADIUS.xl,
-            borderBottomRightRadius: BORDER_RADIUS.xl,
-            overflow: 'hidden',
-          }}
-        >
-          <View style={{ marginBottom: SPACING.md }}>
-            <Text
-              variant="headlineSmall"
-              style={{
-                color: theme.colors.onPrimary,
-                fontWeight: '700',
-                marginBottom: SPACING.sm,
-              }}
-            >
-              Welcome, {user?.name || 'User'}!
-            </Text>
-            <Text
-              variant="bodyMedium"
-              style={{
-                color: theme.colors.onPrimary,
-                opacity: 0.9,
-              }}
-            >
-              {new Date().toLocaleDateString('en-US', {
-                weekday: 'long',
-                month: 'short',
-                day: 'numeric',
-              })}
-            </Text>
-          </View>
-        </View>
+        <PageHeader
+          title={`Welcome, ${user?.name || 'User'}!`}
+          subtitle={new Date().toLocaleDateString('en-US', {
+            weekday: 'long',
+            month: 'short',
+            day: 'numeric',
+          })}
+          roundedBottom
+        />
 
         {/* Error Alert */}
         {statsQuery.isError && (

@@ -13,6 +13,7 @@ import {
   EmptyState,
   ErrorAlert,
   LoadingOverlay,
+  PageHeader,
   SearchBar
 } from '@components/index';
 import { useAuth } from '@hooks/useAuth';
@@ -98,7 +99,7 @@ export default function InventoryScreen() {
       0
     ) || 0;
     const isLowStock = currentStock <= (item.reorderPoint || 0);
-    const stockPercentage = item.reorderPoint 
+    const stockPercentage = item.reorderPoint
       ? Math.min((currentStock / (item.reorderPoint * 2)) * 100, 100)
       : 100;
 
@@ -120,8 +121,8 @@ export default function InventoryScreen() {
             style={{
               borderRadius: 12,
               overflow: 'hidden',
-              backgroundColor: isLowStock 
-                ? theme.colors.errorContainer 
+              backgroundColor: isLowStock
+                ? theme.colors.errorContainer
                 : theme.colors.surface,
               ...SHADOWS.md,
             }}
@@ -130,9 +131,9 @@ export default function InventoryScreen() {
             <View
               style={{
                 height: 4,
-                backgroundColor: isLowStock 
-                  ? theme.colors.error 
-                  : theme.colors.success,
+                backgroundColor: isLowStock
+                  ? theme.colors.error
+                  : (theme.colors as any).success ?? '#10b981',
                 width: `${stockPercentage}%`,
               }}
             />
@@ -170,13 +171,13 @@ export default function InventoryScreen() {
                   {item.category?.name && (
                     <Chip
                       style={{
-                        height: 24,
+                        height: 32,
                         marginTop: SPACING.xs,
                       }}
-                      textStyle={{ fontSize: 11 }}
-                      label={item.category.name}
                       icon="tag"
-                    />
+                    >
+                      {item.category.name}
+                    </Chip>
                   )}
                 </View>
 
@@ -357,35 +358,10 @@ export default function InventoryScreen() {
   return (
     <View style={[LAYOUT.fill, { backgroundColor: theme.colors.background }]}>
       {/* Enhanced Header */}
-      <View
-        style={{
-          backgroundColor: theme.colors.primary,
-          paddingHorizontal: SPACING.lg,
-          paddingTop: insets.top + SPACING.lg,
-          paddingBottom: SPACING.lg,
-        }}
+      <PageHeader
+        title="Inventory"
+        subtitle="Manage products & stock levels"
       >
-        <View style={{ marginBottom: SPACING.md }}>
-          <Text
-            variant="headlineSmall"
-            style={{
-              color: theme.colors.onPrimary,
-              fontWeight: '800',
-              marginBottom: SPACING.xs,
-            }}
-          >
-            Inventory
-          </Text>
-          <Text
-            variant="bodySmall"
-            style={{
-              color: theme.colors.onPrimaryContainer,
-            }}
-          >
-            Manage products & stock levels
-          </Text>
-        </View>
-
         {/* Stats Row */}
         <View
           style={{
@@ -393,6 +369,7 @@ export default function InventoryScreen() {
             justifyContent: 'space-between',
             marginBottom: SPACING.md,
             gap: SPACING.sm,
+            marginTop: SPACING.sm,
           }}
         >
           <View
@@ -485,7 +462,7 @@ export default function InventoryScreen() {
           onChangeText={setSearchQuery}
           placeholder="Search products..."
         />
-      </View>
+      </PageHeader>
 
       {/* Error Alert */}
       {productsQuery.isError && (
@@ -519,8 +496,8 @@ export default function InventoryScreen() {
               flex: 1,
               paddingVertical: SPACING.sm,
               paddingHorizontal: SPACING.md,
-              backgroundColor: !showLowStockOnly 
-                ? theme.colors.primary 
+              backgroundColor: !showLowStockOnly
+                ? theme.colors.primary
                 : theme.colors.surfaceVariant,
               borderRadius: 8,
               alignItems: 'center',
@@ -529,8 +506,8 @@ export default function InventoryScreen() {
             <Text
               variant="labelMedium"
               style={{
-                color: !showLowStockOnly 
-                  ? theme.colors.onPrimary 
+                color: !showLowStockOnly
+                  ? theme.colors.onPrimary
                   : theme.colors.onSurfaceVariant,
                 fontWeight: '600',
               }}
@@ -545,8 +522,8 @@ export default function InventoryScreen() {
               flex: 1,
               paddingVertical: SPACING.sm,
               paddingHorizontal: SPACING.md,
-              backgroundColor: showLowStockOnly 
-                ? theme.colors.error 
+              backgroundColor: showLowStockOnly
+                ? theme.colors.error
                 : theme.colors.surfaceVariant,
               borderRadius: 8,
               alignItems: 'center',
@@ -555,8 +532,8 @@ export default function InventoryScreen() {
             <Text
               variant="labelMedium"
               style={{
-                color: showLowStockOnly 
-                  ? theme.colors.onError 
+                color: showLowStockOnly
+                  ? theme.colors.onError
                   : theme.colors.onSurfaceVariant,
                 fontWeight: '600',
               }}
@@ -580,8 +557,8 @@ export default function InventoryScreen() {
               style={{
                 paddingVertical: SPACING.xs,
                 paddingHorizontal: SPACING.sm,
-                backgroundColor: sortBy === option 
-                  ? theme.colors.tertiaryContainer 
+                backgroundColor: sortBy === option
+                  ? theme.colors.tertiaryContainer
                   : theme.colors.surfaceVariant,
                 borderRadius: 6,
               }}
@@ -589,8 +566,8 @@ export default function InventoryScreen() {
               <Text
                 variant="labelSmall"
                 style={{
-                  color: sortBy === option 
-                    ? theme.colors.onTertiaryContainer 
+                  color: sortBy === option
+                    ? theme.colors.onTertiaryContainer
                     : theme.colors.onSurfaceVariant,
                   fontWeight: '600',
                 }}

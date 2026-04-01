@@ -8,13 +8,16 @@ import {
   View,
   Pressable,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { Button, Card, Text, useTheme, IconButton } from 'react-native-paper';
+
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MobileIcon from '@components/ui/MobileIcon';
 import {
   EmptyState,
   ErrorAlert,
   LoadingOverlay,
+  PageHeader,
 } from '@components/index';
 import {
   useClockIn,
@@ -27,6 +30,8 @@ import { LAYOUT, SHADOWS, SPACING } from '@lib/ui-utils';
 export default function TimeClockScreen() {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
+  const navigation = useNavigation<any>();
+
 
   const [clockInTime, setClockInTime] = useState<string | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
@@ -313,39 +318,25 @@ export default function TimeClockScreen() {
   return (
     <View style={[LAYOUT.fill, { backgroundColor: theme.colors.background }]}>
       {/* Enhanced Header */}
-      <View
-        style={{
-          backgroundColor: theme.colors.primary,
-          paddingTop: insets.top + SPACING.lg,
-          paddingBottom: SPACING.lg,
-          paddingHorizontal: SPACING.lg,
-        }}
+      <PageHeader
+        title="Time Clock"
+        subtitle={new Date().toLocaleDateString('en-US', {
+          weekday: 'long',
+          month: 'short',
+          day: 'numeric',
+        })}
+        rightAction={
+          <Button
+            mode="contained-tonal"
+            onPress={() => navigation.navigate('TimesheetHistory' as any)}
+            icon="history"
+            style={{ borderRadius: 12 }}
+            labelStyle={{ fontWeight: '700' }}
+          >
+            History
+          </Button>
+        }
       >
-        <View style={{ marginBottom: SPACING.md }}>
-          <Text
-            variant="headlineSmall"
-            style={{
-              color: theme.colors.onPrimary,
-              fontWeight: '800',
-              marginBottom: SPACING.xs,
-            }}
-          >
-            Time Clock
-          </Text>
-          <Text
-            variant="bodySmall"
-            style={{
-              color: theme.colors.onPrimaryContainer,
-            }}
-          >
-            {new Date().toLocaleDateString('en-US', {
-              weekday: 'long',
-              month: 'short',
-              day: 'numeric',
-            })}
-          </Text>
-        </View>
-
         {/* Quick Stats */}
         {todayEntry && (
           <View
@@ -353,6 +344,7 @@ export default function TimeClockScreen() {
               flexDirection: 'row',
               justifyContent: 'space-between',
               gap: SPACING.sm,
+              marginTop: SPACING.sm,
             }}
           >
             <View
@@ -446,7 +438,7 @@ export default function TimeClockScreen() {
             </View>
           </View>
         )}
-      </View>
+      </PageHeader>
 
       {/* Error Alert */}
       {(clockStatusQuery.isError || timeEntriesQuery.isError) && (
