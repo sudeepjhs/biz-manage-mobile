@@ -231,27 +231,19 @@ pnpm android
 
 ## Features
 
-### Phase 1 (Current - MVP Core)
+### Core Implementations
 
-- ✅ Authentication (JWT login)
-- ✅ Root navigation setup
-- ✅ Theme system (Material Design 3)
-- ✅ API client integration
-- ⏳ Dashboard (pending Phase 2)
-- ⏳ POS (pending Phase 2)
-- ⏳ Inventory (pending Phase 2)
-- ⏳ Time Clock (pending Phase 2)
+- ✅ **Authentication:** JWT login integration syncing with Web API.
+- ✅ **Role-Based Access Control (RBAC):** Granular UI restrictions, role-specific navigation, and permission matrices.
+- ✅ **Employee Management:** Integrated user profiles, and employee directory.
+- ✅ **Time & Attendance:** Time clock functionality, leave request management, and robust date validation.
+- ✅ **Inventory & Operations:** Stock movement proposals and approvals.
+- ✅ **Theme System:** Consistent Violet-based design system and a synced dark mode toggle.
+- ✅ **API & Architecture:** API client integration, root navigation setup, state persistence with Zustand & React Query.
 
-### Phase 2 (Full Feature Implementation)
+### Upcoming Milestones (Optimization & Polish)
 
-- [ ] Dashboard with real data
-- [ ] POS with product search & checkout
-- [ ] Inventory management & stock movements
-- [ ] Time clock & timesheet entry
 - [ ] Biometric authentication
-
-### Phase 3 (Optimization & Polish)
-
 - [ ] Offline mode with sync queue
 - [ ] Push notifications
 - [ ] Analytics tracking
