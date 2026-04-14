@@ -4,17 +4,12 @@
  * Production: Update URL via environment variable
  */
 
-import { Platform } from 'react-native';
 
 const getBaseUrl = () => {
-  if (process.env.EXPO_PUBLIC_API_URL) return process.env.EXPO_PUBLIC_API_URL;
   if (__DEV__) {
-    // For USB Debugging on Physical Device:
-    // Option A: Use your PC's local IPv4 Address (e.g., 'http://[IP_ADDRESS]')
-    // Option B: Run `adb reverse tcp:3000 tcp:3000` in terminal and keep 'localhost'
-    return 'http://localhost:3000'; // NOTE: Change this to your PC's IP if Option B does not work
+    return 'http://localhost:3000';
   }
-  return 'https://your-production-url.com';
+  return 'https://erp.pitamberasteel.in';
 };
 
 export const API_BASE_URL = getBaseUrl();

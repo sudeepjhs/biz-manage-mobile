@@ -13,10 +13,10 @@ import AppNavigator from '@navigation/AppNavigator';
 import { Snackbar } from 'react-native-paper';
 import { useUIStore } from '@store/uiStore';
 import { useThemeStore } from '@store/themeStore';
-import { 
-  requestUserPermission, 
-  registerDeviceWithBackend, 
-  setupNotificationListeners 
+import {
+  requestUserPermission,
+  registerDeviceWithBackend,
+  setupNotificationListeners
 } from '@lib/notifications';
 
 // Create React Query client
@@ -96,10 +96,10 @@ export default function App() {
   }
 
   // Determine theme based on manual preference or system default
-  const isDark = themeMode === 'system' 
-    ? systemColorScheme === 'dark' 
+  const isDark = themeMode === 'system'
+    ? systemColorScheme === 'dark'
     : themeMode === 'dark';
-    
+
   const theme = isDark ? darkTheme : lightTheme;
 
   if (DEBUG.LOG_NAVIGATION) {
