@@ -90,6 +90,9 @@ export const API_ENDPOINTS = {
     LIST: '/api/customers',
     DETAIL: (id: string) => `/api/customers/${id}`,
   },
+  FINANCE: {
+    INVOICES: '/api/billing/invoices',
+  },
   NOTIFICATIONS: {
     SEND: '/api/notifications/send',
     HISTORY: '/api/notifications/history',

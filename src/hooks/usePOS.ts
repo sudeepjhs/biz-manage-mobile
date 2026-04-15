@@ -40,6 +40,7 @@ export interface POSCategory {
 }
 
 export interface CheckoutPayload {
+  invoiceId?: string;
   customerId?: string;
   customerName?: string;
   customerPhone?: string;
@@ -66,6 +67,13 @@ export interface SaleResponse {
   status: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface POSInvoiceOption {
+  id: string;
+  invoiceNumber: string;
+  customerName?: string;
+  totalAmount: number;
 }
 
 /**
@@ -153,6 +161,22 @@ export const useCheckout = () => {
     onError: (error: any) => {
       console.error('Checkout failed:', error);
     },
+  });
+};
+
+/**
+ * Fetch available invoices for POS linking (unlinked + recent days)
+ */
+export const useAvailableInvoicesForPos = (days = 7) => {
+  return useQuery({
+    queryKey: ['finance', 'invoices', 'available-for-pos', days],
+    queryFn: async () => {
+      const response = await apiClient.get<POSInvoiceOption[]>(
+        `${API_ENDPOINTS.FINANCE.INVOICES}?availableForPos=true&days=${days}`
+      );
+      return response.data;
+    },
+    staleTime: 60 * 1000,
   });
 };
 

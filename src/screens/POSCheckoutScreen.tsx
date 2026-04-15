@@ -12,7 +12,7 @@ import {
   Button,
   SegmentedButtons,
   TextInput,
-  ActivityIndicator,
+  Menu,
 } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 // Material icons are provided via MobileIcon wrapper when needed
@@ -24,8 +24,9 @@ import {
   CartSummary,
   ConfirmDialog,
 } from '@components/index';
+import MobileIcon from '@components/ui/MobileIcon';
 import { usePOSCart } from '@hooks/usePOSCart';
-import { useCheckout, POSProduct } from '@hooks/usePOS';
+import { useCheckout, useAvailableInvoicesForPos } from '@hooks/usePOS';
 import { useApiError } from '@hooks/useApiError';
 import { SPACING, LAYOUT } from '@lib/ui-utils';
 
@@ -62,6 +63,9 @@ export default function POSCheckoutScreen(params?: CheckoutParams) {
   const [customerEmail, setCustomerEmail] = useState<string>('');
   const [orderNotes, setOrderNotes] = useState<string>(notes || '');
   const [confirmVisible, setConfirmVisible] = useState(false);
+  const [invoiceId, setInvoiceId] = useState<string>('');
+  const [invoiceMenuVisible, setInvoiceMenuVisible] = useState(false);
+  const availableInvoicesQuery = useAvailableInvoicesForPos(7);
 
   // Calculate derived values safely
   const calculatedAmountPaid = parseFloat(amountPaid) || 0;
@@ -85,6 +89,7 @@ export default function POSCheckoutScreen(params?: CheckoutParams) {
 
       const checkoutData = {
         items: cartItems,
+        invoiceId: invoiceId || undefined,
         paymentMethod,
         amountPaid: calculatedAmountPaid,
         customerId: customerId || undefined,
@@ -109,6 +114,7 @@ export default function POSCheckoutScreen(params?: CheckoutParams) {
     customerId,
     customerEmail,
     orderNotes,
+    invoiceId,
     discount,
     checkoutMutation,
     completeCheckout,
@@ -214,6 +220,45 @@ export default function POSCheckoutScreen(params?: CheckoutParams) {
 
         {/* Customer Information */}
         <View style={{ gap: SPACING.md }}>
+          <Text variant="titleMedium">Link Existing Invoice (Optional)</Text>
+          <Menu
+            visible={invoiceMenuVisible}
+            onDismiss={() => setInvoiceMenuVisible(false)}
+            anchor={
+              <Button
+                mode="outlined"
+                onPress={() => setInvoiceMenuVisible(true)}
+                disabled={checkoutMutation.isPending || availableInvoicesQuery.isLoading}
+                contentStyle={{ justifyContent: 'space-between' }}
+              >
+                {invoiceId
+                  ? availableInvoicesQuery.data?.find((inv) => inv.id === invoiceId)?.invoiceNumber || 'Invoice selected'
+                  : 'No existing invoice'}
+              </Button>
+            }
+          >
+            <Menu.Item
+              title="No existing invoice"
+              onPress={() => {
+                setInvoiceId('');
+                setInvoiceMenuVisible(false);
+              }}
+            />
+            {(availableInvoicesQuery.data || []).map((invoice) => (
+              <Menu.Item
+                key={invoice.id}
+                title={`${invoice.invoiceNumber} - ${invoice.customerName || 'Walk-in'} - ₹${Number(invoice.totalAmount || 0).toFixed(2)}`}
+                onPress={() => {
+                  setInvoiceId(invoice.id);
+                  setInvoiceMenuVisible(false);
+                }}
+              />
+            ))}
+          </Menu>
+          <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
+            Only unlinked invoices from last 7 days shown. Use this when invoice created first, then POS sale completed later.
+          </Text>
+
           <Text variant="titleMedium">Customer Information (Optional)</Text>
           <TextInput
             label="Email"
