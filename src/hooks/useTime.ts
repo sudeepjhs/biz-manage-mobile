@@ -56,6 +56,23 @@ export interface ClockState {
   activeLeave: { id: string; state: string } | null;
 }
 
+export interface ShiftItem {
+  id: string;
+  employeeId: string;
+  startUTC: string;
+  endUTC: string;
+  state: string;
+  notes?: string;
+  employee?: {
+    id?: string;
+    name: string;
+    department?: { name: string };
+  };
+  location?: {
+    name: string;
+  };
+}
+
 /**
  * Clock in
  */
@@ -162,9 +179,68 @@ export const useShifts = () => {
   return useQuery({
     queryKey: queryKeys.time.shifts.list(),
     queryFn: async () => {
-      const response = await apiClient.get(API_ENDPOINTS.TIME.SHIFTS);
-      return response.data;
+      const response = await apiClient.get<ShiftItem[]>(API_ENDPOINTS.TIME.SHIFTS);
+      return (response.data as any)?.data ?? response.data;
     },
     staleTime: 30 * 60 * 1000, // 30 minutes
+  });
+};
+
+export const useCreateShift = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: {
+      employeeId: string;
+      date: string;
+      startTime: string;
+      endTime: string;
+      notes?: string;
+      state?: string;
+    }) => {
+      const response = await apiClient.post(API_ENDPOINTS.TIME.SHIFTS, payload);
+      return (response.data as any)?.data ?? response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.time.shifts.all });
+    },
+  });
+};
+
+export const useUpdateShift = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      id,
+      payload,
+    }: {
+      id: string;
+      payload: {
+        employeeId: string;
+        date: string;
+        startTime: string;
+        endTime: string;
+        notes?: string;
+        state?: string;
+      };
+    }) => {
+      const response = await apiClient.put(API_ENDPOINTS.TIME.SHIFT(id), payload);
+      return (response.data as any)?.data ?? response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.time.shifts.all });
+    },
+  });
+};
+
+export const useDeleteShift = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const response = await apiClient.delete(API_ENDPOINTS.TIME.SHIFT(id));
+      return (response.data as any)?.data ?? response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.time.shifts.all });
+    },
   });
 };

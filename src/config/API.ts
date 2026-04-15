@@ -48,6 +48,10 @@ export const API_ENDPOINTS = {
     APPROVE_MOVEMENT: (id: string) => `/api/inventory/movements/${id}/approve`,
     REJECT_MOVEMENT: (id: string) => `/api/inventory/movements/${id}/reject`,
     POST_MOVEMENT: (id: string) => `/api/inventory/movements/${id}/post`,
+    SHORTAGES: '/api/inventory/shortages',
+    PURCHASE_REQUESTS: '/api/inventory/purchase-requests',
+    PURCHASE_ORDERS: '/api/inventory/purchase-orders',
+    RECEIVE_PURCHASE_ORDER: (id: string) => `/api/inventory/purchase-orders/${id}/receive`,
   },
   EMPLOYEES: {
     LIST: '/api/employees',
@@ -92,6 +96,10 @@ export const API_ENDPOINTS = {
   },
   FINANCE: {
     INVOICES: '/api/billing/invoices',
+    PAYMENTS: '/api/billing/payments',
+    LEDGER: (customerId: string) => `/api/billing/ledger/${customerId}`,
+    REMINDERS: '/api/billing/reminders',
+    CUSTOMER_REMINDERS: (customerId: string) => `/api/billing/reminders/${customerId}`,
   },
   NOTIFICATIONS: {
     SEND: '/api/notifications/send',

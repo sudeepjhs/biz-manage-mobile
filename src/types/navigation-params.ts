@@ -111,6 +111,12 @@ export type MoreStackParamList = {
   EmployeeDirectory: undefined;
   AuditLogs: undefined;
   AIChat: undefined;
+  StockTypes: undefined;
+  Locations: undefined;
+  Procurement: undefined;
+  MovementQueue: undefined;
+  Billing: undefined;
+  ShiftManagement: undefined;
 };
 
 // Root Navigation Stack (Auth + App)

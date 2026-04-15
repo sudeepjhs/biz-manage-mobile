@@ -36,6 +36,17 @@ const inventory = {
     list: () => [...inventoryAll, 'movements', 'list'] as const,
     detail: (id: string) => [...inventoryAll, 'movements', id] as const,
   },
+  stockTypes: {
+    all: [...inventoryAll, 'stock-types'] as const,
+    list: () => [...inventoryAll, 'stock-types', 'list'] as const,
+    detail: (id: string) => [...inventoryAll, 'stock-types', id] as const,
+  },
+  procurement: {
+    all: [...inventoryAll, 'procurement'] as const,
+    shortages: () => [...inventoryAll, 'procurement', 'shortages'] as const,
+    purchaseRequests: () => [...inventoryAll, 'procurement', 'purchase-requests'] as const,
+    purchaseOrders: () => [...inventoryAll, 'procurement', 'purchase-orders'] as const,
+  },
 } as const;
 
 const posAll = ['pos'] as const;
@@ -122,5 +133,12 @@ export const queryKeys = {
   audit: {
     all: ['audit'] as const,
     logs: (filters?: Record<string, any>) => [...['audit'], 'logs', filters] as const,
+  },
+  finance: {
+    all: ['finance'] as const,
+    invoices: () => ['finance', 'invoices'] as const,
+    payments: () => ['finance', 'payments'] as const,
+    ledger: (customerId: string) => ['finance', 'ledger', customerId] as const,
+    reminders: (customerId: string) => ['finance', 'reminders', customerId] as const,
   },
 } as const;

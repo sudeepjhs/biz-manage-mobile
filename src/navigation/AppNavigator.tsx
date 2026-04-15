@@ -42,9 +42,15 @@ import LeaveHistoryScreen from '@screens/LeaveHistoryScreen';
 // More screens
 import AIChatScreen from '@screens/AIChatScreen';
 import AuditLogScreen from '@screens/AuditLogScreen';
+import BillingScreen from '@screens/BillingScreen';
 import EmployeeDirectoryScreen from '@screens/EmployeeDirectoryScreen';
+import LocationsScreen from '@screens/LocationsScreen';
+import MovementQueueScreen from '@screens/MovementQueueScreen';
 import MoreScreen from '@screens/MoreScreen';
 import PartnersScreen from '@screens/PartnersScreen';
+import ProcurementScreen from '@screens/ProcurementScreen';
+import ShiftManagementScreen from '@screens/ShiftManagementScreen';
+import StockTypesScreen from '@screens/StockTypesScreen';
 
 // Navigation instances
 const Tab = createBottomTabNavigator<BottomTabsParamList>();
@@ -251,6 +257,36 @@ function MoreStackNavigator() {
         component={AIChatScreen}
         options={{ title: 'AI Assistant' }}
       />
+      <MoreStack.Screen
+        name="StockTypes"
+        component={StockTypesScreen}
+        options={{ title: 'Stock Types' }}
+      />
+      <MoreStack.Screen
+        name="Locations"
+        component={LocationsScreen}
+        options={{ title: 'Locations' }}
+      />
+      <MoreStack.Screen
+        name="Procurement"
+        component={ProcurementScreen}
+        options={{ title: 'Procurement' }}
+      />
+      <MoreStack.Screen
+        name="MovementQueue"
+        component={MovementQueueScreen}
+        options={{ title: 'Movement Queue' }}
+      />
+      <MoreStack.Screen
+        name="Billing"
+        component={BillingScreen}
+        options={{ title: 'Billing' }}
+      />
+      <MoreStack.Screen
+        name="ShiftManagement"
+        component={ShiftManagementScreen}
+        options={{ title: 'Shift Management' }}
+      />
     </MoreStack.Navigator>
   );
 }
@@ -352,6 +388,9 @@ export default function AppNavigator() {
 
       {(hasPermission('CUSTOMERS', 'VIEW') ||
         hasPermission('SUPPLIERS', 'VIEW') ||
+        hasPermission('INVENTORY', 'VIEW') ||
+        hasPermission('TIME', 'MANAGE_SHIFTS') ||
+        hasPermission('FINANCE', 'VIEW') ||
         hasPermission('EMPLOYEES', 'VIEW') ||
         hasPermission('AUDIT', 'VIEW') ||
         hasPermission('AI_ASSISTANT', 'CHAT')) && (

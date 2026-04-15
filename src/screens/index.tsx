@@ -27,3 +27,9 @@ export { default as EmployeeDirectoryScreen } from '@screens/EmployeeDirectorySc
 export { default as AuditLogScreen } from '@screens/AuditLogScreen';
 export { default as AIChatScreen } from '@screens/AIChatScreen';
 export { default as ProposeMovementScreen } from '@screens/ProposeMovementScreen';
+export { default as StockTypesScreen } from '@screens/StockTypesScreen';
+export { default as LocationsScreen } from '@screens/LocationsScreen';
+export { default as ProcurementScreen } from '@screens/ProcurementScreen';
+export { default as MovementQueueScreen } from '@screens/MovementQueueScreen';
+export { default as BillingScreen } from '@screens/BillingScreen';
+export { default as ShiftManagementScreen } from '@screens/ShiftManagementScreen';
