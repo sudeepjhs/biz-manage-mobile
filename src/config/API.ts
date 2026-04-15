@@ -38,6 +38,8 @@ export const API_ENDPOINTS = {
   INVENTORY: {
     PRODUCTS: '/api/inventory/products',
     PRODUCT: (id: string) => `/api/inventory/products/${id}`,
+    STOCK_TYPES: '/api/inventory/stock-types',
+    STOCK_TYPE: (id: string) => `/api/inventory/stock-types/${id}`,
     CATEGORIES: '/api/inventory/products/categories',
     LOCATIONS: '/api/inventory/locations',
     LOCATION: (id: string) => `/api/inventory/locations/${id}`,

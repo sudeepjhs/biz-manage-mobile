@@ -9,7 +9,7 @@
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "test": "jest",
-    "build:android": "cd android && ./gradlew assembleRelease && cd ..",
+    "build:android": "cd android && gradlew assembleRelease",
     "build:ios": "cd ios && xcodebuild -workspace BizManageMobile.xcworkspace -scheme BizManageMobile -configuration Release && cd .."
   },
   "dependencies": {

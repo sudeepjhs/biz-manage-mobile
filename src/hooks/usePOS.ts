@@ -6,6 +6,14 @@ import { queryKeys } from '@lib/query-keys';
 /**
  * POS Product Types
  */
+export interface StockType {
+  id: string;
+  name: string;
+  code: string;
+  visibleInPOS?: boolean;
+  description?: string;
+}
+
 export interface POSProduct {
   id: string;
   name: string;
@@ -13,10 +21,12 @@ export interface POSProduct {
   unitPrice: number;
   totalStock: number;
   categoryId?: string;
+  stockTypeId?: string | null;
   category?: {
     id: string;
     name: string;
   };
+  stockType?: StockType | null;
   description?: string;
   status: string;
   createdAt: string;

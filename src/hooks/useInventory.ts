@@ -4,6 +4,19 @@ import { API_ENDPOINTS } from '@config/API';
 import { queryKeys } from '@lib/query-keys';
 
 /**
+ * Stock Type Interface
+ */
+export interface StockTypeM {
+  id: string;
+  name: string;
+  code: string;
+  visibleInPOS?: boolean;
+  description?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/**
  * Inventory Types
  */
 export interface InventoryProduct {
@@ -12,6 +25,7 @@ export interface InventoryProduct {
   sku: string;
   description?: string;
   categoryId?: string;
+  stockTypeId?: string | null;
   status: 'DRAFT' | 'ACTIVE' | 'DISCONTINUED' | 'ARCHIVED';
   reorderPoint?: number;
   unitPrice?: number;
@@ -21,6 +35,7 @@ export interface InventoryProduct {
     id: string;
     name: string;
   };
+  stockType?: StockTypeM | null;
   stockItems: Array<{
     id: string;
     locationId: string;
@@ -146,5 +161,21 @@ export const useProposeMovement = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.inventory.products.all });
     },
+  });
+};
+
+/**
+ * Fetch all stock types
+ */
+export const useStockTypes = () => {
+  return useQuery({
+    queryKey: ['inventory', 'stockTypes'],
+    queryFn: async () => {
+      const response = await apiClient.get<StockTypeM[]>(
+        API_ENDPOINTS.INVENTORY.STOCK_TYPES
+      );
+      return response.data;
+    },
+    staleTime: 30 * 60 * 1000, // 30 minutes (stock types rarely change)
   });
 };
